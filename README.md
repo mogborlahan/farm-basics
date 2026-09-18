@@ -11,7 +11,7 @@ This repository contains the public landing page. The full specification set (bu
 ## Live
 
 - Landing page: https://farm-basics.netlify.app
-- Portfolio: https://mogborlahan.netlify.app
+- Portfolio: https://mogbolahan.netlify.app
 
 ## Contact
 
