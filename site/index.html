@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farm Basics - One Digital Identity for Nigerian Smallholder Farms</title>
+<meta name="description" content="Farm Basics is a product blueprint for a Nigerian smallholder farm platform: one identity across land records, crop guidance, soil science, market access, and bookkeeping.">
+<meta name="author" content="Gbolahan Folarin">
+<meta property="og:title" content="Farm Basics - Product Blueprint">
+<meta property="og:description" content="One digital identity for every smallholder farm. A specification-complete blueprint for Nigerian agriculture.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://farm-basics.netlify.app">
+<link rel="icon" type="image/svg+xml" href="assets/farm-basics-logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  /* Design read: product-blueprint showcase, recruiter-first, uses the
+     project's own accessible light palette and Atkinson Hyperlegible type.
+     Accents: forest #126A3A, sage #5C9247, gold #FDBB26, irrigation #3E7C99, clay #B8471F. */
+  :root {
+    --forest: #126A3A;
+    --sage: #5C9247;
+    --gold: #FDBB26;
+    --cream: #F4F1EA;
+    --clay: #B8471F;
+    --irrigation: #3E7C99;
+    --ink-900: #1F2A22;
+    --ink-700: #3D473F;
+    --ink-500: #6B7568;
+    --ink-300: #A9AFA3;
+    --ink-150: #D8D6CB;
+    --white: #FFFFFF;
+    --radius: 14px;
+    --shadow: 0 1px 3px rgba(31,42,34,0.06), 0 10px 24px rgba(31,42,34,0.05);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Atkinson Hyperlegible", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--cream); color: var(--ink-900); line-height: 1.65;
+    -webkit-font-smoothing: antialiased; font-size: 17px;
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--forest); outline-offset: 3px; border-radius: 4px; }
+  .container { max-width: 1120px; margin: 0 auto; padding: 0 1.5rem; }
+
+  /* Portfolio bar */
+  .pbar { background: var(--ink-900); color: var(--ink-300); font-size: 0.85rem; }
+  .pbar-inner { max-width: 1120px; margin: 0 auto; padding: 0.55rem 1.5rem; display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+  .pbar a { color: var(--ink-300); text-decoration: none; }
+  .pbar a:hover { color: var(--gold); }
+  .pbar .sep { color: var(--ink-500); }
+
+  .nav { position: sticky; top: 0; z-index: 20; background: rgba(244,241,234,0.9); backdrop-filter: blur(10px); border-bottom: 1px solid var(--ink-150); }
+  .nav-inner { max-width: 1120px; margin: 0 auto; padding: 0 1.5rem; height: 66px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .brand { display: inline-flex; align-items: center; gap: 0.65rem; font-weight: 700; text-decoration: none; color: var(--forest); }
+  .brand img { width: 34px; height: 34px; }
+  .brand-name { font-size: 1.02rem; }
+  .nav-links { display: flex; align-items: center; gap: 1.4rem; list-style: none; }
+  .nav-links a { color: var(--ink-500); text-decoration: none; font-size: 0.95rem; }
+  .nav-links a:hover { color: var(--forest); }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; border-radius: 999px; font-weight: 700; font-size: 0.95rem; text-decoration: none; padding: 0.7rem 1.4rem; border: 2px solid transparent; transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease, border-color 0.18s ease; }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary { background: var(--forest); color: #FFFFFF; }
+  .btn-primary:hover { background: #0E5230; }
+  .btn-secondary { background: transparent; border-color: var(--ink-150); color: var(--ink-900); }
+  .btn-secondary:hover { border-color: var(--forest); color: var(--forest); }
+
+  .hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: clamp(2rem, 6vw, 4.5rem); align-items: center; padding: clamp(3.5rem, 9vw, 6rem) 0 clamp(3rem, 7vw, 4.5rem); }
+  .hero-kicker { color: var(--sage); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; margin-bottom: 1rem; }
+  .hero h1 { font-size: clamp(2.3rem, 5.2vw, 3.5rem); line-height: 1.08; letter-spacing: -0.02em; margin-bottom: 1.2rem; max-width: 16ch; color: var(--ink-900); }
+  .hero-sub { color: var(--ink-700); font-size: 1.12rem; max-width: 50ch; margin-bottom: 1.5rem; }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: 0.9rem; align-items: center; }
+  .badge { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.8rem; font-weight: 700; color: var(--clay); background: rgba(184,71,31,0.08); border: 1px solid rgba(184,71,31,0.28); border-radius: 999px; padding: 0.32rem 0.8rem; margin-bottom: 1.25rem; }
+  .badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--clay); }
+
+  .hero-card { background: var(--white); border: 1px solid var(--ink-150); border-radius: var(--radius); padding: 1.9rem; box-shadow: var(--shadow); text-align: center; }
+  .hero-card img { width: 120px; height: 120px; margin-bottom: 1rem; }
+  .hero-card h2 { font-size: 1.05rem; margin-bottom: 0.5rem; color: var(--forest); }
+  .hero-card p { color: var(--ink-500); font-size: 0.92rem; }
+
+  .section { padding: clamp(3rem, 7vw, 4.75rem) 0; }
+  .section-head { margin-bottom: 2.5rem; }
+  .section-head h2 { font-size: clamp(1.6rem, 3.4vw, 2.2rem); letter-spacing: -0.02em; margin-bottom: 0.7rem; color: var(--ink-900); }
+  .section-head p { color: var(--ink-700); max-width: 64ch; }
+
+  .problem-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.9rem; }
+  .problem { background: var(--white); border: 1px solid var(--ink-150); border-radius: 12px; padding: 1.1rem; }
+  .problem span { display: block; color: var(--clay); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.4rem; }
+  .problem p { font-size: 0.86rem; color: var(--ink-700); }
+
+  .domains { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+  .domains span { background: var(--white); border: 1px solid var(--ink-150); border-radius: 999px; padding: 0.5rem 1rem; font-size: 0.9rem; color: var(--ink-700); }
+  .domains span.core { border-color: var(--forest); color: var(--forest); font-weight: 700; }
+
+  .personas { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-top: 2rem; }
+  .persona { border-top: 3px solid var(--sage); padding-top: 0.9rem; }
+  .persona h3 { font-size: 1rem; margin-bottom: 0.4rem; color: var(--ink-900); }
+  .persona p { font-size: 0.86rem; color: var(--ink-500); }
+
+  /* Design system showcase */
+  .ds { background: var(--white); border: 1px solid var(--ink-150); border-radius: var(--radius); padding: clamp(1.5rem, 4vw, 2.5rem); }
+  .ds-sub { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-500); margin-bottom: 0.9rem; }
+  .swatches { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.6rem; margin-bottom: 2.25rem; }
+  .swatch { border-radius: 10px; overflow: hidden; border: 1px solid rgba(31,42,34,0.1); }
+  .swatch .fill { height: 56px; }
+  .swatch .name { font-size: 0.72rem; padding: 0.45rem 0.5rem; background: var(--cream); color: var(--ink-700); }
+  .swatch .name b { display: block; color: var(--ink-900); }
+  .type-spec h3 { font-size: clamp(1.5rem, 3vw, 2.1rem); color: var(--ink-900); margin-bottom: 0.5rem; }
+  .type-spec p { color: var(--ink-700); max-width: 60ch; }
+  .type-note { font-size: 0.82rem; color: var(--ink-500); margin-top: 0.7rem; }
+
+  .principles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; margin-top: 2.25rem; }
+  .principle { border-left: 3px solid var(--gold); padding-left: 1rem; }
+  .principle h3 { font-size: 0.98rem; margin-bottom: 0.35rem; }
+  .principle p { font-size: 0.88rem; color: var(--ink-700); }
+
+  .docs-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.1rem; }
+  .doc-card { background: var(--white); border: 1px solid var(--ink-150); border-radius: 12px; padding: 1.35rem; }
+  .doc-card .num { font-size: 1.7rem; font-weight: 700; color: var(--forest); display: block; margin-bottom: 0.35rem; }
+  .doc-card p { font-size: 0.86rem; color: var(--ink-700); }
+
+  .roadmap { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+  .phase { background: var(--white); border: 1px solid var(--ink-150); border-radius: 12px; padding: 1.25rem; }
+  .phase .pname { font-size: 0.92rem; font-weight: 700; margin-bottom: 0.35rem; }
+  .phase .pstate { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; display: inline-block; margin-bottom: 0.6rem; }
+  .phase.done { border-color: var(--sage); }
+  .phase.done .pstate { color: var(--sage); }
+  .phase.next .pstate { color: var(--irrigation); }
+  .phase.later .pstate { color: var(--ink-500); }
+  .phase p { font-size: 0.84rem; color: var(--ink-700); }
+
+  .cta { background: var(--forest); color: #FFFFFF; border-radius: var(--radius); padding: clamp(2.5rem, 6vw, 4rem) 2rem; text-align: center; }
+  .cta h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: 0.75rem; color: #FFFFFF; }
+  .cta p { color: rgba(255,255,255,0.86); max-width: 56ch; margin: 0 auto 1.85rem; }
+  .cta-actions { display: flex; flex-wrap: wrap; gap: 0.9rem; justify-content: center; }
+  .cta .btn-secondary { border-color: rgba(255,255,255,0.5); color: #FFFFFF; }
+  .cta .btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: #FFFFFF; color: #FFFFFF; }
+  .cta .btn-light { background: var(--gold); color: var(--ink-900); }
+  .cta .btn-light:hover { background: #E0A81E; }
+
+  footer { border-top: 1px solid var(--ink-150); padding: 2.25rem 1.5rem; text-align: center; color: var(--ink-500); font-size: 0.86rem; display: flex; flex-direction: column; gap: 0.4rem; }
+  footer a { color: var(--forest); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  @media (max-width: 960px) {
+    body { font-size: 16px; }
+    .hero { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .problem-grid { grid-template-columns: repeat(2, 1fr); }
+    .personas { grid-template-columns: repeat(2, 1fr); }
+    .swatches { grid-template-columns: repeat(3, 1fr); }
+    .principles { grid-template-columns: 1fr; }
+    .docs-grid { grid-template-columns: repeat(2, 1fr); }
+    .roadmap { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="pbar">
+  <div class="pbar-inner">
+    <a href="https://mogborlahan.netlify.app">Portfolio</a>
+    <span class="sep">/</span>
+    <span>Farm Basics</span>
+    <span class="sep">/</span>
+    <a href="https://linkedin.com/in/mogbolahan" target="_blank" rel="noopener">LinkedIn</a>
+    <span class="sep">/</span>
+    <a href="mailto:gbolahan.folarin@outlook.com">Request walkthrough</a>
+  </div>
+</div>
+
+<nav class="nav" aria-label="Primary">
+  <div class="nav-inner">
+    <a class="brand" href="#top" aria-label="Farm Basics">
+      <img src="assets/farm-basics-logo.svg" alt="">
+      <span class="brand-name">Farm Basics</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#platform">Platform</a></li>
+      <li><a href="#design">Design system</a></li>
+      <li><a href="#blueprint">Blueprint</a></li>
+      <li><a href="#roadmap" class="btn btn-primary">Roadmap</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main id="top">
+  <div class="container">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="hero-kicker">Product blueprint - Nigerian agriculture</p>
+        <h1>One digital identity for every smallholder farm.</h1>
+        <p class="hero-sub">
+          Farm Basics is a platform blueprint that follows a smallholder farmer through land recording, crop guidance,
+          soil science, market access, and automatic bookkeeping, so information captured once is reused everywhere.
+        </p>
+        <div class="badge"><span class="dot" aria-hidden="true"></span> Specification complete - implementation not started</div>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#platform">See the blueprint</a>
+          <a class="btn btn-secondary" href="https://linkedin.com/in/mogbolahan" target="_blank" rel="noopener">Connect on LinkedIn</a>
+        </div>
+      </div>
+
+      <aside class="hero-card">
+        <img src="assets/farm-basics-logo.svg" alt="Farm Basics logo">
+        <h2>A blueprint, not a prototype</h2>
+        <p>This project is deliberately documentation-first: a full business case, product requirements, engineering design, and accessibility-led design system, ready to hand to an implementation team.</p>
+      </aside>
+    </section>
+
+    <section class="section" id="platform">
+      <div class="section-head">
+        <h2>The problem: five disconnected systems</h2>
+        <p>Today a smallholder farmer's information lives in five places that never talk to each other. Every visit starts from zero.</p>
+      </div>
+      <div class="problem-grid">
+        <div class="problem"><span>Government</span><p>Identity drives that stop at the office door.</p></div>
+        <div class="problem"><span>NGOs</span><p>Extension visits that leave no durable record.</p></div>
+        <div class="problem"><span>Buyers</span><p>Informal produce purchases with no receipts or history.</p></div>
+        <div class="problem"><span>Input dealers</span><p>Unregulated advice on seed and chemicals.</p></div>
+        <div class="problem"><span>Community</span><p>Agronomy passed by word of mouth only.</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>One platform, thirteen domains</h2>
+        <p>Every domain shares one identity, one geography model, one trust profile, one review engine, and one audit trail.</p>
+      </div>
+      <div class="domains">
+        <span class="core">Identity</span>
+        <span>Field boundary recording</span>
+        <span>Crop lifecycle</span>
+        <span>Land history</span>
+        <span>Soil advice and labs</span>
+        <span>Pest and disease outbreaks</span>
+        <span>Knowledge bank</span>
+        <span>Certifications</span>
+        <span>Partners and vendors</span>
+        <span>Marketplace and escrow</span>
+        <span>Automatic bookkeeping</span>
+        <span>Admin and operations</span>
+        <span class="core">Audit trail</span>
+      </div>
+
+      <div class="personas">
+        <div class="persona"><h3>Farmers</h3><p>Commercial, low-literacy with agent support, and cooperatives.</p></div>
+        <div class="persona"><h3>Extension agents</h3><p>Tablet-based registration and field support.</p></div>
+        <div class="persona"><h3>Buyers</h3><p>Produce marketplace with escrow-protected settlement.</p></div>
+        <div class="persona"><h3>Vendors</h3><p>Inputs, machinery, hardware, and transport services.</p></div>
+        <div class="persona"><h3>Labs</h3><p>Accredited soil testing with GPS-enforced sampling.</p></div>
+      </div>
+    </section>
+
+    <section class="section" id="design">
+      <div class="section-head">
+        <h2>Designed for the field, not the boardroom</h2>
+        <p>The design system makes hard accessibility choices on purpose: outdoors in sunlight, on a 1GB Android device, sometimes read aloud to a farmer who does not read.</p>
+      </div>
+
+      <div class="ds">
+        <p class="ds-sub">Colour system</p>
+        <div class="swatches">
+          <div class="swatch"><div class="fill" style="background:#126A3A"></div><div class="name"><b>forest</b>#126A3A</div></div>
+          <div class="swatch"><div class="fill" style="background:#5C9247"></div><div class="name"><b>sage</b>#5C9247</div></div>
+          <div class="swatch"><div class="fill" style="background:#FDBB26"></div><div class="name"><b>gold</b>#FDBB26</div></div>
+          <div class="swatch"><div class="fill" style="background:#B8471F"></div><div class="name"><b>clay</b>#B8471F</div></div>
+          <div class="swatch"><div class="fill" style="background:#3E7C99"></div><div class="name"><b>irrigation</b>#3E7C99</div></div>
+          <div class="swatch"><div class="fill" style="background:#F4F1EA"></div><div class="name"><b>cream</b>#F4F1EA</div></div>
+          <div class="swatch"><div class="fill" style="background:#1F2A22"></div><div class="name"><b>ink 900</b>#1F2A22</div></div>
+        </div>
+
+        <p class="ds-sub">Typography</p>
+        <div class="type-spec">
+          <h3>AaBbCc 123 - Atkinson Hyperlegible</h3>
+          <p>Chosen for its differentiated letterforms, so characters that look alike to a low-vision reader remain distinguishable. Body text never drops below 15px in the farmer app.</p>
+          <p class="type-note">Primary text on the cream base measures a 13.1 to 1 contrast ratio, built for reading in direct sunlight.</p>
+        </div>
+
+        <div class="principles">
+          <div class="principle"><h3>Offline is a state, not an error</h3><p>The Android app is offline-first with a local store and a sync engine, assuming 2G and intermittent connectivity.</p></div>
+          <div class="principle"><h3>Icon and word, always</h3><p>Status is never conveyed by colour or icon alone. Every symbol is paired with a plain-language label.</p></div>
+          <div class="principle"><h3>Built for the lowest device</h3><p>A hard floor of Android 5.0 and 1GB of RAM shapes every screen and every data decision.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="blueprint">
+      <div class="section-head">
+        <h2>An unusually complete blueprint</h2>
+        <p>The documentation is the deliverable. It traces every requirement from the business case to the engineering design, and it is honest about what remains open.</p>
+      </div>
+      <div class="docs-grid">
+        <div class="doc-card"><span class="num">1</span><p>Business Requirements Document, a 1,200-line case hardened by a rewrite after a known-broken first version.</p></div>
+        <div class="doc-card"><span class="num">4</span><p>Product Requirements volumes: foundation, knowledge and risk, trade and trust, and admin operations.</p></div>
+        <div class="doc-card"><span class="num">10</span><p>Engineering documents covering architecture, schema, API, security, integrations, CI/CD, observability, and recovery.</p></div>
+        <div class="doc-card"><span class="num">2</span><p>Design systems and rendered style guides, plus operations and administration specifications.</p></div>
+      </div>
+    </section>
+
+    <section class="section" id="roadmap">
+      <div class="section-head">
+        <h2>What comes next</h2>
+        <p>Four blocking legal and operational questions are documented and tracked: escrow licensing, data erasure, authoritative geography data, and data residency. They gate launch, not design.</p>
+      </div>
+      <div class="roadmap">
+        <div class="phase done">
+          <div class="pname">Phase 0 - Specification</div>
+          <div class="pstate">Complete</div>
+          <p>Business case, product requirements, engineering design, and design system.</p>
+        </div>
+        <div class="phase next">
+          <div class="pname">Phase 1 - Foundation MVP</div>
+          <div class="pstate">Next</div>
+          <p>Identity, field boundary recording, and the crop production lifecycle.</p>
+        </div>
+        <div class="phase later">
+          <div class="pname">Phase 2 - Trust and trade</div>
+          <div class="pstate">Planned</div>
+          <p>Soil labs, outbreak alerts, certifications, and the marketplace with escrow.</p>
+        </div>
+        <div class="phase later">
+          <div class="pname">Phase 3 - Scale</div>
+          <div class="pstate">Planned</div>
+          <p>Automatic bookkeeping, analytics, and the full operations console.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="cta">
+        <h2>Read the blueprint</h2>
+        <p>The landing page is public. The full specification set (business case, product requirements, engineering design, and design system) is available on request.</p>
+        <div class="cta-actions">
+          <a class="btn btn-light" href="https://github.com/mogborlahan/farm-basics" target="_blank" rel="noopener">View on GitHub</a>
+          <a class="btn btn-secondary" href="mailto:gbolahan.folarin@outlook.com?subject=Farm%20Basics%20walkthrough">Request a walkthrough</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <span>Farm Basics - a product blueprint for Nigerian smallholder agriculture.</span>
+  <span><a href="https://mogborlahan.netlify.app">Portfolio</a> &nbsp;&middot;&nbsp; <a href="https://linkedin.com/in/mogbolahan">LinkedIn</a> &nbsp;&middot;&nbsp; <a href="mailto:gbolahan.folarin@outlook.com">gbolahan.folarin@outlook.com</a></span>
+</footer>
+
+</body>
+</html>

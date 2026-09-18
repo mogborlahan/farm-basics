@@ -1,0 +1,12 @@
+# Private planning material (not public)
+Doc/
+Archived/
+skills/
+
+# Local Netlify CLI state
+.netlify/
+site/.netlify/
+
+# OS files
+.DS_Store
+Thumbs.db
