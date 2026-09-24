@@ -1,7 +1,25 @@
-# Private planning material (not public)
+# Private planning material — never commit (per AGENTS.md)
 Doc/
 Archived/
 skills/
+
+# Private planning sidecars / session archives that may appear under Plan/ or skills/
+skills/skills-lock.json
+*.session-eval.json
+*.tar.bz2
+sessions/
+
+# Credentials & secrets — never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+secrets.*
+service-account*.json
 
 # Local Netlify CLI state
 .netlify/
