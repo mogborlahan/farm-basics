@@ -28,3 +28,11 @@ site/.netlify/
 # OS files
 .DS_Store
 Thumbs.db
+# Local-only AI governance artifacts —? must never be committed
+/PROJECT_IMPLEMENTATION_STATUS.md
+/PROJECT_IMPLEMENTATION_STATUS.html
+/PROJECT_IMPLEMENTATION_STATUS_ARCHIVE.md
+/.project-agent/
+
+# Archify generated diagrams (skill output, regenerable)
+.archify/
