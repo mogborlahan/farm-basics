@@ -1,6 +1,6 @@
 # Farm Basics — Implementation Sprint Plan
 
-**Unified System & Admin Operations Console** | Version 1.0 | Status: Draft for Review
+**Unified System & Admin Operations Console** | Version 1.0 | Status: Draft for Review — upstream sprint/phase plan; decomposed into tasks and micro-tasks by `Farm-Basics-Implementation-Sprints.md` (companion)
 
 **Scope:** A dependency-aware, implementation-ready sprint plan for the Farm Basics Nigerian smallholder farm platform, derived exclusively from the specification set in `Doc/`.
 
@@ -13,7 +13,7 @@
 
 ## 1. Executive Summary
 
-Farm Basics is a thirteen-domain platform plus a full RBAC-governed administration console: identity, field boundary recording, crop production lifecycle, land history, soil advice & test labs, pest & disease outbreak reporting, knowledge bank, certifications, partners & vendors, marketplace, and accounts — operated through one admin console with twelve roles and thirteen consoles.
+Farm Basics is an eleven-domain platform plus a full RBAC-governed administration console: identity, field boundary recording, crop production lifecycle, land history, soil advice & test labs, pest & disease outbreak reporting, knowledge bank, certifications, partners & vendors, marketplace, and accounts — operated through one admin console with thirteen roles and thirteen consoles.
 
 The BRD provides the phasing backbone but deliberately does **not** sequence delivery into work units. This plan turns BRD §4.3's four phases into a single dependency-respecting work breakdown of **~24 two-week sprints** (≈48 weeks, indicative), each ending in a potentially shippable increment and passing the corresponding acceptance criteria from BRD §18:
 
@@ -40,12 +40,12 @@ The planning inputs and their role, plus the discrepancies the plan works around
 | `Doc/02-Engineering/01-ENG-System-Architecture-Document.md` … `09-ENG-Disaster-Recovery-Runbook.md`, `06-DATA-Master-Data-and-Content-Sourcing-Strategy.md` | Architecture, schema/ERD, API, security & threat model, third-party integrations, CI/CD & environments, observability, DR runbook, master-data sourcing. | Allocated mostly to Phase 0 scaffolding and the S22–S24 hardening window; ERD is the DB-change baseline. |
 | `Doc/03-Legal/10-LEGAL-Regulatory-Compliance-and-Corporate-Strategy-Memo.md`, `11-LEGAL-Terms-of-Service-and-Privacy-Policy-DRAFT.md` | Legal/ToS scaffolding. | Gated by BRD §7 sign-offs per phase; ToS is DRAFT — finalization scheduled with the §7.6 gates. |
 | `Doc/04-QA/12-QA-Master-Test-Plan.md`, `13-QA-UAT-and-Pilot-Protocol.md`, `14-QA-Accessibility-Conformance-Plan.md` | Test strategy, UAT/pilot protocol, accessibility conformance. | Doc 12 flags three test categories (concurrency races, offline disconnects, constraint violations) as under-specified — *Requires Clarification*; concretized here in §11. |
-| `Doc/05-Design/Farm-Basics-Design-System-2.md`, `farm-basics-design-system.md`, `farm-basics-styleguide-2.html`, `farm-basics-styleguide.html` | Two experience modes (farmer app + admin console), semantic token system, concentric-arc progress system, offline-first guidance, performance budgets. | **v2 (Design System 2) is the operating standard used in every DoD below.** |
+| `Doc/05-Design/Farm-Basics-Design-System-2.md`, `farm-basics-styleguide-2.html` (v2 pair; v1 `farm-basics-design-system.md` / `farm-basics-styleguide.html` superseded) | Two experience modes (farmer app + admin console), semantic token system, concentric-arc progress system, offline-first guidance, performance budgets. | **v2 (Design System 2) is the operating standard used in every DoD below.** |
 | `Doc/Archived/` | v1-era per-domain specs (including the `unified-platform-spec.md` BRD §0.3 cites). | Cross-reference only; superseded by Part A/B. Not used as authority. |
 
 **Documentation discrepancies the plan works around (non-blocking, logged to §13):**
 
-1. **Review-category count**: UPS §2.4's prose says "ten review categories," but its own table lists **eleven** codes (`IDENTITY_NIN_MISMATCH` … `FORUM_PROMOTION`). Plan assumes the table (11 categories) is authoritative; *Requires Clarification*.
+1. **Review-category count**: UPS §2.4's prose says "ten review categories," but its own table lists **eleven** codes (`IDENTITY_NIN_MISMATCH` … `FORUM_PROMOTION`). Plan assumed the table (11 categories) is authoritative. **RESOLVED 2026-09-28** — Part A §2.4's prose was corrected to eleven and the count propagated to BRD, PRD Volume D, and 14-QA.
 2. **Stale cross-reference**: BRD v2 cites "§5.3" for the phased delivery plan in several places (§7.2, §22 sign-off note) while phasing actually lives at **§4.3** (in v1.0 phasing may have been §5.3). Plan uses §4.3.
 3. **Part A/B section glyphs**: internal cross-references render as `A§12.4` / `A§5.8` style (a mangled section glyph); all resolve to the same-section numbering used here ([§] refers to the indicated heading regardless of glyph).
 4. **Estimation vacuum**: neither BRD nor either Part spec sizes effort, staffing, or cost. All sprint durations here are indicative (*Requires Clarification*).
@@ -554,14 +554,14 @@ A sprint or phase is **Done** when *all* of the following hold (each maps to a s
 | Data | Reconciliation jobs green; drift → alert proved | UPS §2.8 | S1+, S24 |
 | Data | Seed data frozen + versioned (geo, labs, catalog, profiles, roles) | 06-DATA, UPS appendices | S24 |
 | Operations | Runbooks (deploy, incident, escrow dispute, break-glass, DR) | ENG 08/09, §12 mitigations | S24 |
-| Operations | Rotating alert-triage ownership for ALT-*/ALT-AD* | UPS §14/AOC §18 | S21+ |
+| Operations | Alert-triage ownership acknowledged for ALT-*/ALT-AD* — **solo: single named owner, no rotation** | UPS §14/AOC §18 | S21+ |
 | Legal | BRD §7.6 sign-offs signed for every phase shipped | BRD §7 | S3/S10/S16/S21 |
 | Legal | ToS + Privacy finalized (DRAFT doc reconciled) | 11-LEGAL | S21–S24 |
 | Marketplace | Escrow (or documented fallback) + dispute dual sign-off exercised | UPS §12.4, ALT-AD08 | S14/S16 |
 | QA | Doc 13 UAT/pilot sign-off; Doc 12 test-case completion ≥ agreed coverage | Docs 12/13 | S24 |
 | QA | Accessibility conformance report clean | Doc 14 | S22 |
 | Launch | §3 launch-success baseline captured at go-live | BRD §3 | S24 |
-| Launch | Go/no-go meeting with legal, engineering, finance, product | BRD §22 | S24 |
+| Launch | Go/no-go decision — **solo: documented written go/no-go against this checklist, not a multi-party meeting**; legal sign-offs (row above) still require their named signatories | BRD §22 | S24 |
 
 ## 19. Overall Implementation Roadmap
 

@@ -213,7 +213,7 @@ body{
       <div class="fb-topmeta"><span class="fb-chip forest">Phases 0-3</span><span class="fb-chip gold">24 sprints</span><span class="fb-chip sage">S1-S24</span><span class="fb-chip ink">effort TBC</span></div>
     </header>
     <main class="fb-content"><h1 id="farm-basics--implementation-sprint-plan">Farm Basics — Implementation Sprint Plan</h1>
-<p><strong>Unified System &amp; Admin Operations Console</strong> | Version 1.0 | Status: Draft for Review</p>
+<p><strong>Unified System &amp; Admin Operations Console</strong> | Version 1.0 | Status: Draft for Review — upstream sprint/phase plan; decomposed into tasks and micro-tasks by <code>Farm-Basics-Implementation-Sprints.md</code> (companion)</p>
 <p><strong>Scope:</strong> A dependency-aware, implementation-ready sprint plan for the Farm Basics Nigerian smallholder farm platform, derived exclusively from the specification set in <code>Doc/</code>.</p>
 <blockquote>
 <p><strong>Status notes</strong></p>
@@ -225,7 +225,7 @@ body{
 </blockquote>
 <hr />
 <h2 id="1-executive-summary">1. Executive Summary</h2>
-<p>Farm Basics is a thirteen-domain platform plus a full RBAC-governed administration console: identity, field boundary recording, crop production lifecycle, land history, soil advice &amp; test labs, pest &amp; disease outbreak reporting, knowledge bank, certifications, partners &amp; vendors, marketplace, and accounts — operated through one admin console with twelve roles and thirteen consoles.</p>
+<p>Farm Basics is an eleven-domain platform plus a full RBAC-governed administration console: identity, field boundary recording, crop production lifecycle, land history, soil advice &amp; test labs, pest &amp; disease outbreak reporting, knowledge bank, certifications, partners &amp; vendors, marketplace, and accounts — operated through one admin console with thirteen roles and thirteen consoles.</p>
 <p>The BRD provides the phasing backbone but deliberately does <strong>not</strong> sequence delivery into work units. This plan turns BRD §4.3's four phases into a single dependency-respecting work breakdown of <strong>~24 two-week sprints</strong> (≈48 weeks, indicative), each ending in a potentially shippable increment and passing the corresponding acceptance criteria from BRD §18:</p>
 <table>
 <thead>
@@ -317,7 +317,7 @@ body{
 <td>Doc 12 flags three test categories (concurrency races, offline disconnects, constraint violations) as under-specified — <em>Requires Clarification</em>; concretized here in §11.</td>
 </tr>
 <tr>
-<td><code>Doc/05-Design/Farm-Basics-Design-System-2.md</code>, <code>farm-basics-design-system.md</code>, <code>farm-basics-styleguide-2.html</code>, <code>farm-basics-styleguide.html</code></td>
+<td><code>Doc/05-Design/Farm-Basics-Design-System-2.md</code>, <code>farm-basics-styleguide-2.html</code> (v2 pair; v1 <code>farm-basics-design-system.md</code> / <code>farm-basics-styleguide.html</code> superseded)</td>
 <td>Two experience modes (farmer app + admin console), semantic token system, concentric-arc progress system, offline-first guidance, performance budgets.</td>
 <td><strong>v2 (Design System 2) is the operating standard used in every DoD below.</strong></td>
 </tr>
@@ -330,7 +330,7 @@ body{
 </table>
 <p><strong>Documentation discrepancies the plan works around (non-blocking, logged to §13):</strong></p>
 <ol type="1">
-<li><strong>Review-category count</strong>: UPS §2.4's prose says "ten review categories," but its own table lists <strong>eleven</strong> codes (<code>IDENTITY_NIN_MISMATCH</code> … <code>FORUM_PROMOTION</code>). Plan assumes the table (11 categories) is authoritative; <em>Requires Clarification</em>.</li>
+<li><strong>Review-category count</strong>: UPS §2.4's prose says "ten review categories," but its own table lists <strong>eleven</strong> codes (<code>IDENTITY_NIN_MISMATCH</code> … <code>FORUM_PROMOTION</code>). Plan assumed the table (11 categories) is authoritative. <strong>RESOLVED 2026-09-28</strong> — Part A §2.4's prose was corrected to eleven and the count propagated to BRD, PRD Volume D, and 14-QA.</li>
 <li><strong>Stale cross-reference</strong>: BRD v2 cites "§5.3" for the phased delivery plan in several places (§7.2, §22 sign-off note) while phasing actually lives at <strong>§4.3</strong> (in v1.0 phasing may have been §5.3). Plan uses §4.3.</li>
 <li><strong>Part A/B section glyphs</strong>: internal cross-references render as <code>A§12.4</code> / <code>A§5.8</code> style (a mangled section glyph); all resolve to the same-section numbering used here ([§] refers to the indicated heading regardless of glyph).</li>
 <li><strong>Estimation vacuum</strong>: neither BRD nor either Part spec sizes effort, staffing, or cost. All sprint durations here are indicative (<em>Requires Clarification</em>).</li>
@@ -1665,7 +1665,7 @@ body{
 </tr>
 <tr>
 <td>Operations</td>
-<td>Rotating alert-triage ownership for ALT-<em>/ALT-AD</em></td>
+<td>Alert-triage ownership acknowledged for ALT-<em>/ALT-AD</em> — <strong>solo: single named owner, no rotation</strong></td>
 <td>UPS §14/AOC §18</td>
 <td>S21+</td>
 </tr>
@@ -1707,7 +1707,7 @@ body{
 </tr>
 <tr>
 <td>Launch</td>
-<td>Go/no-go meeting with legal, engineering, finance, product</td>
+<td>Go/no-go decision — <strong>solo: documented written go/no-go against this checklist, not a multi-party meeting</strong>; legal sign-offs (row above) still require their named signatories</td>
 <td>BRD §22</td>
 <td>S24</td>
 </tr>

@@ -16,10 +16,40 @@ Requires pandoc.  Set PANDOC env var to override the default binary path.
 import argparse
 import os
 import re
+import shutil
 import subprocess
 import sys
 
-PANDOC_DEFAULT = r"C:\Users\gbola\anaconda3\Library\bin\pandoc.exe"
+def find_pandoc():
+    """Resolve the pandoc binary: $PANDOC first, then PATH, then known install roots.
+
+    Anaconda was removed from this machine on 2026-10-01, so the previous hardcoded
+    anaconda3 path no longer resolves. Order matters: an explicit $PANDOC wins so a
+    specific version can still be pinned, then PATH, then the winget install root.
+    """
+    if os.environ.get("PANDOC"):
+        return os.environ["PANDOC"]
+    found = shutil.which("pandoc")
+    if found:
+        return found
+    localappdata = os.environ.get("LOCALAPPDATA")
+    programfiles = os.environ.get("ProgramFiles") or os.environ.get("PROGRAMFILES")
+    candidates = [
+        os.path.join(localappdata, "Pandoc", "pandoc.exe") if localappdata else None,
+        os.path.join(programfiles, "Pandoc", "pandoc.exe") if programfiles else None,
+        "/usr/bin/pandoc",
+        "/usr/local/bin/pandoc",
+    ]
+    for path in candidates:
+        if path and os.path.isfile(path):
+            return path
+    raise SystemExit(
+        "pandoc not found. Install it (winget install JohnMacFarlane.Pandoc) "
+        "or set the PANDOC environment variable to its full path."
+    )
+
+
+PANDOC_DEFAULT = None
 SKILL_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CSS = os.path.join(SKILL_ROOT, "assets", "farm-basics.css")
 
@@ -126,7 +156,7 @@ def sh(cmd):
 
 
 def run_pandoc(md):
-    pandoc = os.environ.get("PANDOC", PANDOC_DEFAULT)
+    pandoc = PANDOC_DEFAULT or find_pandoc()
     out = os.path.join(SKILL_ROOT, ".fragment.html")
     sh([pandoc, md, "-f", "gfm", "-t", "html5", "--wrap=none", "-o", out])
     with open(out, encoding="utf-8") as f:

@@ -81,7 +81,13 @@ Intra-sprint, at every phase/section boundary the agent **shall** re-apply **T-2
 
 1. **Autonomous scope:** within a sprint the agent **may** proceed task-to-task without further sign-off, provided DoR holds and guardrails are applied. Re-slicing an over-10-minute micro-task into two and recording the split is mandated by `Closing notes` and **does not** require approval.
 2. **Stop-and-ask (Requires Clarification):** the agent **shall** halt and surface a decision when any of the following occurs: a gated dependency (procurement, third-party contract, stakeholder decision) is required; a `*Requires Clarification*` block is reached; the runbook conflicts with a source document; a budget, capacity, or licensing question arises; a change would alter an engineering document's decision beyond a journaled note. While halted, surrounding logic **shall** be implemented with a documented interface so work is not double-blocked.
-3. **Approved-change path:** extending this runbook (new micro-task, revised cite, gate wording) is an approved update; editing BRD/PRD/ENG/QA/Legal sources is not — those accept correction through change requests, not inline edits by the implementer.
+3. **Approved-change path:** extending this runbook (new micro-task, revised cite, gate wording) is an approved update.
+4. **Inline source correction (solo-builder mode).** This programme is self-developed and executed by a single builder; there is no second implementer to route a change request through, and no current aspiration to become one. The agent **may** therefore correct BRD/PRD/ENG/QA/Legal sources inline, provided all three hold:
+   1. The correction makes a source document agree with another source document, an already-locked decision (e.g. `Doc\02-Engineering\01A-ENG-Technology-Stack-and-Tooling-Plan.md` D-##), or an enforced test — it **shall not** introduce a new architectural, legal, or commercial decision.
+   2. The change is recorded in the Sprint-Journal (P0.8) naming the file, section, and the disagreeing source it was reconciled against.
+   3. Where the correction touches an engineering document's *decision* rather than its *consistency*, P0.7.2's stop-and-ask still applies — that remains Requires Clarification.
+
+   Corrections that satisfy 1–3 are routine work, not change requests. Anything failing condition 1 is a new decision, not a fix, and routes to P0.7.2.
 
 ### P0.8 — Resumption protocol & Sprint-Journal
 

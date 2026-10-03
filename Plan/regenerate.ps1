@@ -2,7 +2,31 @@
 # Uses Plan\tools\build_page.py (pandoc + shared CSS at Plan\assets\farm-basics.css).
 
 $ErrorActionPreference = "Stop"
-$py = "C:\Users\gbola\anaconda3\python.exe"
+
+# Resolve Python at run time. Anaconda was removed from this machine on 2026-10-01,
+# so the previously hardcoded anaconda3 path no longer exists. build_page.py needs
+# only the standard library, so any CPython 3.8+ works.
+$py = $null
+$pyCandidates = @(
+  (Join-Path $env:LOCALAPPDATA "Python\pythoncore-3.14-64\python.exe"),
+  (Join-Path $env:LOCALAPPDATA "Programs\Python\Python313\python.exe")
+)
+$onPath = Get-Command python.exe -ErrorAction SilentlyContinue
+if ($onPath) { $pyCandidates += $onPath.Source }
+foreach ($c in $pyCandidates) {
+  if ($c -and (Test-Path -LiteralPath $c)) { $py = $c; break }
+}
+if (-not $py) {
+  throw "python.exe not found. Install CPython 3.8+ or set the PANDOC/python path in Plan\regenerate.ps1."
+}
+
+# build_page.py resolves pandoc itself ($PANDOC, then PATH, then the winget install
+# root); pandoc is not on PATH until a new shell is opened after installation.
+if (-not $env:PANDOC) {
+  $pandocRoot = Join-Path $env:LOCALAPPDATA "Pandoc\pandoc.exe"
+  if (Test-Path -LiteralPath $pandocRoot) { $env:PANDOC = $pandocRoot }
+}
+
 $builder = Join-Path $PSScriptRoot "tools\build_page.py"
 $here = $PSScriptRoot
 
