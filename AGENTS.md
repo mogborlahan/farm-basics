@@ -9,9 +9,9 @@ Farm Basics is a product blueprint (specification set + implementation plan) and
 | Rebuild plan HTML from Markdown | `powershell -NoProfile -ExecutionPolicy Bypass -File Plan/regenerate.ps1` — needs `pandoc` on `PATH` or `$env:PANDOC` set; uses `Plan/tools/build_page.py` + `Plan/assets/farm-basics.css` |
 | Landing page | static, no build step (`site/`) |
 | Commit spec changes | `git -C Doc add -A; git -C Doc commit` — and likewise for `Archived/`. Two independent local-only repos, no remotes; see Conventions |
-| Archive specs offsite | `powershell -NoProfile -ExecutionPolicy Bypass -File Plan/tools/archive-specs.ps1` — encrypted `git bundle` archives |
+| Archive specs offsite | `powershell -NoProfile -ExecutionPolicy Bypass -File Plan/tools/archive-specs.ps1` — verifies and encrypts `git bundle` archives of all three local-only repos with `age`; needs the identity at `%LOCALAPPDATA%\Farm-Basics\archive-identity.txt` (see Conventions) |
 | Tests/lint/build | none yet — apps not scaffolded; see Doc 01A §11 execution plan |
-| Environment | Windows host, Windows PowerShell 5.1 only (`pwsh`/PowerShell 7 is **not** installed); `Plan/regenerate.ps1` resolves Python at run time (Anaconda was removed 2026-10-01, so no anaconda path is assumed); `pandoc` installed to `%LOCALAPPDATA%\Pandoc` via winget and is off `PATH` until a new shell opens |
+| Environment | Windows host, Windows PowerShell 5.1 only (`pwsh`/PowerShell 7 is **not** installed); `Plan/regenerate.ps1` resolves Python at run time (Anaconda was removed 2026-10-01, so no anaconda path is assumed); `pandoc` (installed to `%LOCALAPPDATA%\Pandoc`) and `age` (winget `FiloSottile.age`) are both off `PATH` until a new shell opens — `archive-specs.ps1` resolves `age` itself as a fallback |
 
 ## Project structure
 
