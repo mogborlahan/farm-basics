@@ -1,6 +1,7 @@
 <#
 .SYNOPSIS
-    Creates encrypted, verifiable archives of the local-only Doc/ and Archived/ Git repositories.
+    Creates encrypted, verifiable archives of the local-only Doc/, Archived/ and
+    Plan/sessions/ Git repositories.
 
 .DESCRIPTION
     Farm Basics keeps its specification set in local-only Git repositories with no
@@ -12,24 +13,36 @@
       1. Refuses to run if a remote is configured (guards against accidental publish).
       2. Refuses to run if the working tree is dirty (an archive of uncommitted work
          is not recoverable, which defeats the purpose).
-      3. Creates a full git bundle of every ref.
-      4. Verifies the bundle with 'git bundle verify'.
-      5. Encrypts the bundle (age passphrase if available, else 7-Zip AES-256).
-      6. Prints the SHA-256 of the encrypted artefact so it can be checked after restore.
+      3. Writes a full git bundle of every ref, using a native redirect so the
+         binary payload is never passed through PowerShell text handling.
+      4. Verifies the bundle with 'git bundle verify' before encrypting.
+      5. Encrypts it with age, using an X25519 keypair rather than a passphrase.
+      6. Deletes the plaintext bundle and prints the SHA-256 of the ciphertext.
 
-    The passphrase is never written to disk by this script and is not accepted as a
-    parameter, so it cannot leak through shell history or this file. Supply it via
-    the FB_ARCHIVE_PASSWORD environment variable or the interactive prompt.
+    Why a keypair and not a passphrase: age's '-p' reads the passphrase from an
+    interactive console only. Piping it on stdin does not work - age blocks
+    indefinitely - and age 1.3.2 has no '--passphrase-file' flag. An identity file
+    is therefore the only non-interactive option age offers, and it is also the
+    better design: the public key can be recorded and shared, while only the holder
+    of the private key can decrypt.
+
+    The plaintext bundle exists only briefly. It is written to a directory whose
+    ACL is stripped down to the current user and SYSTEM, and removed in a finally
+    block. It is a complete restorable copy of the specification set, so leaving
+    it behind would defeat the encryption.
 
 .PARAMETER Destination
     Directory to write encrypted archives into. Defaults to
     %USERPROFILE%\Farm-Basics-Archives. Copy the result to removable or offsite
     media; this script does not move it for you.
 
+.PARAMETER IdentityFile
+    Path to the age identity file holding the secret key. Defaults to
+    %LOCALAPPDATA%\Farm-Basics\archive-identity.txt. If it does not exist the
+    script prints the exact age-keygen command to create it and exits.
+
 .PARAMETER KeepPlaintextBundle
-    Retain the unencrypted .bundle after encryption. Off by default. A plaintext
-    bundle is a complete, restorable copy of the specification set, so leaving it
-    next to the ciphertext largely defeats the encryption.
+    Retain the unencrypted .bundle. Off by default, for the reason above.
 
 .EXAMPLE
     powershell -NoProfile -ExecutionPolicy Bypass -File Plan/tools/archive-specs.ps1
@@ -45,14 +58,15 @@
 
 [CmdletBinding()]
 param(
-    [string] $Destination = (Join-Path $env:USERPROFILE 'Farm-Basics-Archives'),
+    [string] $Destination      = (Join-Path $env:USERPROFILE 'Farm-Basics-Archives'),
+    [string] $IdentityFile     = (Join-Path $env:LOCALAPPDATA 'Farm-Basics\archive-identity.txt'),
     [switch] $KeepPlaintextBundle
 )
 
 Set-StrictMode -Version 2.0
 $ErrorActionPreference = 'Stop'
 
-$script:RepoRoot  = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+$script:RepoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 
 # The local-only repositories, each gitignored by the public repo above it.
 # 'Path' is relative to the repo root; 'Label' is the filename-safe stem.
@@ -75,14 +89,67 @@ function Get-EnvSafe {
     return $null
 }
 
+# Several git subcommands report success on stderr - 'git bundle verify' prints
+# "<path> is okay" there and exits 0. With $ErrorActionPreference = 'Stop' that
+# stderr line becomes a terminating NativeCommandError, so a successful command
+# looks like a failure. Every native call therefore goes through here, which
+# captures both streams and judges success by exit code alone.
+function Invoke-Native {
+    param([string] $FilePath, [string[]] $Arguments)
+
+    $previous = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $output = & $FilePath @Arguments 2>&1
+        $code   = $LASTEXITCODE
+    }
+    finally { $ErrorActionPreference = $previous }
+
+    return [pscustomobject]@{
+        Output   = @($output | ForEach-Object { "$_" })
+        ExitCode = $code
+    }
+}
+
+function Resolve-AgeTool {
+    param([string] $ExeName)
+
+    $onPath = Get-Command $ExeName -ErrorAction SilentlyContinue
+    if ($onPath) { return $onPath.Source }
+
+    # winget installs portable packages into a versioned directory and relies on the
+    # persisted user PATH, which is not visible until a new shell starts.
+    $packages = Get-EnvSafe 'LOCALAPPDATA'
+    if ($packages) {
+        $hit = Get-ChildItem (Join-Path $packages 'Microsoft\WinGet\Packages') `
+                            -Filter $ExeName -Recurse -ErrorAction SilentlyContinue |
+                            Select-Object -First 1
+        if ($hit) { return $hit.FullName }
+    }
+    return $null
+}
+
+# Creates a directory that only the current user and SYSTEM can read. Used for the
+# transient plaintext bundle.
+function New-LockedDirectory {
+    param([string] $Path)
+
+    New-Item -ItemType Directory -Path $Path -Force | Out-Null
+
+    $user = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+    & icacls.exe $Path /inheritance:r /grant:r "${user}:(OI)(CI)F" 'SYSTEM:(OI)(CI)F' | Out-Null
+
+    return $Path
+}
+
 function Assert-RepoIsLocalOnly {
     param([string] $RepoPath, [string] $Label)
 
-    $remotes = @(git -C $RepoPath remote)
-    if ($LASTEXITCODE -ne 0) { throw "Not a Git repository: $RepoPath" }
-    if ($remotes.Count -gt 0) {
+    $r = Invoke-Native 'git' @('-C', $RepoPath, 'remote')
+    if ($r.ExitCode -ne 0) { throw "Not a Git repository: $RepoPath" }
+    if ($r.Output.Count -gt 0) {
         throw ("{0} has a remote configured ({1}). This script only archives local-only " +
-               "repositories. Remove the remote first." -f $Label, ($remotes -join ', '))
+               "repositories. Remove the remote first." -f $Label, ($r.Output -join ', '))
     }
     Write-Ok "$Label has no remote configured (local-only)"
 }
@@ -90,10 +157,11 @@ function Assert-RepoIsLocalOnly {
 function Assert-RepoIsClean {
     param([string] $RepoPath, [string] $Label)
 
-    $dirty = @(git -C $RepoPath status --porcelain)
-    if ($dirty.Count -gt 0) {
+    $r = Invoke-Native 'git' @('-C', $RepoPath, 'status', '--porcelain')
+    if ($r.ExitCode -ne 0) { throw "git status failed in $Label" }
+    if ($r.Output.Count -gt 0) {
         throw ("{0} has {1} uncommitted change(s). Commit them before archiving, otherwise " +
-               "they are absent from the bundle and would be lost." -f $Label, $dirty.Count)
+               "they are absent from the bundle and would be lost." -f $Label, $r.Output.Count)
     }
     Write-Ok "$Label working tree is clean"
 }
@@ -101,110 +169,101 @@ function Assert-RepoIsClean {
 function New-BundleFor {
     param([string] $RepoPath, [string] $Label, [string] $BundlePath)
 
-    # --all captures every ref under refs/, including branches and tags.
-    git -C $RepoPath bundle create $BundlePath --all 2>&1 | Out-Null
-    if ($LASTEXITCODE -ne 0) { throw "git bundle create failed for $Label" }
+    # 'git bundle create -' writes the bundle to stdout. The redirect is performed by
+    # cmd.exe rather than PowerShell, because piping binary through the PowerShell
+    # pipeline would decode and re-encode it.
+    $cmdLine = 'git -C "{0}" bundle create - --all > "{1}"' -f $RepoPath, $BundlePath
+    $create  = Invoke-Native 'cmd.exe' @('/c', $cmdLine)
+    if ($create.ExitCode -ne 0) {
+        throw "git bundle create failed for ${Label}: $($create.Output -join ' ')"
+    }
+    if (-not (Test-Path $BundlePath)) { throw "git bundle produced no file for $Label" }
 
-    $verify = git -C $RepoPath bundle verify $BundlePath 2>&1
-    if ($LASTEXITCODE -ne 0) {
-        throw ("git bundle verify failed for {0}: {1}" -f $Label, ($verify -join ' '))
+    $verify = Invoke-Native 'git' @('-C', $RepoPath, 'bundle', 'verify', $BundlePath)
+    if ($verify.ExitCode -ne 0) {
+        throw ("git bundle verify failed for {0}: {1}" -f $Label, ($verify.Output -join ' '))
     }
 
-    $commits = git -C $RepoPath rev-list --all --count
+    # @() is required: a pipeline returning a single match yields a scalar, and a
+    # scalar has no .Count property under Set-StrictMode.
+    $complete = @($verify.Output | Where-Object { $_ -match 'complete history' }).Count -gt 0
+    if (-not $complete) {
+        throw ("{0}: bundle did not report a complete history, so it would not be a " +
+               "faithful archive. Refusing to record it." -f $Label)
+    }
+
+    $commits = (Invoke-Native 'git' @('-C', $RepoPath, 'rev-list', '--all', '--count')).Output -join ''
     $sizeMb  = [math]::Round((Get-Item $BundlePath).Length / 1MB, 2)
-    Write-Ok ("{0} bundle verified: {1} commit(s), {2} MB" -f $Label, $commits, $sizeMb)
+    Write-Ok ("{0} bundle verified, complete history: {1} commit(s), {2} MB" -f $Label, $commits, $sizeMb)
 }
 
-function Get-Encryptor {
-    $age  = Get-Command 'age' -ErrorAction SilentlyContinue
-    $pf   = Get-EnvSafe 'ProgramFiles'
-    $pf86 = Get-EnvSafe 'ProgramFiles(x86)'
-    $candidates = @(, $pf, , $pf86) | Where-Object { $_ } | ForEach-Object { Join-Path $_ '7-Zip\7z.exe' }
-    $sevenZip = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+function Assert-NotRepositoryRoot {
+    param([string] $Path, [string] $Label)
 
-    if ($age)      { return @{ Name = 'age'; Path = $age.Source; Strength = 'age (X25519/scrypt passphrase)' } }
-    if ($sevenZip) { return @{ Name = '7zip'; Path = $sevenZip; Strength = '7-Zip AES-256' } }
-    return $null
-}
-
-function Invoke-Encrypt {
-    param([hashtable] $Encryptor, [string] $PlainPath, [string] $CipherPath, [string] $Passphrase)
-
-    switch ($Encryptor.Name) {
-
-        'age' {
-            # Passphrase goes in on stdin, so it never appears in the process list.
-            $psi = New-Object System.Diagnostics.ProcessStartInfo
-            $psi.FileName               = $Encryptor.Path
-            $psi.Arguments              = '-p -o "{0}" "{1}"' -f $CipherPath, $PlainPath
-            $psi.UseShellExecute        = $false
-            $psi.RedirectStandardInput  = $true
-            $psi.RedirectStandardError   = $true
-
-            $proc = [System.Diagnostics.Process]::Start($psi)
-            $proc.StandardInput.WriteLine($Passphrase)
-            $proc.StandardInput.Close()
-            $err = $proc.StandardError.ReadToEnd()
-            $proc.WaitForExit()
-            if ($proc.ExitCode -ne 0) { throw "age failed: $err" }
-        }
-
-        '7zip' {
-            # 7-Zip takes the passphrase only as a command-line argument, so it is
-            # briefly visible in the process list. That is a real weakness of this
-            # backend and the reason age is preferred when both are installed.
-            $proc = Start-Process -FilePath $Encryptor.Path `
-                                  -ArgumentList @('a', '-t7z', '-mhe=on', '-mx=9', "-p$Passphrase", "`"$CipherPath`"", "`"$PlainPath`"") `
-                                  -NoNewWindow -Wait -PassThru
-            if ($proc.ExitCode -ne 0) { throw "7-Zip failed with exit code $($proc.ExitCode)" }
-        }
+    # 'git bundle create' run at a repository root refuses a destination inside that
+    # same repository, because git would treat the bundle as an object to pack.
+    $root = (Invoke-Native 'git' @('-C', $Path, 'rev-parse', '--show-toplevel')).Output -join ''
+    if ($root -and $Path.StartsWith($root, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw ("{0} lives inside the repository at {1}, whose bundles must be written " +
+               "outside it. Choose another location." -f $Label, $root)
     }
-}
-
-function Get-Passphrase {
-    $fromEnv = Get-EnvSafe 'FB_ARCHIVE_PASSWORD'
-    if ($fromEnv) { return $fromEnv }
-
-    if (-not [Environment]::UserInteractive) {
-        throw 'No passphrase available. Set FB_ARCHIVE_PASSWORD in a non-interactive session.'
-    }
-
-    $secure = Read-Host 'Passphrase for the spec archives' -AsSecureString
-    $bstr   = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure)
-    try   { return [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr) }
-    finally { [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr) }
 }
 
 # ---------------------------------------------------------------------------
 
+$scratch = $null
 try {
     Write-Step 'Farm Basics - encrypted spec archive'
 
+    # ---- toolchain -------------------------------------------------------
+    $ageExe    = Resolve-AgeTool 'age.exe'
+    $keygenExe = Resolve-AgeTool 'age-keygen.exe'
+    if (-not $ageExe -or -not $keygenExe) {
+        # Note: 'throw (' would be parsed as invoking a function named throw, so the
+        # message is assembled in a variable instead of inline.
+        $msg = 'age not found. Install it with:  winget install --id FiloSottile.age -e' +
+               ' then open a new shell.'
+        throw $msg
+    }
+    $ageVersion = (Invoke-Native $ageExe @('--version')).Output -join ' '
+    Write-Ok "age $ageVersion"
+
+    # ---- identity --------------------------------------------------------
+    if (-not (Test-Path $IdentityFile)) {
+        $dir = Split-Path -Parent $IdentityFile
+        New-LockedDirectory -Path $dir | Out-Null
+        $msg = "No age identity file at $IdentityFile. Create one with:" + "`n" +
+               ('  age-keygen -o "' + $IdentityFile + '"') + "`n" +
+               'age-keygen prints the public key and writes the secret key to that file.' + "`n" +
+               'Record the public key in your password manager alongside the archives, and keep ' +
+               'a copy of the secret key somewhere separate. Without it the archives cannot be ' +
+               'decrypted.'
+        throw $msg
+    }
+
+    $publicKey = ((Invoke-Native $keygenExe @('-y', $IdentityFile)).Output | Select-Object -First 1)
+    if ($LASTEXITCODE -ne 0 -or -not $publicKey) { throw "Could not read a public key from $IdentityFile" }
+    Write-Ok "recipient $publicKey"
+
+    # ---- destination -----------------------------------------------------
     if (-not (Test-Path $Destination)) {
         New-Item -ItemType Directory -Path $Destination -Force | Out-Null
         Write-Ok "created destination $Destination"
     }
 
-    # Never write archives inside the repository they archive.
     $destFull = (Resolve-Path $Destination).Path
     if ($destFull.StartsWith($script:RepoRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
         throw "Destination is inside the repository ($script:RepoRoot). Choose a location outside it."
     }
 
-    $encryptor = Get-Encryptor
-    if (-not $encryptor) {
-        throw 'No encryptor found. Install age (https://github.com/FiloSottile/age) or 7-Zip, then retry.'
-    }
-    Write-Ok "encryptor: $($encryptor.Name) - $($encryptor.Strength)"
+    $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+    $scratch = New-LockedDirectory -Path (Join-Path ([System.IO.Path]::GetTempPath()) "fb-archive-$stamp")
 
-    $stamp     = Get-Date -Format 'yyyyMMdd-HHmmss'
-    $passphrase = Get-Passphrase
-    if ([string]::IsNullOrWhiteSpace($passphrase)) { throw 'Empty passphrase; refusing to write an unencrypted archive under an encrypted name.' }
-
+    # ---- archive ---------------------------------------------------------
     $results = @()
     foreach ($target in $script:ArchiveOf) {
 
-        $name    = $target.Label
+        $name     = $target.Label
         $repoPath = Join-Path $script:RepoRoot $target.Path
         if (-not (Test-Path (Join-Path $repoPath '.git'))) {
             throw "'$($target.Path)' is not a Git repository at $repoPath"
@@ -213,29 +272,34 @@ try {
         Write-Step "Archiving $name"
         Assert-RepoIsLocalOnly -RepoPath $repoPath -Label $name
         Assert-RepoIsClean    -RepoPath $repoPath -Label $name
+        Assert-NotRepositoryRoot -Path $repoPath -Label $name
 
-        $plain = Join-Path $env:TEMP "farm-basics-$name-$stamp.bundle"
-        $cipher = Join-Path $destFull "farm-basics-$name-$stamp.bundle.$($encryptor.Name).enc"
+        $plain  = Join-Path $scratch "$name.bundle"
+        $cipher = Join-Path $destFull "farm-basics-$name-$stamp.bundle.age"
 
         try {
             New-BundleFor -RepoPath $repoPath -Label $name -BundlePath $plain
-            Invoke-Encrypt -Encryptor $encryptor -PlainPath $plain -CipherPath $cipher -Passphrase $passphrase
+
+            $enc = Invoke-Native $ageExe @('-r', $publicKey, '-o', $cipher, $plain)
+            if ($enc.ExitCode -ne 0 -or -not (Test-Path $cipher)) {
+                throw "age encryption failed for ${name}: $($enc.Output -join ' ')"
+            }
 
             $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $cipher).Hash
-            $size = [math]::Round((Get-Item $cipher).Length / 1MB, 2)
-
-            Write-Ok ("encrypted -> {0} ({1} MB)" -f $cipher, $size)
+            Write-Ok ("encrypted -> {0} ({1} MB)" -f $cipher, [math]::Round((Get-Item $cipher).Length / 1MB, 2))
             Write-Ok "SHA-256 $hash"
 
             $results += [pscustomobject]@{
-                Repo     = $name
-                File     = $cipher
-                Bytes    = (Get-Item $cipher).Length
-                Sha256   = $hash
-                Commits  = (git -C $repoPath rev-list --all --count)
+                Repo       = $name
+                File       = $cipher
+                Bytes      = (Get-Item $cipher).Length
+                Sha256     = $hash
+                Recipient  = $publicKey
+                Commits    = (Invoke-Native 'git' @('-C', $repoPath, 'rev-list', '--all', '--count')).Output -join ''
             }
         }
         finally {
+            # The plaintext bundle is a complete restorable copy of the documents.
             if (Test-Path $plain) {
                 if ($KeepPlaintextBundle) {
                     Move-Item -LiteralPath $plain -Destination (Join-Path $destFull "farm-basics-$name-$stamp.bundle") -Force
@@ -247,7 +311,7 @@ try {
         }
     }
 
-    # Write the manifest unencrypted: it holds only paths, sizes and digests.
+    # ---- manifest --------------------------------------------------------
     $manifest = Join-Path $destFull "farm-basics-archive-$stamp.manifest.csv"
     $results | Export-Csv -Path $manifest -NoTypeInformation -Encoding UTF8
     Write-Ok "manifest -> $manifest"
@@ -255,11 +319,15 @@ try {
     Write-Step 'Done'
     Write-Host "  Encrypted archives are in: $destFull"
     Write-Host '  Copy them to removable or offsite media. This script does not move them for you.'
-    Write-Host '  Verify after restore with the SHA-256 values in the manifest.'
-    Write-Host '  Restore with:  git clone <bundle> <target>   (a bundle is a valid git remote source)'
+    Write-Host '  To restore, decrypt with the age identity, then clone from the bundle:'
+    Write-Host '      age -d -i <identity> -o doc.bundle farm-basics-doc-<stamp>.bundle.age'
+    Write-Host '      git clone doc.bundle <target>'
+    Write-Host '  Verify the ciphertext against the SHA-256 in the manifest before trusting it.'
     Write-Host ''
-    Write-Warn2 'Record the passphrase in a password manager. There is no recovery if it is lost.'
+    Write-Warn2 "Back up the age secret key separately. The archives are unrecoverable without it."
 }
 finally {
-    if (Get-EnvSafe 'FB_ARCHIVE_PASSWORD') { Remove-Item Env:\FB_ARCHIVE_PASSWORD -ErrorAction SilentlyContinue }
+    if ($scratch -and (Test-Path $scratch)) {
+        Remove-Item -LiteralPath $scratch -Recurse -Force -ErrorAction SilentlyContinue
+    }
 }
