@@ -259,20 +259,34 @@ try {
     $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
     $scratch = New-LockedDirectory -Path (Join-Path ([System.IO.Path]::GetTempPath()) "fb-archive-$stamp")
 
-    # ---- archive ---------------------------------------------------------
-    $results = @()
+    # ---- pre-flight ------------------------------------------------------
+    # Every guard runs against every repository before a single byte is written.
+    # Guarding inside the archive loop instead means a failure on the third
+    # repository leaves the first two as ciphertext with no manifest to verify
+    # them against, which is worse than no archive at all: unverifiable files in
+    # the destination, sharing a timestamp with a set that was never completed.
+    Write-Step 'Pre-flight checks'
     foreach ($target in $script:ArchiveOf) {
-
         $name     = $target.Label
         $repoPath = Join-Path $script:RepoRoot $target.Path
         if (-not (Test-Path (Join-Path $repoPath '.git'))) {
             throw "'$($target.Path)' is not a Git repository at $repoPath"
         }
-
-        Write-Step "Archiving $name"
         Assert-RepoIsLocalOnly -RepoPath $repoPath -Label $name
         Assert-RepoIsClean    -RepoPath $repoPath -Label $name
         Assert-NotRepositoryRoot -Path $repoPath -Label $name
+    }
+
+    # ---- archive ---------------------------------------------------------
+    $results = @()
+    $written = @()
+    try {
+    foreach ($target in $script:ArchiveOf) {
+
+        $name     = $target.Label
+        $repoPath = Join-Path $script:RepoRoot $target.Path
+
+        Write-Step "Archiving $name"
 
         $plain  = Join-Path $scratch "$name.bundle"
         $cipher = Join-Path $destFull "farm-basics-$name-$stamp.bundle.age"
@@ -286,6 +300,7 @@ try {
             }
 
             $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $cipher).Hash
+            $written += $cipher
             Write-Ok ("encrypted -> {0} ({1} MB)" -f $cipher, [math]::Round((Get-Item $cipher).Length / 1MB, 2))
             Write-Ok "SHA-256 $hash"
 
@@ -325,6 +340,24 @@ try {
     Write-Host '  Verify the ciphertext against the SHA-256 in the manifest before trusting it.'
     Write-Host ''
     Write-Warn2 "Back up the age secret key separately. The archives are unrecoverable without it."
+    }
+    catch {
+        # Ciphertext without a manifest cannot be verified, so a partial set is
+        # worse than none: it would sit in the destination looking like a valid
+        # archive while sharing its timestamp with a set that never completed.
+        foreach ($f in $written) {
+            if (Test-Path -LiteralPath $f) {
+                Remove-Item -LiteralPath $f -Force -ErrorAction SilentlyContinue
+            }
+        }
+        if (Test-Path -LiteralPath $manifest) {
+            Remove-Item -LiteralPath $manifest -Force -ErrorAction SilentlyContinue
+        }
+        if ($written.Count -gt 0) {
+            Write-Warn2 ("Removed {0} incomplete ciphertext file(s) and the manifest from {1}; nothing partial is left behind." -f $written.Count, $destFull)
+        }
+        throw
+    }
 }
 finally {
     if ($scratch -and (Test-Path $scratch)) {
