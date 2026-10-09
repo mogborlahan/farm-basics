@@ -13,7 +13,7 @@
 | `docx` | github.com/anthropics/skills | Generates Word documents with styles, TOC, tables | Deliver the sprint plan, UAT protocol, and BRD as polished `.docx` to stakeholders |
 | `pdf` | github.com/anthropics/skills | Produces styled PDF artifacts | Export specs/checklists as shareable PDFs |
 | `pptx` | github.com/anthropics/skills | Builds PowerPoint decks | Phase gate / go-no-go board presentations |
-| `xlsx` | github.com/anthropics/skills | Creates Excel workbooks with formulas | The 12-role permission matrix and effort/capacity tracking sheets |
+| `xlsx` | github.com/anthropics/skills | Creates Excel workbooks with formulas | The 13-role permission matrix and effort/capacity tracking sheets |
 | `doc-coauthoring` | github.com/anthropics/skills | Co-writes long documents with tracked revisions | Maintaining Parts A/B and the BRD through change requests |
 | `skill-creator` | github.com/anthropics/skills | Authoring new skills | Wrap repeated project procedures (e.g., a "10-minute micro-task slicing" skill) |
 
@@ -22,7 +22,6 @@
 | Skill | Source | What it does | Fit for Farm Basics |
 |---|---|---|---|
 | `webapp-testing` | github.com/anthropics/skills | Automated testing of web applications | Browser-level regression for farmer app + admin console |
-| `frontend-design` | github.com/anthropics/skills | Clean, modern UI design | Admin console and farmer app screens in the Design System |
 | `canvas-design` | github.com/anthropics/skills | Styled drawings/illustrations | Field-boundary maps and how-to visual guides |
 | `theme-factory` | github.com/anthropics/skills | Generates cohesive color themes | Enforcing Design System 2 tokens across platforms |
 | `brand-guidelines` | github.com/anthropics/skills | Consistent brand application | Keeping the logo/mark usage compliant inside consoles |
@@ -92,7 +91,7 @@ Source: `github.com/alirezarezvani/claude-skills` at commit `19392f7`, MIT. Revi
 | `api-design-reviewer` | REST/resource review — verbs, status codes, pagination, error envelopes, versioning | `03-ENG-API-Specification.md`; consistency pass against the idempotency and webhook replay rules |
 | `ci-cd-pipeline-builder` | Pipeline authoring and hardening (stages, gates, caching, secrets handling) | The seven-stage mandatory CI gate in EN 07 §2 (solo mode) is the first real consumer |
 | `runbook-generator` | Turns a procedure into an operator runbook | `09-ENG-Disaster-Recovery-Runbook.md` (R-09 restore verification) and the Phase-0 alert-triage runbook |
-| `observability-designer` | SLI/SLO definition, metric/label cardinality, dashboard & alert design | `08-ENG-Observability-and-Alerting.md`; constrains the S3.2 alert taxonomy so cardinality is bounded by design |
+| `observability-designer` | SLI/SLO definition, metric/label cardinality, dashboard & alert design | `08-ENG-Observability-and-Monitoring-Plan.md`; constrains the S3.2 alert taxonomy so cardinality is bounded by design |
 | `dependency-auditor` | Dependency review — licence, known CVEs, lockfile drift, upgrade risk | Runs against the ASP.NET Core / NuGet and Flutter / pub graphs as they appear |
 
 Deliberately **not** installed: `skill-security-auditor` from the same repo — `skill-inspector` already covers that ground locally.
@@ -128,7 +127,7 @@ Preconditions verified on this host: Node v24.21.0 (requires `>=18`) and Chrome 
 ## Suggested review order
 
 1. `docx`, `pdf`, `xlsx` + `skill-creator` (immediate value for deliverables).
-2. `webapp-testing` + `frontend-design` (actively building consoles in S1–S12).
+2. `webapp-testing` + `design-taste-frontend` (actively building consoles in S1–S12) — note `frontend-design` was removed from disk (see the four tombstones in the header); `design-taste-frontend`/`taste-skill` supersedes it here.
 3. Design-quality set — `impeccable` + `taste-skill`, plus the transferable `emilkowalski/skills` (at UI build start; supports S23 design conformance).
 4. `agent-device` (callstack) ahead of mobile feature sprints — Flutter E2E verification (S5+); add the §6 Flutter/Dart set as the farmer-app build starts.
 5. `ponytail` from S1 to set the YAGNI/discipline tone.

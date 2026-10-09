@@ -220,9 +220,10 @@ body{
 <li><strong>Operating rules:</strong> the <code>Preamble</code> below is binding for every session — session-start ritual, reading/citation protocol, DoR/DoD, requirements traceability, guardrail injection, skills directive, change-control boundary, and the Sprint-Journal.</li>
 <li><strong>Guardrails:</strong> <code>Doc\02-Engineering\10-ENG-AI-Agent-Security-Guardrails.md</code> (v1.1) is injected per the Preamble's Guardrail Injection Map and enforced per its Section 7.</li>
 <li><strong>Skills:</strong> installed skills per <code>skills\skills-lock.json</code> and the install locations in P0.6; research catalogue and install notes at <code>Plan\Recommended-Skills.md</code>.</li>
-<li><strong>Sources:</strong> all references point into <code>Doc\</code> (BRD, PRD, Engineering 01–09, Design System 1 &amp; 2, QA Master Test Plan, Parts A/B, Legal 10–11, Data). Short cites, e.g. <code>[UPS §2.4]</code> = <code>Doc\06-Operations\Part A — Platform Operations.md</code>.</li>
+<li><strong>Sources:</strong> all references point into <code>Doc\</code> (BRD, PRD, Engineering 01–10, 01A, 04A, Design System 1 &amp; 2, QA Master Test Plan, Parts A/B, Legal 10–11, Data). Short cites, e.g. <code>[UPS §2.4]</code> = <code>Doc\06-Operations\Part A — Platform Operations.md</code>.</li>
 <li><strong>Exit ticket:</strong> each sprint ends with its acceptance gate (<code>[BRD §18.0]</code>, module AC straddles, or QA package pass). Leave a sprint only when its ticket is satisfied.</li>
 <li><strong>Effort note:</strong> the focused micro-task inventory below is the <em>deterministic</em> implementation surface (hours). Full calendar sprint effort additionally includes orientation, environment access, integration, reviews, and capacity variance — those remain <em>Requires Clarification</em> per <code>BRD §7.1</code>.</li>
+<li><strong>Spec note (2026-10-08):</strong> <code>Doc\02-Engineering\04A-ENG-Network-Access-and-Zero-Trust-Architecture.md</code> now governs network access — the three-tier access model, two-type infrastructure break-glass, the D-10b activation toggle, and the self-hosted anti-abuse baseline. Infra micro-tasks touching access, edge, or observability exposure shall read it alongside ENG 04; decisions D-17–D-21 are recorded in <code>01A</code> §13.</li>
 </ul>
 </blockquote>
 <hr />
@@ -243,7 +244,7 @@ body{
 <h3 id="p02--reading--citation-protocol">P0.2 — Reading &amp; citation protocol</h3>
 <ol type="1">
 <li>All references in this document use the short form declared in the header (e.g. <code>[UPS §2.4]</code>, <code>[ENG 07 §3]</code>). The agent <strong>shall</strong> open and read the cited source section before implementing a micro-task whose check expects it; a short cite is a pointer, not a summary.</li>
-<li>The <code>Doc\*</code> set (BRD, PRDs, Engineering 01–09, QA, Design System 1 &amp; 2, Parts A/B, Legal, Data), the sprint plan, and this runbook are the <strong>source of truth</strong>. The agent <strong>shall not</strong> silently override them; corrective decisions <strong>shall</strong> be recorded in the Sprint-Journal and, where user-scoped, flagged as <em>Requires Clarification</em>.</li>
+<li>The <code>Doc\*</code> set (BRD, PRDs, Engineering 01–10, QA, Design System 1 &amp; 2, Parts A/B, Legal, Data), the sprint plan, and this runbook are the <strong>source of truth</strong>. The agent <strong>shall not</strong> silently override them; corrective decisions <strong>shall</strong> be recorded in the Sprint-Journal and, where user-scoped, flagged as <em>Requires Clarification</em>.</li>
 <li>Micro-task checkboxes persist in-browser. A ticked checkbox <strong>shall</strong> only record completed, verified work in accordance with P0.3.</li>
 </ol>
 <h3 id="p03--definition-of-ready--definition-of-done-dor--dod">P0.3 — Definition of Ready / Definition of Done (DoR / DoD)</h3>
@@ -364,7 +365,7 @@ body{
 <li><label><input type="checkbox" class="fb-check" /><strong>S1.1.M3</strong> (≈8 min) — Scaffold web API project with <code>/health</code> and structured error middleware [UPS §0.1].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S1.1.M4</strong> (≈8 min) — Scaffold farmer mobile app against dev API endpoint [DS §10].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S1.1.M5</strong> (≈8 min) — Scaffold admin console app shell (dark surface, brand mark) [AOC; DS2 §3.7].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S1.1.M6</strong> (≈8 min) — CI pipeline: build + unit tests on every commit [ENG 07 §4].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S1.1.M6</strong> (≈8 min) — CI pipeline: build + unit tests on every commit [ENG 07 §4; ENG 10].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S1.1.M7</strong> (≈6 min) — Define dev / test / staging / prod IaC folders and secret policy [ENG 07 §5].</label></li>
 </ul>
 <h3 id="task-12--observability-alerting-disaster-recovery-baseline">Task 1.2 — Observability, alerting, disaster-recovery baseline</h3>
@@ -396,45 +397,45 @@ body{
 <hr />
 <h2 id="sprint-2--foundations-2-identity-roles-governance-foundation">Sprint 2 — Foundations 2: identity, roles, governance foundation</h2>
 <blockquote>
-<p><strong>Phase 0 · Focus:</strong> account + roles, capability model, RBAC enforcement, review-driving config, trusted status, API conventions. <strong>Exit ticket:</strong> role/authorization AC pass. <strong>Primary:</strong> BRD §4.4, §14.4; UPS §2.1/§2.6/§2.9; PartB §3.1/§3.2.</p>
+<p><strong>Phase 0 · Focus:</strong> account + roles, capability model, RBAC enforcement, review-driving config, trusted status, API conventions. <strong>Exit ticket:</strong> role/authorization AC pass. <strong>Primary:</strong> BRD §10.1; UPS §2.1/§2.6/§2.9; PartB §2/§3.</p>
 </blockquote>
 <h3 id="task-21--account--role-foundation">Task 2.1 — Account &amp; role foundation</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S2.1.M1</strong> (≈10 min) — User/account entity with status lifecycle (PENDING/ACTIVE/SUSPENDED/CLOSED) [UPS §2.1].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S2.1.M2</strong> (≈8 min) — 12 admin roles modeled as capabilities (data, permissions, sync, review, finances, advocacy, P&amp;L, users, mod, content, T&amp;S, audit) [PartB §3.1].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S2.1.M3</strong> (≈8 min) — Capability→action mapping table (who may do what on each module) [PartB §3.2; BRD §14.4].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S2.1.M4</strong> (≈8 min) — RBAC middleware enforcing capability check on protected actions [PartB §3.2].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S2.1.M2</strong> (≈8 min) — 13 admin roles modeled as capabilities (data, permissions, sync, review, finances, advocacy, P&amp;L, users, mod, content, T&amp;S, audit) [PartB §2].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S2.1.M3</strong> (≈8 min) — Capability→action mapping table (who may do what on each module) [PartB §3; BRD §10.1].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S2.1.M4</strong> (≈8 min) — RBAC middleware enforcing capability check on protected actions [PartB §1].</label></li>
 </ul>
 <h3 id="task-22--review-driving-configuration-status-and-trust-base">Task 2.2 — Review-driving configuration, status and trust base</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S2.2.M5</strong> (≈8 min) — Module entities record status + review flags on writes ([UPS §2.6]).</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S2.2.M6</strong> (≈8 min) — Auto-review markers: risk-level, geodata, financial signals config [UPS §4.2].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S2.2.M7</strong> (≈10 min) — Brand-safety and denied-content signal list baked into review scoring config [UPS §4.2].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S2.2.M8</strong> (≈6 min) — Declared-phone dedupe rule (shape) implemented and unit-tested [PartB §3.3, CBN gate].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S2.2.M6</strong> (≈8 min) — Auto-review markers: risk-level, geodata, financial signals config [UPS §2.4].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S2.2.M7</strong> (≈10 min) — Brand-safety and denied-content signal list baked into review scoring config [UPS §2.4].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S2.2.M8</strong> (≈6 min) — Declared-phone dedupe rule (shape) implemented and unit-tested [PartB §5, CBN gate].</label></li>
 </ul>
 <h3 id="task-23--api-conventions--partner-gateway">Task 2.3 — API conventions &amp; partner gateway</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S2.3.M9</strong> (≈8 min) — API versioning, error envelope, rate-limit headers in a convention doc/module [ENG 03].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S2.3.M10</strong> (≈8 min) — Partner gateway seam (external provider call + timeout) used later by Prembly/PayGuard [UPS §13].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S2.3.M11</strong> (≈6 min) — Emergency kill-switch flag for a partner integration (effective immediately) [PartB §3.3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S2.3.M10</strong> (≈8 min) — Partner gateway seam (external provider call + timeout) used later by Prembly/PayGuard [UPS §12.5].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S2.3.M11</strong> (≈6 min) — Emergency kill-switch flag for a partner integration (effective immediately) [PartB §15].</label></li>
 </ul>
 <h3 id="task-24--governance--phase-0-exit-for-s2">Task 2.4 — Governance + Phase-0 exit for S2</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S2.4.M12</strong> (≈8 min) — Audit log grows: exporter for audit trails (search/filter) [UPS §2.6].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S2.4.M13</strong> (≈6 min) — Run RBAC + review-flag AC wipe tests [BRD §18.0].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S2.4.M14</strong> (≈4 min) — Record permission-matrix rows as seed data for all 12 roles [PartB §3.1] → <strong>exit pass</strong>.</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S2.4.M14</strong> (≈4 min) — Record permission-matrix rows as seed data for all 13 roles [PartB §2/§3] → <strong>exit pass</strong>.</label></li>
 </ul>
 <hr />
 <h2 id="sprint-3--foundations-3-reviews-alerting-notifications-ivr">Sprint 3 — Foundations 3: reviews, alerting, notifications, IVR</h2>
 <blockquote>
-<p><strong>Phase 0 · Focus:</strong> review engine (categories), alert taxonomy + delivery, notifications, IVR scripting, channels. <strong>Exit ticket:</strong> review queue AC, alert delivery AC, notification AC. <strong>Primary:</strong> UPS §2.9, §2.5; PartB §3.4; BRD §12.0.</p>
+<p><strong>Phase 0 · Focus:</strong> review engine (categories), alert taxonomy + delivery, notifications, IVR scripting, channels. <strong>Exit ticket:</strong> review queue AC, alert delivery AC, notification AC. <strong>Primary:</strong> UPS §2.9, §2.5; PartB §6; BRD §12.0.</p>
 </blockquote>
 <h3 id="task-31--review-engine">Task 3.1 — Review engine</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S3.1.M1</strong> (≈8 min) — Review category model (≥11 categories incl. verified consumer, operator, brand fit, improper behavior) [UPS §2.9].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S3.1.M2</strong> (≈8 min) — Review queue view: assign, prioritize, comment, decision, appeal trail [UPS §2.9].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S3.1.M3</strong> (≈8 min) — Review decision applies status change + audit snapshot [UPS §2.6].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S3.1.M4</strong> (≈6 min) — Escalation path to discretion / legal for edge cases [BRD §4.4; PRD Vol B].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S3.1.M4</strong> (≈6 min) — Escalation path to discretion / legal for edge cases [BRD §10.3; PRD Vol B].</label></li>
 </ul>
 <h3 id="task-32--alert-taxonomy--delivery">Task 3.2 — Alert taxonomy &amp; delivery</h3>
 <ul class="task-list">
@@ -458,13 +459,13 @@ body{
 <hr />
 <h2 id="sprint-4--foundations-4-phase-0-sign-off-and-legal-pack">Sprint 4 — Foundations 4: phase-0 sign-off and legal pack</h2>
 <blockquote>
-<p><strong>Phase 0 · Focus:</strong> identity/trust console, audit search, alerts wiring, break-glass, phase-0 tests, legal artefacts. <strong>Exit ticket:</strong> Phase-0 approved by governance; legal pack filed. <strong>Primary:</strong> PartB §3.3; AOC; UPS §2.4/§2.6/§2.8; Legal 10/11.</p>
+<p><strong>Phase 0 · Focus:</strong> identity/trust console, audit search, alerts wiring, break-glass, phase-0 tests, legal artefacts. <strong>Exit ticket:</strong> Phase-0 approved by governance; legal pack filed. <strong>Primary:</strong> PartB §5/§16; AOC; UPS §2.4/§2.6/§2.8; Legal 10/11.</p>
 </blockquote>
 <h3 id="task-41--identity--trust-console">Task 4.1 — Identity &amp; trust console</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S4.1.M1</strong> (≈8 min) — User + role management screens (list, search, suspend, role change) [PartB §3.1].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S4.1.M2</strong> (≈8 min) — Break-glass / delegated emergency access flow with audit trail [PartB §3.3].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S4.1.M3</strong> (≈6 min) — Partner status board (Prembly/PayGuard seams green/red/kill-switched) [PartB §3.3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S4.1.M1</strong> (≈8 min) — User + role management screens (list, search, suspend, role change) [PartB §2].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S4.1.M2</strong> (≈8 min) — Break-glass / delegated emergency access flow with audit trail [PartB §17].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S4.1.M3</strong> (≈6 min) — Partner status board (Prembly/PayGuard seams green/red/kill-switched) [PartB §7].</label></li>
 </ul>
 <h3 id="task-42--audit-alerts-reconciliation-on-console">Task 4.2 — Audit, alerts, reconciliation on console</h3>
 <ul class="task-list">
@@ -474,70 +475,70 @@ body{
 </ul>
 <h3 id="task-43--phase-0-acceptance--hardening">Task 4.3 — Phase-0 acceptance &amp; hardening</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S4.3.M7</strong> (≈8 min) — Run S1–S4 combined regression + concurrency race checks [ENG 05].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S4.3.M8</strong> (≈8 min) — Offline disconnect matrix for Phase-0 surfaces (idempotent retry) [ENG 05 ℹ 12].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S4.3.M9</strong> (≈6 min) — Permission-matrix smoke against every console action [PartB §3.2].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S4.3.M7</strong> (≈8 min) — Run S1–S4 combined regression + concurrency race checks [Doc 12].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S4.3.M8</strong> (≈8 min) — Offline disconnect matrix for Phase-0 surfaces (idempotent retry) [Doc 12].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S4.3.M9</strong> (≈6 min) — Permission-matrix smoke against every console action [PartB §3].</label></li>
 </ul>
 <h3 id="task-44--legal-pack">Task 4.4 — Legal pack</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S4.4.M10</strong> (≈10 min) — NDPR compliance checklist populated for live services [Doc 10].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S4.4.M11</strong> (≈8 min) — Digital lending law compatibility note per CBN gate [BRD §7.2; Legal].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S4.4.M12</strong> (≈6 min) — Data-sharing authorizations + consent templates drafted [Legal 11].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S4.4.M13</strong> (≈8 min) — Vendor / partner agreements summary checklist (Prembly, PayGuard, telecom) [PartB §3.4].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S4.4.M13</strong> (≈8 min) — Vendor / partner agreements summary checklist (Prembly, PayGuard, telecom) [PartB §7].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S4.4.M14</strong> (≈4 min) — Phase-0 governance sign-off record in project log [BRD §4.3] → <strong>exit pass</strong>.</label></li>
 </ul>
 <hr />
 <h2 id="sprint-5--phase-1-registration-core-nin-verification-otp">Sprint 5 — Phase 1: Registration core (NIN, verification, OTP)</h2>
 <blockquote>
-<p><strong>Phase 1 · Focus:</strong> NIN + liveness verification seams, farmer registration flow, CMS skeleton. <strong>Exit ticket:</strong> registration AC walk incl. provider fallback. <strong>Primary:</strong> UPS §4.4, §15; PRD Vol B; Legal 11; ENG 01 §12.</p>
+<p><strong>Phase 1 · Focus:</strong> NIN + liveness verification seams, farmer registration flow, CMS skeleton. <strong>Exit ticket:</strong> registration AC walk incl. provider fallback. <strong>Primary:</strong> UPS §3, §15; PRD Vol B; Legal 11; 06-DATA.</p>
 </blockquote>
 <h3 id="task-51--nin-otp-liveness-baseline">Task 5.1 — NIN, OTP, liveness baseline</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.1.M1</strong> (≈8 min) — NIN format validation + declared-phone dedupe on registration [UPS §4.4; PartB §3.3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S5.1.M1</strong> (≈8 min) — NIN format validation + declared-phone dedupe on registration [UPS §3; PartB §5].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S5.1.M2</strong> (≈8 min) — NIN verification provider seam (Prembly) with sandbox mock mode [UPS §15].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.1.M3</strong> (≈8 min) — OTP issue + verify endpoints with rate limiting [UPS §4.4].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.1.M4</strong> (≈8 min) — Liveness capture integration (selfie) + result flag [UPS §4.4].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S5.1.M3</strong> (≈8 min) — OTP issue + verify endpoints with rate limiting [UPS §3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S5.1.M4</strong> (≈8 min) — Liveness capture integration (selfie) + result flag [UPS §3].</label></li>
 </ul>
 <h3 id="task-52--farmer-registration-flow">Task 5.2 — Farmer registration flow</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S5.2.M5</strong> (≈10 min) — Wizard: personal → farm detail → NIN/liveness → OTP, resumable draft [PRD Vol B; UPS §2.6].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S5.2.M6</strong> (≈6 min) — Registration lands <code>PENDING</code> with full audit snapshot [UPS §2.6].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S5.2.M7</strong> (≈6 min) — Consent + data-sharing authorization captured and audited [Legal 11].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.2.M8</strong> (≈8 min) — Multi-account / duplicate identity guard with flagging [PartB §3.3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S5.2.M8</strong> (≈8 min) — Multi-account / duplicate identity guard with flagging [PartB §5].</label></li>
 </ul>
 <h3 id="task-53--cms-skeleton">Task 5.3 — CMS skeleton</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.3.M9</strong> (≈8 min) — Content type model with variance support (multi-variant content) [ENG 01 §12].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.3.M10</strong> (≈8 min) — CMS editor screen (draft → review → publish) [ENG 01 §12].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.3.M11</strong> (≈6 min) — Publish requires approval + writes audit trail [UPS §4.2; §2.6].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.3.M12</strong> (≈6 min) — Contributor role + moderation queue wiring [PartB §3.2].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S5.3.M9</strong> (≈8 min) — Content type model with variance support (multi-variant content) [06-DATA; UPS §9].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S5.3.M10</strong> (≈8 min) — CMS editor screen (draft → review → publish) [06-DATA].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S5.3.M11</strong> (≈6 min) — Publish requires approval + writes audit trail [UPS §2.4; §2.6].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S5.3.M12</strong> (≈6 min) — Contributor role + moderation queue wiring [PartB §11].</label></li>
 </ul>
 <h3 id="task-54--s5-gate">Task 5.4 — S5 gate</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S5.4.M13</strong> (≈6 min) — Registration AC walk incl. provider-down fallback path [BRD §18.0].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.4.M14</strong> (≈6 min) — OTP + liveness negative tests (bad code, spoofed selfie) [ENG 05] → <strong>exit pass</strong>.</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S5.4.M14</strong> (≈6 min) — OTP + liveness negative tests (bad code, spoofed selfie) [Doc 12] → <strong>exit pass</strong>.</label></li>
 </ul>
 <hr />
 <h2 id="sprint-6--phase-1-registration-journeys-fob-agent-tablet-org">Sprint 6 — Phase 1: registration journeys (fob, agent, tablet, org)</h2>
 <blockquote>
-<p><strong>Phase 1 · Focus:</strong> no-phone fob journey, agent/tablet/organization registration, verification &amp; trust console. <strong>Exit ticket:</strong> fob/agent/tablet AC walk. <strong>Primary:</strong> UPS §4.4, §2.9; DS2; PartB §3.1/§3.4.</p>
+<p><strong>Phase 1 · Focus:</strong> no-phone fob journey, agent/tablet/organization registration, verification &amp; trust console. <strong>Exit ticket:</strong> fob/agent/tablet AC walk. <strong>Primary:</strong> UPS §3, §2.9; DS2; PartB §5/§9.</p>
 </blockquote>
 <h3 id="task-61--no-phone-fob-journey">Task 6.1 — No-phone "fob" journey</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S6.1.M1</strong> (≈8 min) — Fob entry capture with geodata recorded on registration [UPS §4.4; §2.2].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S6.1.M2</strong> (≈6 min) — Fob downgrade flag + message variance for limited-connectivity farmers [UPS §4.4].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S6.1.M1</strong> (≈8 min) — Fob entry capture with geodata recorded on registration [UPS §3; §2.2].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S6.1.M2</strong> (≈6 min) — Fob downgrade flag + message variance for limited-connectivity farmers [UPS §3].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S6.1.M3</strong> (≈6 min) — Fob registrations routed to review + escalation rules [UPS §2.6/§2.9].</label></li>
 </ul>
 <h3 id="task-62--agent-tablet-organisation-journeys">Task 6.2 — Agent, tablet, organisation journeys</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S6.2.M4</strong> (≈8 min) — Agent onboarding flow + commission profile stub [PartB §3.4].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S6.2.M4</strong> (≈8 min) — Agent onboarding flow + commission profile stub [PartB §9].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S6.2.M5</strong> (≈8 min) — Dedicated tablet (kiosk) mode UI for field registration [DS2].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S6.2.M6</strong> (≈8 min) — Organization (association/cooperative) registration model [ENG 01 §12].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S6.2.M7</strong> (≈6 min) — Org admin + member invite flow with role defaulting [PartB §3.1].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S6.2.M6</strong> (≈8 min) — Organization (association/cooperative) registration model [UPS §3.5].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S6.2.M7</strong> (≈6 min) — Org admin + member invite flow with role defaulting [PartB §5].</label></li>
 </ul>
 <h3 id="task-63--verification--trust-console">Task 6.3 — Verification &amp; trust console</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S6.3.M8</strong> (≈8 min) — Registration queue + document review screens [UPS §4.4].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S6.3.M8</strong> (≈8 min) — Registration queue + document review screens [UPS §3].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S6.3.M9</strong> (≈6 min) — Status transitions, reject reasons, appeal flow [UPS §2.9].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S6.3.M10</strong> (≈8 min) — Trust-status compute + display (farmer/agent/org) [UPS §2.9].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S6.3.M11</strong> (≈6 min) — Verification history + audit trail view [UPS §2.6].</label></li>
@@ -545,7 +546,7 @@ body{
 <h3 id="task-64--s6-gate">Task 6.4 — S6 gate</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S6.4.M12</strong> (≈8 min) — Fob + agent + tablet + org registration AC walk [BRD §18.0].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S6.4.M13</strong> (≈6 min) — Verification queue + appeal round-trip wipe [ENG 05] → <strong>exit pass</strong>.</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S6.4.M13</strong> (≈6 min) — Verification queue + appeal round-trip wipe [Doc 12] → <strong>exit pass</strong>.</label></li>
 </ul>
 <hr />
 <h2 id="sprint-7--phase-1-field-boundary-capture--geodesy">Sprint 7 — Phase 1: field boundary capture &amp; geodesy</h2>
@@ -571,7 +572,7 @@ body{
 <li><label><input type="checkbox" class="fb-check" /><strong>S7.3.M9</strong> (≈8 min) — Field filters API (location, size, status, crop) [ENG 01].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S7.3.M10</strong> (≈8 min) — Field list/map console screen [AOC].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S7.3.M11</strong> (≈8 min) — Boundary edit → re-verify workflow with review routing [UPS §2.9].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S7.3.M12</strong> (≈6 min) — Geography index performance check on filtered queries [ENG 05].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S7.3.M12</strong> (≈6 min) — Geography index performance check on filtered queries [Doc 12].</label></li>
 </ul>
 <h3 id="task-74--s7-gate">Task 7.4 — S7 gate</h3>
 <ul class="task-list">
@@ -581,7 +582,7 @@ body{
 <hr />
 <h2 id="sprint-8--phase-1-boundary-state-offline-capture-surveys">Sprint 8 — Phase 1: boundary state, offline capture, surveys</h2>
 <blockquote>
-<p><strong>Phase 1 · Focus:</strong> boundary state machine + geo alerts, offline capture &amp; sync, survey/exceptions. <strong>Exit ticket:</strong> state-machine + offline sync regression. <strong>Primary:</strong> UPS §4.1, §2.5; ENG 05 (12); PartB §3.2/§3.4.</p>
+<p><strong>Phase 1 · Focus:</strong> boundary state machine + geo alerts, offline capture &amp; sync, survey/exceptions. <strong>Exit ticket:</strong> state-machine + offline sync regression. <strong>Primary:</strong> UPS §4.1, §2.5; Doc 12; PartB §9.</p>
 </blockquote>
 <h3 id="task-81--boundary-state-machine--geo-alerts">Task 8.1 — Boundary state machine &amp; geo alerts</h3>
 <ul class="task-list">
@@ -591,93 +592,93 @@ body{
 </ul>
 <h3 id="task-82--offline-capture--sync">Task 8.2 — Offline capture &amp; sync</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S8.2.M4</strong> (≈8 min) — Offline boundary capture queue with batch sync [ENG 05 ℹ12].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S8.2.M5</strong> (≈8 min) — Sync conflict resolution (documented winners) + audit record [ENG 05].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S8.2.M4</strong> (≈8 min) — Offline boundary capture queue with batch sync [Doc 12].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S8.2.M5</strong> (≈8 min) — Sync conflict resolution (documented winners) + audit record [Doc 12].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S8.2.M6</strong> (≈6 min) — Resilient UI states (offline pending count, reconnect) [DS2].</label></li>
 </ul>
 <h3 id="task-83--surveys-exceptions-disputes">Task 8.3 — Surveys, exceptions, disputes</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S8.3.M7</strong> (≈8 min) — Survey-team task assignment + field verification workflow [PartB §3.4].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S8.3.M8</strong> (≈6 min) — Exception/override approvals with required reason + audit [PartB §3.2].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S8.3.M7</strong> (≈8 min) — Survey-team task assignment + field verification workflow [PartB §9].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S8.3.M8</strong> (≈6 min) — Exception/override approvals with required reason + audit [PartB §3].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S8.3.M9</strong> (≈6 min) — Boundary dispute flag + review routing [UPS §2.9].</label></li>
 </ul>
 <h3 id="task-84--s8-gate">Task 8.4 — S8 gate</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S8.4.M10</strong> (≈8 min) — Boundary state-machine AC wipe [BRD §18.0].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S8.4.M11</strong> (≈8 min) — Offline→online sync regression incl. race/dup submission [ENG 05] → <strong>exit pass</strong>.</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S8.4.M11</strong> (≈8 min) — Offline→online sync regression incl. race/dup submission [Doc 12] → <strong>exit pass</strong>.</label></li>
 </ul>
 <hr />
 <h2 id="sprint-9--phase-1-crop-lifecycle-core">Sprint 9 — Phase 1: crop lifecycle core</h2>
 <blockquote>
-<p><strong>Phase 1 · Focus:</strong> crop registry, CropProfile, growth stages, task catalog, MSE-status, validation flags. <strong>Exit ticket:</strong> stage-advance + alert trigger passes. <strong>Primary:</strong> ENG 01 §9; UPS §4.3, §4.5.</p>
+<p><strong>Phase 1 · Focus:</strong> crop registry, CropProfile, growth stages, task catalog, MSE-status, validation flags. <strong>Exit ticket:</strong> stage-advance + alert trigger passes. <strong>Primary:</strong> ENG 01 §9; UPS §5.</p>
 </blockquote>
 <h3 id="task-91--crop-entities--profiles">Task 9.1 — Crop entities &amp; profiles</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S9.1.M1</strong> (≈8 min) — Crop registry (catalog of supported crops) [ENG 01 §9].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S9.1.M2</strong> (≈10 min) — CropProfile: input requirements, water needs, disease flags [ENG 01 §9; UPS §4.3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S9.1.M2</strong> (≈10 min) — CropProfile: input requirements, water needs, disease flags [ENG 01 §9; UPS §5.2].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S9.1.M3</strong> (≈8 min) — Configurable growth-stage framework per crop [ENG 01 §9].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S9.1.M4</strong> (≈6 min) — Season/cycle entity linking field + crop + dates [ENG 01 §9].</label></li>
 </ul>
 <h3 id="task-92--seed-planting-mse-status">Task 9.2 — Seed, planting, MSE-status</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S9.2.M5</strong> (≈8 min) — Seed registry tracking quality-compliant seed sources [UPS §4.5].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S9.2.M5</strong> (≈8 min) — Seed registry tracking quality-compliant seed sources [UPS §5].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S9.2.M6</strong> (≈8 min) — Task catalog generation from stage model (planting, inputs, harvesting) [ENG 01 §9].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S9.2.M7</strong> (≈8 min) — MSE-status recorded per field per season [UPS §4.3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S9.2.M7</strong> (≈8 min) — MSE-status recorded per field per season [UPS §5].</label></li>
 </ul>
 <h3 id="task-93--validation--alerts">Task 9.3 — Validation &amp; alerts</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S9.3.M8</strong> (≈8 min) — Growth-stage validation rules + early/late flags [ENG 01 §9].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S9.3.M9</strong> (≈6 min) — Missing MSE / sample-mandate alerts wired [UPS §4.3; §2.5].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S9.3.M9</strong> (≈6 min) — Missing MSE / sample-mandate alerts wired [UPS §5.6; §2.5].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S9.3.M10</strong> (≈6 min) — Quality-issue flags (non-compliant seed, off-plan inputs) [ENG 01 §9].</label></li>
 </ul>
 <h3 id="task-94--s9-gate">Task 9.4 — S9 gate</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S9.4.M11</strong> (≈8 min) — Stage-advance AC walk + flag triggers [BRD §18.0].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S9.4.M12</strong> (≈6 min) — MSE + sample alert negative/positive tests [ENG 05] → <strong>exit pass</strong>.</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S9.4.M12</strong> (≈6 min) — MSE + sample alert negative/positive tests [Doc 12] → <strong>exit pass</strong>.</label></li>
 </ul>
 <hr />
 <h2 id="sprint-10--phase-1-accounting--ledgers-core">Sprint 10 — Phase 1: accounting &amp; ledgers core</h2>
 <blockquote>
-<p><strong>Phase 1 · Focus:</strong> chart of accounts, double-entry posting, statements, reconciliation, treasury safety. <strong>Exit ticket:</strong> posting-integrity + matching pass. <strong>Primary:</strong> PartB §3.1/§3.3; ENG 01 §11; UPS §2.8.</p>
+<p><strong>Phase 1 · Focus:</strong> chart of accounts, double-entry posting, statements, reconciliation, treasury safety. <strong>Exit ticket:</strong> posting-integrity + matching pass. <strong>Primary:</strong> PartB §10; ENG 01 §11; UPS §2.8.</p>
 </blockquote>
 <h3 id="task-101--chart-of-accounts--double-entry">Task 10.1 — Chart of accounts &amp; double-entry</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S10.1.M1</strong> (≈8 min) — CoA entity + starter Nigerian-format accounts seed [PartB §3.1].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S10.1.M2</strong> (≈10 min) — Double-entry posting engine (balanced dr/cr, atomic) [PartB §3.3].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S10.1.M3</strong> (≈8 min) — Business actions emit journal entries via hooks [PartB §3.3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S10.1.M1</strong> (≈8 min) — CoA entity + starter Nigerian-format accounts seed [PartB §10].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S10.1.M2</strong> (≈10 min) — Double-entry posting engine (balanced dr/cr, atomic) [PartB §10].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S10.1.M3</strong> (≈8 min) — Business actions emit journal entries via hooks [PartB §10].</label></li>
 </ul>
 <h3 id="task-102--ledger--statements">Task 10.2 — Ledger &amp; statements</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S10.2.M4</strong> (≈8 min) — Account balances + statement generator [ENG 01 §11].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S10.2.M5</strong> (≈8 min) — Ledger immutability; adjustments require approval + audit [PartB §3.3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S10.2.M5</strong> (≈8 min) — Ledger immutability; adjustments require approval + audit [PartB §10].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S10.2.M6</strong> (≈6 min) — Transaction categorization for aggregation [UPS §2.8].</label></li>
 </ul>
 <h3 id="task-103--reconciliation--treasury-safety">Task 10.3 — Reconciliation &amp; treasury safety</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S10.3.M7</strong> (≈8 min) — External statement import + automated matching [UPS §2.8].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S10.3.M8</strong> (≈8 min) — Discrepancy flagging + resolution workflow [UPS §2.8].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S10.3.M9</strong> (≈6 min) — Rounding/anti-scaling policy enforced on postings [PartB §3.3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S10.3.M9</strong> (≈6 min) — Rounding/anti-scaling policy enforced on postings [PartB §10].</label></li>
 </ul>
 <h3 id="task-104--s10-gate">Task 10.4 — S10 gate</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S10.4.M10</strong> (≈8 min) — Double-entry integrity tests (balance invariants, atomicity) [ENG 05].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S10.4.M10</strong> (≈8 min) — Double-entry integrity tests (balance invariants, atomicity) [Doc 12].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S10.4.M11</strong> (≈6 min) — Matching + discrepancy-resolution wipe [BRD §18.0] → <strong>exit pass</strong>.</label></li>
 </ul>
 <hr />
 <h2 id="sprint-11--phase-1-fixed-assets-period-close-computed-reports">Sprint 11 — Phase 1: fixed assets, period close, computed reports</h2>
 <blockquote>
-<p><strong>Phase 1 · Focus:</strong> asset register &amp; depreciation, finance period lifecycle, computed P&amp;L/reports. <strong>Exit ticket:</strong> period-close regression + depreciation sample pass. <strong>Primary:</strong> ENG 01 §11; PartB §3.3.</p>
+<p><strong>Phase 1 · Focus:</strong> asset register &amp; depreciation, finance period lifecycle, computed P&amp;L/reports. <strong>Exit ticket:</strong> period-close regression + depreciation sample pass. <strong>Primary:</strong> ENG 01 §11; PartB §10.</p>
 </blockquote>
 <h3 id="task-111--fixed-assets">Task 11.1 — Fixed assets</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S11.1.M1</strong> (≈8 min) — Asset register + depreciation schedule engine [ENG 01 §11].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S11.1.M2</strong> (≈6 min) — Asset tag/QR identification concept integrated [ENG 01 §11].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S11.1.M3</strong> (≈6 min) — Asset disposal/write-off flow with approval [PartB §3.3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S11.1.M3</strong> (≈6 min) — Asset disposal/write-off flow with approval [PartB §10].</label></li>
 </ul>
 <h3 id="task-112--finance-period-close">Task 11.2 — Finance period close</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S11.2.M4</strong> (≈8 min) — Period open/close lifecycle with lockdown [PartB §3.3].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S11.2.M5</strong> (≈6 min) — Month-end closing checklist + period audit snapshot [PartB §3.3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S11.2.M4</strong> (≈8 min) — Period open/close lifecycle with lockdown [PartB §10].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S11.2.M5</strong> (≈6 min) — Month-end closing checklist + period audit snapshot [PartB §10].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S11.2.M6</strong> (≈6 min) — Year-end rollover + opening balance posting [ENG 01 §11].</label></li>
 </ul>
 <h3 id="task-113--computed-reports">Task 11.3 — Computed reports</h3>
@@ -688,7 +689,7 @@ body{
 </ul>
 <h3 id="task-114--s11-gate">Task 11.4 — S11 gate</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S11.4.M10</strong> (≈8 min) — Period-close + rollover regression [ENG 05].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S11.4.M10</strong> (≈8 min) — Period-close + rollover regression [Doc 12].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S11.4.M11</strong> (≈6 min) — Depreciation + computed-report sample accuracy tests [BRD §18.0] → <strong>exit pass</strong>.</label></li>
 </ul>
 <hr />
@@ -698,15 +699,15 @@ body{
 </blockquote>
 <h3 id="task-121--master-data--config-consoles">Task 12.1 — Master data &amp; config consoles</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S12.1.M1</strong> (≈8 min) — Catalog screens (crops, varieties, inputs) with approval-on-change [PartB §3.2].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S12.1.M1</strong> (≈8 min) — Catalog screens (crops, varieties, inputs) with approval-on-change [PartB §4].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S12.1.M2</strong> (≈8 min) — Config/rule editor UI (settings key/value, review categories) [UPS §2.9].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S12.1.M3</strong> (≈6 min) — Reference-data versioning + change log [UPS §2.9].</label></li>
 </ul>
 <h3 id="task-122--field-ops-console">Task 12.2 — Field ops console</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S12.2.M4</strong> (≈8 min) — Ops dashboard: fields in stage, open alerts, queue depth [AOC].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S12.2.M5</strong> (≈8 min) — MSE / NEAR-revenue monitoring widgets [UPS §4.3].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S12.2.M6</strong> (≈6 min) — Task-dispatch queue for field officers [PartB §3.4].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S12.2.M5</strong> (≈8 min) — MSE / NEAR-revenue monitoring widgets [UPS §5].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S12.2.M6</strong> (≈6 min) — Task-dispatch queue for field officers [PartB §9].</label></li>
 </ul>
 <h3 id="task-123--analytics-baseline">Task 12.3 — Analytics baseline</h3>
 <ul class="task-list">
@@ -722,24 +723,24 @@ body{
 <hr />
 <h2 id="sprint-13--phase-1-exit-pilot-metrics-regional-rbac-acceptance">Sprint 13 — Phase 1 exit: pilot metrics, regional RBAC, acceptance</h2>
 <blockquote>
-<p><strong>Phase 1 · Focus:</strong> pilot KPI tracking, NPAU populations, region-scoped RBAC, Phase-1 acceptance. <strong>Exit ticket:</strong> pilot sign-off + P1 readiness. <strong>Primary:</strong> BRD §2.3, §4.3, §18.0; PartB §3.1/§3.2; ENG 05.</p>
+<p><strong>Phase 1 · Focus:</strong> pilot KPI tracking, NPAU populations, region-scoped RBAC, Phase-1 acceptance. <strong>Exit ticket:</strong> pilot sign-off + P1 readiness. <strong>Primary:</strong> BRD §2.3, §4.3, §18.0; PartB §1/§3; Doc 12.</p>
 </blockquote>
 <h3 id="task-131--pilot-metrics--analytics">Task 13.1 — Pilot metrics &amp; analytics</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S13.1.M1</strong> (≈8 min) — Pilot KPI definitions + tracking dashboard [BRD §2.3].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S13.1.M2</strong> (≈6 min) — NPAU-affected population views [ENG 01].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S13.1.M3</strong> (≈8 min) — NEAR-revenue gap anomaly analysis [UPS §4.3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S13.1.M3</strong> (≈8 min) — NEAR-revenue gap anomaly analysis [UPS §5].</label></li>
 </ul>
 <h3 id="task-132--region-scoped-rbac">Task 13.2 — Region-scoped RBAC</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S13.2.M4</strong> (≈8 min) — Region/scope dimension added to roles &amp; capabilities [PartB §3.2].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S13.2.M5</strong> (≈8 min) — Query-layer data isolation filters by scope [PartB §3.1].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S13.2.M4</strong> (≈8 min) — Region/scope dimension added to roles &amp; capabilities [PartB §1].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S13.2.M5</strong> (≈8 min) — Query-layer data isolation filters by scope [PartB §1].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S13.2.M6</strong> (≈8 min) — Region-scope authorization AC tests [BRD §18.0].</label></li>
 </ul>
 <h3 id="task-133--phase-1-acceptance">Task 13.3 — Phase-1 acceptance</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S13.3.M7</strong> (≈8 min) — Full Phase-1 regression suite run + report [ENG 05].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S13.3.M8</strong> (≈8 min) — Offline / disconnect / race wipe across P1 modules [ENG 05 ℹ12].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S13.3.M7</strong> (≈8 min) — Full Phase-1 regression suite run + report [Doc 12].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S13.3.M8</strong> (≈8 min) — Offline / disconnect / race wipe across P1 modules [Doc 12].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S13.3.M9</strong> (≈6 min) — Training vignettes for field staff prepared [PRD Vol B].</label></li>
 </ul>
 <h3 id="task-134--s13-gate">Task 13.4 — S13 gate</h3>
@@ -749,17 +750,17 @@ body{
 <hr />
 <h2 id="sprint-14--phase-2-land-history-tenancy-exports">Sprint 14 — Phase 2: land history, tenancy, exports</h2>
 <blockquote>
-<p><strong>Phase 2 · Focus:</strong> ownership/tenancy history, timeline, overlap, certified-land exports with disclaimer. <strong>Exit ticket:</strong> overlap + export wipe. <strong>Primary:</strong> UPS §4.1; Legal 10/11; AOC.</p>
+<p><strong>Phase 2 · Focus:</strong> ownership/tenancy history, timeline, overlap, certified-land exports with disclaimer. <strong>Exit ticket:</strong> overlap + export wipe. <strong>Primary:</strong> UPS §6; Legal 10/11; AOC.</p>
 </blockquote>
 <h3 id="task-141--ownership--tenancy-history">Task 14.1 — Ownership &amp; tenancy history</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S14.1.M1</strong> (≈8 min) — Land ownership/tenancy records + relationships [UPS §4.1].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S14.1.M2</strong> (≈8 min) — Per-land history timeline (ownership chain, changes) [UPS §4.1].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S14.1.M1</strong> (≈8 min) — Land ownership/tenancy records + relationships [UPS §6.1].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S14.1.M2</strong> (≈8 min) — Per-land history timeline (ownership chain, changes) [UPS §6.2].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S14.1.M3</strong> (≈8 min) — Land title/document upload + verification workflow [Legal 11].</label></li>
 </ul>
 <h3 id="task-142--overlap-detection--exports">Task 14.2 — Overlap detection &amp; exports</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S14.2.M4</strong> (≈10 min) — Overlap detection extended across history versions [UPS §4.1].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S14.2.M4</strong> (≈10 min) — Overlap detection extended across history versions [UPS §6.3].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S14.2.M5</strong> (≈8 min) — Certified-land summary export with legal disclaimer [Legal 10].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S14.2.M6</strong> (≈6 min) — Export accuracy assertion + disclaimer component tests [Legal 10].</label></li>
 </ul>
@@ -771,39 +772,39 @@ body{
 <h3 id="task-144--s14-gate">Task 14.4 — S14 gate</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S14.4.M9</strong> (≈6 min) — Overlap + history AC wipe [BRD §18.0].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S14.4.M10</strong> (≈6 min) — Export + disclaimer round-trip tests [ENG 05] → <strong>exit pass</strong>.</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S14.4.M10</strong> (≈6 min) — Export + disclaimer round-trip tests [Doc 12] → <strong>exit pass</strong>.</label></li>
 </ul>
 <h2 id="sprint-15--phase-2-soil-testing--recommendations">Sprint 15 — Phase 2: soil testing &amp; recommendations</h2>
 <blockquote>
-<p><strong>Phase 2 · Focus:</strong> sample lifecycle, protocol + GPS enforcement, soil-driven crop recommendations, lab registry. <strong>Exit ticket:</strong> recommendation + lab AC. <strong>Primary:</strong> UPS §4.3; PartB §3.4.</p>
+<p><strong>Phase 2 · Focus:</strong> sample lifecycle, protocol + GPS enforcement, soil-driven crop recommendations, lab registry. <strong>Exit ticket:</strong> recommendation + lab AC. <strong>Primary:</strong> UPS §7; PartB §7.</p>
 </blockquote>
 <h3 id="task-151--soil-sample-lifecycle">Task 15.1 — Soil sample lifecycle</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S15.1.M1</strong> (≈8 min) — Sample entity + status flow (requested, collected, in-lab, reported) [UPS §4.3].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S15.1.M2</strong> (≈6 min) — Sample collection protocol checklist enforced in flow [UPS §4.3].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S15.1.M3</strong> (≈8 min) — GPS tolerance enforcement on sample location capture [UPS §4.3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S15.1.M1</strong> (≈8 min) — Sample entity + status flow (requested, collected, in-lab, reported) [UPS §7.1].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S15.1.M2</strong> (≈6 min) — Sample collection protocol checklist enforced in flow [UPS §7.2].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S15.1.M3</strong> (≈8 min) — GPS tolerance enforcement on sample location capture [UPS §7.5].</label></li>
 </ul>
 <h3 id="task-152--recommended-crops">Task 15.2 — Recommended crops</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S15.2.M4</strong> (≈10 min) — Soil-test-driven crop recommendation engine [UPS §4.3].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S15.2.M5</strong> (≈6 min) — Recommendation adjustment gate (override requires approval) [UPS §4.3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S15.2.M4</strong> (≈10 min) — Soil-test-driven crop recommendation engine [UPS §7.6].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S15.2.M5</strong> (≈6 min) — Recommendation adjustment gate (override requires approval) [UPS §7.7].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S15.2.M6</strong> (≈6 min) — Recommendation history + audit trail [UPS §2.6].</label></li>
 </ul>
 <h3 id="task-153--lab-registry">Task 15.3 — Lab registry</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S15.3.M7</strong> (≈8 min) — Lab registry + accreditation tracker [PartB §3.4].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S15.3.M8</strong> (≈8 min) — Sample-to-lab assignment + status sync [UPS §4.3].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S15.3.M9</strong> (≈6 min) — Seed/lab compliance flags on reports [UPS §4.5].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S15.3.M7</strong> (≈8 min) — Lab registry + accreditation tracker [PartB §7].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S15.3.M8</strong> (≈8 min) — Sample-to-lab assignment + status sync [UPS §7.4].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S15.3.M9</strong> (≈6 min) — Seed/lab compliance flags on reports [UPS §5; §7.9].</label></li>
 </ul>
 <h3 id="task-154--s15-gate">Task 15.4 — S15 gate</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S15.4.M10</strong> (≈8 min) — GPS-enforcement + recommendation-engine AC [BRD §18.0].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S15.4.M11</strong> (≈6 min) — Lab assignment + sync round-trip tests [ENG 05] → <strong>exit pass</strong>.</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S15.4.M11</strong> (≈6 min) — Lab assignment + sync round-trip tests [Doc 12] → <strong>exit pass</strong>.</label></li>
 </ul>
 <hr />
 <h2 id="sprint-16--phase-2-marketplace">Sprint 16 — Phase 2: marketplace</h2>
 <blockquote>
-<p><strong>Phase 2 · Focus:</strong> listings, offers, pooling, reservation semantics, trust &amp; anti-fraud. <strong>Exit ticket:</strong> offer + reserve-lock wipe. <strong>Primary:</strong> ENG 01 §10; UPS §2.9; PartB §3.3.</p>
+<p><strong>Phase 2 · Focus:</strong> listings, offers, pooling, reservation semantics, trust &amp; anti-fraud. <strong>Exit ticket:</strong> offer + reserve-lock wipe. <strong>Primary:</strong> ENG 01 §10; UPS §2.9; PartB §8/§13.</p>
 </blockquote>
 <h3 id="task-161--listings--feed">Task 16.1 — Listings &amp; feed</h3>
 <ul class="task-list">
@@ -820,58 +821,58 @@ body{
 <h3 id="task-163--trust--compliance">Task 16.3 — Trust &amp; compliance</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S16.3.M7</strong> (≈6 min) — Listing verification markers + review routing [UPS §2.9].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S16.3.M8</strong> (≈8 min) — Anti-fraud vetting on high-value listings [PartB §3.3].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S16.3.M9</strong> (≈6 min) — Brand-safety phrase scan applied to ads [UPS §4.2].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S16.3.M8</strong> (≈8 min) — Anti-fraud vetting on high-value listings [PartB §13].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S16.3.M9</strong> (≈6 min) — Brand-safety phrase scan applied to ads [UPS §2.4].</label></li>
 </ul>
 <h3 id="task-164--s16-gate">Task 16.4 — S16 gate</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S16.4.M10</strong> (≈8 min) — Offer + negotiation AC walk [BRD §18.0].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S16.4.M11</strong> (≈6 min) — Reserve-lock + expiry concurrency tests [ENG 05] → <strong>exit pass</strong>.</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S16.4.M11</strong> (≈6 min) — Reserve-lock + expiry concurrency tests [Doc 12] → <strong>exit pass</strong>.</label></li>
 </ul>
 <hr />
 <h2 id="sprint-17--phase-2-escrow--payments">Sprint 17 — Phase 2: escrow &amp; payments</h2>
 <blockquote>
-<p><strong>Phase 2 · Focus:</strong> EscrowStatus model, escrow-ledger integration, dual sign-off, PayGuard seam + fallback, disputes. <strong>Exit ticket:</strong> dual sign-off + dispute wipe. <strong>Primary:</strong> PartB §3.3; UPS §13, §2.8; BRD §7.2.</p>
+<p><strong>Phase 2 · Focus:</strong> EscrowStatus model, escrow-ledger integration, dual sign-off, PayGuard seam + fallback, disputes. <strong>Exit ticket:</strong> dual sign-off + dispute wipe. <strong>Primary:</strong> PartB §8; UPS §12.5, §2.8; BRD §7.2.</p>
 </blockquote>
 <h3 id="task-171--escrow-core">Task 17.1 — Escrow core</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S17.1.M1</strong> (≈8 min) — EscrowStatus model (pending, held, released, disputed, refunded) [PartB §3.3].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S17.1.M2</strong> (≈8 min) — Escrow account ↔︎ ledger double-entry integration [PartB §3.3].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S17.1.M3</strong> (≈8 min) — Dual sign-off release flow (buyer + seller) [PartB §3.3].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S17.1.M4</strong> (≈6 min) — Automatic release on acceptance/delivery confirmation [PartB §3.3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S17.1.M1</strong> (≈8 min) — EscrowStatus model (pending, held, released, disputed, refunded) [PartB §8].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S17.1.M2</strong> (≈8 min) — Escrow account ↔︎ ledger double-entry integration [PartB §8].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S17.1.M3</strong> (≈8 min) — Dual sign-off release flow (buyer + seller) [PartB §8].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S17.1.M4</strong> (≈6 min) — Automatic release on acceptance/delivery confirmation [PartB §8].</label></li>
 </ul>
 <h3 id="task-172--payguard-integration--fallback">Task 17.2 — PayGuard integration &amp; fallback</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S17.2.M5</strong> (≈8 min) — PayGuard provider adapter behind partner gateway [UPS §13].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S17.2.M6</strong> (≈8 min) — Fallback discrete/manual option when provider unavailable [PartB §3.3; BRD §7.2].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S17.2.M5</strong> (≈8 min) — PayGuard provider adapter behind partner gateway [UPS §12.5].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S17.2.M6</strong> (≈8 min) — Fallback discrete/manual option when provider unavailable [PartB §8; BRD §7.2].</label></li>
 </ul>
 <h3 id="task-173--disputes--reconciliation">Task 17.3 — Disputes &amp; reconciliation</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S17.3.M7</strong> (≈8 min) — Dispute lifecycle + evidence upload [PartB §3.3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S17.3.M7</strong> (≈8 min) — Dispute lifecycle + evidence upload [PartB §8].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S17.3.M8</strong> (≈8 min) — Dispute → review decision → release/refund [UPS §2.9].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S17.3.M9</strong> (≈6 min) — Nightly escrow balance reconciliation [UPS §2.8].</label></li>
 </ul>
 <h3 id="task-174--s17-gate">Task 17.4 — S17 gate</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S17.4.M10</strong> (≈8 min) — Dual sign-off + fallback-path AC [BRD §18.0].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S17.4.M11</strong> (≈8 min) — Dispute + reconciliation negative scenarios [ENG 05] → <strong>exit pass</strong>.</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S17.4.M11</strong> (≈8 min) — Dispute + reconciliation negative scenarios [Doc 12] → <strong>exit pass</strong>.</label></li>
 </ul>
 <hr />
 <h2 id="sprint-18--phase-2-vendor-management">Sprint 18 — Phase 2: vendor management</h2>
 <blockquote>
-<p><strong>Phase 2 · Focus:</strong> vendor identity/tiers/categories, safety-ranked recommendations, anti-abuse, vendor console. <strong>Exit ticket:</strong> tier + recommendation wipe. <strong>Primary:</strong> PartB §3.4; ENG 01 §10.</p>
+<p><strong>Phase 2 · Focus:</strong> vendor identity/tiers/categories, safety-ranked recommendations, anti-abuse, vendor console. <strong>Exit ticket:</strong> tier + recommendation wipe. <strong>Primary:</strong> PartB §7; ENG 01 §10.</p>
 </blockquote>
 <h3 id="task-181--vendor-identity--tiers">Task 18.1 — Vendor identity &amp; tiers</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S18.1.M1</strong> (≈8 min) — Vendor registration + document verification flow [PartB §3.4].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S18.1.M2</strong> (≈6 min) — Vendor tier model (verification/rating-based) [PartB §3.4].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S18.1.M1</strong> (≈8 min) — Vendor registration + document verification flow [PartB §7].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S18.1.M2</strong> (≈6 min) — Vendor tier model (verification/rating-based) [PartB §7].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S18.1.M3</strong> (≈8 min) — Vendor categories + service/product catalogs [ENG 01 §10].</label></li>
 </ul>
 <h3 id="task-182--recommendations--anti-abuse">Task 18.2 — Recommendations &amp; anti-abuse</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S18.2.M4</strong> (≈8 min) — Safety-ranked recommendations (geo + rating + compliance) [PartB §3.4].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S18.2.M5</strong> (≈8 min) — Anti-abuse detection (fake listings, rating manipulation) [PartB §3.4].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S18.2.M6</strong> (≈6 min) — Vendor quality metrics (complaints, fulfillment) [PartB §3.4].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S18.2.M4</strong> (≈8 min) — Safety-ranked recommendations (geo + rating + compliance) [PartB §7].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S18.2.M5</strong> (≈8 min) — Anti-abuse detection (fake listings, rating manipulation) [PartB §7].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S18.2.M6</strong> (≈6 min) — Vendor quality metrics (complaints, fulfillment) [PartB §7].</label></li>
 </ul>
 <h3 id="task-183--vendor-console">Task 18.3 — Vendor console</h3>
 <ul class="task-list">
@@ -881,12 +882,12 @@ body{
 <h3 id="task-184--s18-gate">Task 18.4 — S18 gate</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S18.4.M9</strong> (≈6 min) — Tier + recommendation AC walk [BRD §18.0].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S18.4.M10</strong> (≈6 min) — Anti-abuse detection unit tests [ENG 05] → <strong>exit pass</strong>.</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S18.4.M10</strong> (≈6 min) — Anti-abuse detection unit tests [Doc 12] → <strong>exit pass</strong>.</label></li>
 </ul>
 <hr />
 <h2 id="sprint-19--phase-2-consoles--exit">Sprint 19 — Phase 2: consoles &amp; exit</h2>
 <blockquote>
-<p><strong>Phase 2 · Focus:</strong> marketplace/vendor/land-cert/escrow ops consoles, Phase-2 regression + sign-off. <strong>Exit ticket:</strong> P2 accepted. <strong>Primary:</strong> AOC; ENG 05/07; BRD §4.3.</p>
+<p><strong>Phase 2 · Focus:</strong> marketplace/vendor/land-cert/escrow ops consoles, Phase-2 regression + sign-off. <strong>Exit ticket:</strong> P2 accepted. <strong>Primary:</strong> AOC; Doc 12/ENG 07; BRD §4.3.</p>
 </blockquote>
 <h3 id="task-191--marketplace--vendor-ops-consoles">Task 19.1 — Marketplace &amp; vendor ops consoles</h3>
 <ul class="task-list">
@@ -900,101 +901,118 @@ body{
 </ul>
 <h3 id="task-193--phase-2-acceptance">Task 19.3 — Phase-2 acceptance</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S19.3.M5</strong> (≈8 min) — Phase-2 regression + integration suite [ENG 05/07].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S19.3.M6</strong> (≈8 min) — Escrow-adjacent negative scenarios (double release, orphan hold) [ENG 05].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S19.3.M5</strong> (≈8 min) — Phase-2 regression + integration suite [Doc 12/ENG 07].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S19.3.M6</strong> (≈8 min) — Escrow-adjacent negative scenarios (double release, orphan hold) [Doc 12].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S19.3.M7</strong> (≈6 min) — Phase-2 sign-off checklist + P3 readiness [BRD §4.3] → <strong>exit pass</strong>.</label></li>
 </ul>
 <h2 id="sprint-20--phase-3-pest--disease-reporting">Sprint 20 — Phase 3: pest &amp; disease reporting</h2>
 <blockquote>
-<p><strong>Phase 3 · Focus:</strong> crop-report intake, detection pipeline, regional aggregation, alert tiers, anti-panic gating, anti-abuse. <strong>Exit ticket:</strong> alert-tier wipe. <strong>Primary:</strong> UPS §4.3; PartB §3.4.</p>
+<p><strong>Phase 3 · Focus:</strong> crop-report intake, detection pipeline, regional aggregation, alert tiers, anti-panic gating, anti-abuse. <strong>Exit ticket:</strong> alert-tier wipe. <strong>Primary:</strong> UPS §8; PartB §9.</p>
 </blockquote>
 <h3 id="task-201--report-intake">Task 20.1 — Report intake</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S20.1.M1</strong> (≈8 min) — Crop report intake (type, severity, location, image) [UPS §4.3].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S20.1.M2</strong> (≈8 min) — Report pipeline routing to detection watch [UPS §4.3].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S20.1.M3</strong> (≈6 min) — Regional/crop aggregation for visibility [UPS §4.3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S20.1.M1</strong> (≈8 min) — Crop report intake (type, severity, location, image) [UPS §8.2].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S20.1.M2</strong> (≈8 min) — Report pipeline routing to detection watch [UPS §8.3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S20.1.M3</strong> (≈6 min) — Regional/crop aggregation for visibility [UPS §8.4].</label></li>
 </ul>
 <h3 id="task-202--detection--response">Task 20.2 — Detection &amp; response</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S20.2.M4</strong> (≈8 min) — Detection thresholds + regional/national alert tiers [UPS §4.3].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S20.2.M5</strong> (≈8 min) — Anti-panic gating (verification before mass alert) [UPS §4.3].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S20.2.M6</strong> (≈6 min) — Official response status + bulletin publishing [UPS §4.3].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S20.2.M7</strong> (≈6 min) — Anti-abuse on reports (spam/prank suppression) [PartB §3.4].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S20.2.M4</strong> (≈8 min) — Detection thresholds + regional/national alert tiers [UPS §8.5].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S20.2.M5</strong> (≈8 min) — Anti-panic gating (verification before mass alert) [UPS §8.4].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S20.2.M6</strong> (≈6 min) — Official response status + bulletin publishing [UPS §8.5].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S20.2.M7</strong> (≈6 min) — Anti-abuse on reports (spam/prank suppression) [PartB §13].</label></li>
 </ul>
 <h3 id="task-203--s20-gate">Task 20.3 — S20 gate</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S20.3.M8</strong> (≈8 min) — Detection-to-alert tier AC walk [BRD §18.0].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S20.3.M9</strong> (≈6 min) — Anti-panic + anti-abuse negative tests [ENG 05] → <strong>exit pass</strong>.</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S20.3.M9</strong> (≈6 min) — Anti-panic + anti-abuse negative tests [Doc 12] → <strong>exit pass</strong>.</label></li>
 </ul>
 <hr />
 <h2 id="sprint-21--phase-3-knowledge-bank--community">Sprint 21 — Phase 3: knowledge bank &amp; community</h2>
 <blockquote>
-<p><strong>Phase 3 · Focus:</strong> knowledge content engine, search, quick-info, farmer forum, moderation, governing rules on chemicals. <strong>Exit ticket:</strong> search + moderation wipe. <strong>Primary:</strong> ENG 01 §12; PartB §3.2/§3.3; Legal 10.</p>
+<p><strong>Phase 3 · Focus:</strong> knowledge content engine, search, quick-info, farmer forum, moderation, governing rules on chemicals. <strong>Exit ticket:</strong> search + moderation wipe. <strong>Primary:</strong> UPS §9; PartB §11; Legal 10.</p>
 </blockquote>
 <h3 id="task-211--knowledge-content-engine">Task 21.1 — Knowledge content engine</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S21.1.M1</strong> (≈8 min) — Knowledge-article model + taxonomy [ENG 01 §12].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S21.1.M2</strong> (≈8 min) — Full-text search + autocomplete (incl. local languages) [ENG 01 §12].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S21.1.M3</strong> (≈6 min) — Quick-info module (crop, input, pest snippets) [ENG 01 §12].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S21.1.M1</strong> (≈8 min) — Knowledge-article model + taxonomy [UPS §9].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S21.1.M2</strong> (≈8 min) — Full-text search + autocomplete (incl. local languages) [UPS §9].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S21.1.M3</strong> (≈6 min) — Quick-info module (crop, input, pest snippets) [UPS §9].</label></li>
 </ul>
 <h3 id="task-212--community--moderation">Task 21.2 — Community &amp; moderation</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S21.2.M4</strong> (≈8 min) — Farmer forum (topics, posts, replies) + reputation [ENG 01 §12].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S21.2.M5</strong> (≈8 min) — Moderation queue + denial rules [PartB §3.2/§3.3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S21.2.M4</strong> (≈8 min) — Farmer forum (topics, posts, replies) + reputation [UPS §9].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S21.2.M5</strong> (≈8 min) — Moderation queue + denial rules [PartB §11].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S21.2.M6</strong> (≈6 min) — Chemical/product governing rules enforced on content [Legal 10].</label></li>
 </ul>
 <h3 id="task-213--s21-gate">Task 21.3 — S21 gate</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S21.3.M7</strong> (≈6 min) — Search + autocomplete AC walk [BRD §18.0].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S21.3.M8</strong> (≈6 min) — Moderation + chemical-rule wipe [ENG 05] → <strong>exit pass</strong>.</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S21.3.M8</strong> (≈6 min) — Moderation + chemical-rule wipe [Doc 12] → <strong>exit pass</strong>.</label></li>
 </ul>
 <hr />
 <h2 id="sprint-22--phase-3-certifications-consoles-staffing">Sprint 22 — Phase 3: certifications, consoles, staffing</h2>
 <blockquote>
-<p><strong>Phase 3 · Focus:</strong> certification lifecycle with verification research, fraud checks, badges, remaining consoles, staffing &amp; training. <strong>Exit ticket:</strong> cert + console wipe. <strong>Primary:</strong> UPS §4.6, §2.9; AOC; Legal 10; BRD §2.4.</p>
+<p><strong>Phase 3 · Focus:</strong> certification lifecycle with verification research, fraud checks, badges, remaining consoles, staffing &amp; training, review operations, trust &amp; safety, compliance. <strong>Exit ticket:</strong> cert + console wipe. <strong>Primary:</strong> UPS §10, §2.9; AOC; Legal 10; BRD §2.4; PartB §6/§13/§16.</p>
 </blockquote>
 <h3 id="task-221--certifications">Task 22.1 — Certifications</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S22.1.M1</strong> (≈8 min) — Certification types + scope configuration [UPS §4.6].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S22.1.M2</strong> (≈8 min) — Verification-research workflow (documents, site visit) [UPS §4.6].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S22.1.M3</strong> (≈8 min) — Certification lifecycle (request → verify → granted → expiry/revoke) [UPS §4.6].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S22.1.M4</strong> (≈6 min) — Fraud detection on certification claims [UPS §4.6].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S22.1.M5</strong> (≈6 min) — Badge computation for profiles + marketplace [UPS §4.6; DS2].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S22.1.M1</strong> (≈8 min) — Certification types + scope configuration [UPS §10.1].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S22.1.M2</strong> (≈8 min) — Verification-research workflow (documents, site visit) [UPS §10.2].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S22.1.M3</strong> (≈8 min) — Certification lifecycle (request → verify → granted → expiry/revoke) [UPS §10.3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S22.1.M4</strong> (≈6 min) — Fraud detection on certification claims [UPS §10.4].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S22.1.M5</strong> (≈6 min) — Badge computation for profiles + marketplace [UPS §10.6; DS2].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S22.1.M6</strong> (≈6 min) — Cert reviews routed to review engine [UPS §2.9].</label></li>
 </ul>
 <h3 id="task-222--phase-3-consoles">Task 22.2 — Phase-3 consoles</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S22.2.M7</strong> (≈8 min) — Content-governance console (approve, publish, deny) [AOC].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S22.2.M8</strong> (≈6 min) — Content-review ops with evidence trail [AOC; UPS §4.2].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S22.2.M8</strong> (≈6 min) — Content-review ops with evidence trail [AOC; UPS §2.4].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S22.2.M9</strong> (≈8 min) — Analytics console (all KPIs + exports) [AOC; ENG 06].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S22.2.M10</strong> (≈8 min) — Compliance / NDPR console (consents, exports, erasure) [Legal 10].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S22.2.M11</strong> (≈6 min) — Feature-flag / config console (all toggles) [UPS §2.9].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S22.2.M10</strong> (≈6 min) — Feature-flag / config console (all toggles) [UPS §2.9].</label></li>
 </ul>
 <h3 id="task-223--staffing--training">Task 22.3 — Staffing &amp; training</h3>
 <ul class="task-list">
 <li><label><input type="checkbox" class="fb-check" /><strong>S22.3.M12</strong> (≈6 min) — Support-staff role model + handoff runbook [BRD §2.4].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S22.3.M13</strong> (≈8 min) — Training + onboarding kit for content/moderation teams [BRD §2.4].</label></li>
 </ul>
-<h3 id="task-224--s22-gate">Task 22.4 — S22 gate</h3>
+<h3 id="task-224--review-operations">Task 22.4 — Review operations</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S22.4.M14</strong> (≈8 min) — Certification AC walk incl. revoke/expiry [BRD §18.0].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S22.4.M15</strong> (≈6 min) — Console governance + NDPR wipe [ENG 05] → <strong>exit pass</strong>.</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S22.4.M16</strong> (≈8 min) — Reviewer roster + workload view (ReviewerProfile CRUD, MaxConcurrentAssignments) with SLA/escalation dashboard [PartB §6].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S22.4.M17</strong> (≈8 min) — QA sampling of review verdicts + reviewer coaching queue (configurable sampling rate) [PartB §6].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S22.4.M18</strong> (≈8 min) — Appeals/escalation oversight: appeal-chain enforcement (different reviewer) + reason-logged reassignment/override [PartB §6].</label></li>
+</ul>
+<h3 id="task-225--trust--safety-operations">Task 22.5 — Trust &amp; Safety operations</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" class="fb-check" /><strong>S22.5.M19</strong> (≈8 min) — Unified cross-domain risk signal feed grouped by identity/organization [PartB §13].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S22.5.M20</strong> (≈8 min) — Suspend/ban action + cascade (listings/orders/escrow effects; ban blocks re-registration; SuperAdmin-only reversal) [PartB §13].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S22.5.M21</strong> (≈8 min) — Investigation case files (FraudCase wrapper over linked signal refs) [PartB §13].</label></li>
+</ul>
+<h3 id="task-226--compliance-operations">Task 22.6 — Compliance operations</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" class="fb-check" /><strong>S22.6.M22</strong> (≈8 min) — Compliance / NDPR console + data-subject access/erasure (DSAR) workflow: consent register, exports, erasure defaults to anonymization pending legal sign-off [PartB §16].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S22.6.M23</strong> (≈6 min) — Legal hold placed/released, checked before any erasure or identity merge [PartB §16].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S22.6.M24</strong> (≈8 min) — Unified audit export across audit/review/marketplace trails [PartB §16].</label></li>
+</ul>
+<h3 id="task-227--s22-gate">Task 22.7 — S22 gate</h3>
+<ul class="task-list">
+<li><label><input type="checkbox" class="fb-check" /><strong>S22.7.M14</strong> (≈8 min) — Certification AC walk incl. revoke/expiry [BRD §18.0].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S22.7.M15</strong> (≈6 min) — Console governance + NDPR wipe [Doc 12] → <strong>exit pass</strong>.</label></li>
 </ul>
 <hr />
 <h2 id="sprint-23--hardening-1-performance-offline-accessibility-design-conformance">Sprint 23 — Hardening 1: performance, offline, accessibility, design conformance</h2>
 <blockquote>
-<p><strong>Hardening · Focus:</strong> load tests, indexing/caching, full offline matrix, WCAG + DS2 design conformance. <strong>Exit ticket:</strong> load + a11y pass. <strong>Primary:</strong> ENG 05; DS2; BRD §18.0.</p>
+<p><strong>Hardening · Focus:</strong> load tests, indexing/caching, full offline matrix, WCAG + DS2 design conformance. <strong>Exit ticket:</strong> load + a11y pass. <strong>Primary:</strong> Doc 12; DS2; BRD §18.0.</p>
 </blockquote>
 <h3 id="task-231--performance--scale">Task 23.1 — Performance &amp; scale</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S23.1.M1</strong> (≈10 min) — Load tests (auth, listings, geo queries, alerts) [ENG 05].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S23.1.M2</strong> (≈8 min) — Index review + query plans on hot paths [ENG 02/05].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S23.1.M1</strong> (≈10 min) — Load tests (auth, listings, geo queries, alerts) [Doc 12].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S23.1.M2</strong> (≈8 min) — Index review + query plans on hot paths [ENG 02/Doc 12].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S23.1.M3</strong> (≈8 min) — Caching strategy for read models [ENG 02].</label></li>
 </ul>
 <h3 id="task-232--offline--resilience">Task 23.2 — Offline &amp; resilience</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S23.2.M4</strong> (≈8 min) — Full offline-matrix regression across all modules [ENG 05 ℹ12].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S23.2.M5</strong> (≈6 min) — Retry/backoff + queue-safety audit [ENG 05].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S23.2.M4</strong> (≈8 min) — Full offline-matrix regression across all modules [Doc 12].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S23.2.M5</strong> (≈6 min) — Retry/backoff + queue-safety audit [Doc 12].</label></li>
 </ul>
 <h3 id="task-233--accessibility--design-conformance">Task 23.3 — Accessibility &amp; design conformance</h3>
 <ul class="task-list">
@@ -1010,14 +1028,14 @@ body{
 <hr />
 <h2 id="sprint-24--hardening-2-security-business-continuity-uat-go-live">Sprint 24 — Hardening 2: security, business continuity, UAT, go-live</h2>
 <blockquote>
-<p><strong>Hardening · Focus:</strong> SSO/MFA + security scan, DR drill vs RPO/RTO, data freeze, UAT, training, go/no-go. <strong>Exit ticket:</strong> final readiness sign-off → LAUNCH. <strong>Primary:</strong> PartB §3; ENG 07/09; QA 13/14; BRD §4.3; ENG 06.</p>
+<p><strong>Hardening · Focus:</strong> SSO/MFA + security scan, DR drill vs RPO/RTO, data freeze, UAT, training, go/no-go. <strong>Exit ticket:</strong> final readiness sign-off → LAUNCH. <strong>Primary:</strong> PartB §17; ENG 07/09; QA 13/14; BRD §4.3; ENG 06.</p>
 </blockquote>
 <h3 id="task-241--security-hardening">Task 24.1 — Security hardening</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S24.1.M1</strong> (≈8 min) — SSO/MFA + session hardening review [PartB §3].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S24.1.M2</strong> (≈8 min) — Permission-matrix security smoke across consoles [PartB §3.2].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S24.1.M1</strong> (≈8 min) — SSO/MFA + session hardening review [PartB §17].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S24.1.M2</strong> (≈8 min) — Permission-matrix security smoke across consoles [PartB §3].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S24.1.M3</strong> (≈6 min) — Dependency + header/OWASP-oriented scan [ENG 07].</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S24.1.M4</strong> (≈8 min) — Breach/incident runbook + response drill [PartB §3].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S24.1.M4</strong> (≈8 min) — Breach/incident runbook + response drill [PartB §17].</label></li>
 </ul>
 <h3 id="task-242--business-continuity--data-freeze">Task 24.2 — Business continuity &amp; data freeze</h3>
 <ul class="task-list">
@@ -1026,7 +1044,7 @@ body{
 </ul>
 <h3 id="task-243--uat-training-go-live">Task 24.3 — UAT, training, go-live</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S24.3.M7</strong> (≈8 min) — UAT with stakeholders across all four phases [QA 14].</label></li>
+<li><label><input type="checkbox" class="fb-check" /><strong>S24.3.M7</strong> (≈8 min) — UAT with stakeholders across all four phases [QA 13].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S24.3.M8</strong> (≈6 min) — Train-the-trainer + runbook handoff [BRD §2.4].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S24.3.M9</strong> (≈8 min) — Go/no-go checklist + launch baseline snapshot [BRD §4.3].</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S24.3.M10</strong> (≈6 min) — Cutover, freeze list, rollback plan rehearsed [ENG 09].</label></li>
@@ -1038,7 +1056,7 @@ body{
 <hr />
 <h2 id="closing-notes">Closing notes</h2>
 <ul>
-<li><strong>Verification:</strong> every micro-task's AC is met by completing its description; sprint-level gates run the checklists in <code>Doc\04-QA\13-QA-Release-Checklists.md</code> and <code>14-UAT-Protocol.md</code>.</li>
+<li><strong>Verification:</strong> every micro-task's AC is met by completing its description; sprint-level gates run the checklists in <code>Doc\04-QA\12-QA-Master-Test-Plan.md</code> and <code>13-QA-UAT-and-Pilot-Protocol.md</code>.</li>
 <li><strong>Sizing discipline:</strong> re-slice any micro-task that grows beyond 10 minutes into two smaller ones; record the split in the project log. Post-launch fixes and change requests enter new sprints through the backlog process in <code>BRD §7.1</code> — this document stays the frozen S1–S24 baseline.</li>
 <li><strong>Source of truth:</strong> where this document and the sprint plan (<code>Plan\Farm-Basics-Sprint-Plan.md</code>) disagree, the sprint plan governs effort/resourcing; this document governs <em>work breakdown and order</em>.</li>
 </ul>
