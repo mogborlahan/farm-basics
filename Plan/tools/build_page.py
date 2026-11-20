@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function () {
   try { state = JSON.parse(localStorage.getItem(key)) || {}; } catch (e) {}
   function paint() {
     checks.forEach(function (c) {
-      var on = !!state[c.dataset.id];
+      var on = (c.dataset.id in state) ? !!state[c.dataset.id] : c.defaultChecked;
       c.checked = on;
       var li = c.closest('li');
       if (li) li.classList.toggle('done', on);
@@ -176,8 +176,8 @@ def assemble(md, out, title, subtitle, meta, phases, progress, note):
     frag = run_pandoc(md)
     toc_inner = build_toc(frag)
     body = re.sub(
-        r'<input type="checkbox"[^>]*/?>',
-        '<input type="checkbox" class="fb-check" />',
+        r'<input type="checkbox"([^>]*)/?>',
+        lambda m: '<input type="checkbox" class="fb-check" checked />' if "checked" in m.group(1) else '<input type="checkbox" class="fb-check" />',
         frag,
     )
     logo = load_logo()

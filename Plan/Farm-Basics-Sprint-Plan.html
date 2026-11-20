@@ -1860,7 +1860,7 @@ document.addEventListener('DOMContentLoaded', function () {
   try { state = JSON.parse(localStorage.getItem(key)) || {}; } catch (e) {}
   function paint() {
     checks.forEach(function (c) {
-      var on = !!state[c.dataset.id];
+      var on = (c.dataset.id in state) ? !!state[c.dataset.id] : c.defaultChecked;
       c.checked = on;
       var li = c.closest('li');
       if (li) li.classList.toggle('done', on);
