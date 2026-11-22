@@ -27,6 +27,22 @@ public static class RateLimitPolicies
                ?? "anonymous";
     }
 
+    public static string ResolveOtpPartitionKey(HttpContext httpContext)
+    {
+        ArgumentNullException.ThrowIfNull(httpContext);
+        string callerKey = ResolvePartitionKey(httpContext);
+        string? identityId = httpContext.Request.RouteValues.TryGetValue("identityId", out object? rawId)
+            ? rawId?.ToString()
+            : null;
+        string actionScope = httpContext.Request.Path.Value?.EndsWith("/resend-otp", StringComparison.OrdinalIgnoreCase) == true
+            ? "resend"
+            : "verify";
+
+        return string.IsNullOrWhiteSpace(identityId)
+            ? $"{actionScope}:{callerKey}"
+            : $"{actionScope}:{identityId}:{callerKey}";
+    }
+
     public static IServiceCollection AddFarmBasicsRateLimiting(this IServiceCollection services)
     {
         services.AddRateLimiter(options =>
@@ -63,7 +79,7 @@ public static class RateLimitPolicies
 
             options.AddPolicy(OtpVerify, httpContext =>
                 RateLimitPartition.GetFixedWindowLimiter(
-                    ResolvePartitionKey(httpContext),
+                    ResolveOtpPartitionKey(httpContext),
                     _ => new FixedWindowRateLimiterOptions
                     {
                         PermitLimit = OtpVerifyLimitPer15Minutes,

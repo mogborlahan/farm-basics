@@ -1193,16 +1193,735 @@ class LocalOutboxMutationsCompanion
   }
 }
 
+class $RegistrationDraftsTable extends RegistrationDrafts
+    with TableInfo<$RegistrationDraftsTable, RegistrationDraft> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RegistrationDraftsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _stepIndexMeta = const VerificationMeta(
+    'stepIndex',
+  );
+  @override
+  late final GeneratedColumn<int> stepIndex = GeneratedColumn<int>(
+    'step_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _phoneMeta = const VerificationMeta('phone');
+  @override
+  late final GeneratedColumn<String> phone = GeneratedColumn<String>(
+    'phone',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _emailMeta = const VerificationMeta('email');
+  @override
+  late final GeneratedColumn<String> email = GeneratedColumn<String>(
+    'email',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _stateCodeMeta = const VerificationMeta(
+    'stateCode',
+  );
+  @override
+  late final GeneratedColumn<String> stateCode = GeneratedColumn<String>(
+    'state_code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _lgaNameMeta = const VerificationMeta(
+    'lgaName',
+  );
+  @override
+  late final GeneratedColumn<String> lgaName = GeneratedColumn<String>(
+    'lga_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _pendingIdentityIdMeta = const VerificationMeta(
+    'pendingIdentityId',
+  );
+  @override
+  late final GeneratedColumn<String> pendingIdentityId =
+      GeneratedColumn<String>(
+        'pending_identity_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _farmerIdMeta = const VerificationMeta(
+    'farmerId',
+  );
+  @override
+  late final GeneratedColumn<String> farmerId = GeneratedColumn<String>(
+    'farmer_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _statusMessageMeta = const VerificationMeta(
+    'statusMessage',
+  );
+  @override
+  late final GeneratedColumn<String> statusMessage = GeneratedColumn<String>(
+    'status_message',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastErrorCodeMeta = const VerificationMeta(
+    'lastErrorCode',
+  );
+  @override
+  late final GeneratedColumn<String> lastErrorCode = GeneratedColumn<String>(
+    'last_error_code',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lockoutUntilUtcMeta = const VerificationMeta(
+    'lockoutUntilUtc',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lockoutUntilUtc =
+      GeneratedColumn<DateTime>(
+        'lockout_until_utc',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    stepIndex,
+    phone,
+    email,
+    stateCode,
+    lgaName,
+    pendingIdentityId,
+    farmerId,
+    statusMessage,
+    lastErrorCode,
+    lockoutUntilUtc,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'registration_draft';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RegistrationDraft> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('step_index')) {
+      context.handle(
+        _stepIndexMeta,
+        stepIndex.isAcceptableOrUnknown(data['step_index']!, _stepIndexMeta),
+      );
+    }
+    if (data.containsKey('phone')) {
+      context.handle(
+        _phoneMeta,
+        phone.isAcceptableOrUnknown(data['phone']!, _phoneMeta),
+      );
+    }
+    if (data.containsKey('email')) {
+      context.handle(
+        _emailMeta,
+        email.isAcceptableOrUnknown(data['email']!, _emailMeta),
+      );
+    }
+    if (data.containsKey('state_code')) {
+      context.handle(
+        _stateCodeMeta,
+        stateCode.isAcceptableOrUnknown(data['state_code']!, _stateCodeMeta),
+      );
+    }
+    if (data.containsKey('lga_name')) {
+      context.handle(
+        _lgaNameMeta,
+        lgaName.isAcceptableOrUnknown(data['lga_name']!, _lgaNameMeta),
+      );
+    }
+    if (data.containsKey('pending_identity_id')) {
+      context.handle(
+        _pendingIdentityIdMeta,
+        pendingIdentityId.isAcceptableOrUnknown(
+          data['pending_identity_id']!,
+          _pendingIdentityIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('farmer_id')) {
+      context.handle(
+        _farmerIdMeta,
+        farmerId.isAcceptableOrUnknown(data['farmer_id']!, _farmerIdMeta),
+      );
+    }
+    if (data.containsKey('status_message')) {
+      context.handle(
+        _statusMessageMeta,
+        statusMessage.isAcceptableOrUnknown(
+          data['status_message']!,
+          _statusMessageMeta,
+        ),
+      );
+    }
+    if (data.containsKey('last_error_code')) {
+      context.handle(
+        _lastErrorCodeMeta,
+        lastErrorCode.isAcceptableOrUnknown(
+          data['last_error_code']!,
+          _lastErrorCodeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('lockout_until_utc')) {
+      context.handle(
+        _lockoutUntilUtcMeta,
+        lockoutUntilUtc.isAcceptableOrUnknown(
+          data['lockout_until_utc']!,
+          _lockoutUntilUtcMeta,
+        ),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  RegistrationDraft map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RegistrationDraft(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      stepIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}step_index'],
+      )!,
+      phone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}phone'],
+      )!,
+      email: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}email'],
+      )!,
+      stateCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}state_code'],
+      )!,
+      lgaName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}lga_name'],
+      )!,
+      pendingIdentityId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pending_identity_id'],
+      ),
+      farmerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}farmer_id'],
+      ),
+      statusMessage: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status_message'],
+      ),
+      lastErrorCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_error_code'],
+      ),
+      lockoutUntilUtc: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}lockout_until_utc'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $RegistrationDraftsTable createAlias(String alias) {
+    return $RegistrationDraftsTable(attachedDatabase, alias);
+  }
+}
+
+class RegistrationDraft extends DataClass
+    implements Insertable<RegistrationDraft> {
+  final int id;
+  final int stepIndex;
+  final String phone;
+  final String email;
+  final String stateCode;
+  final String lgaName;
+  final String? pendingIdentityId;
+  final String? farmerId;
+  final String? statusMessage;
+  final String? lastErrorCode;
+  final DateTime? lockoutUntilUtc;
+  final DateTime updatedAt;
+  const RegistrationDraft({
+    required this.id,
+    required this.stepIndex,
+    required this.phone,
+    required this.email,
+    required this.stateCode,
+    required this.lgaName,
+    this.pendingIdentityId,
+    this.farmerId,
+    this.statusMessage,
+    this.lastErrorCode,
+    this.lockoutUntilUtc,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['step_index'] = Variable<int>(stepIndex);
+    map['phone'] = Variable<String>(phone);
+    map['email'] = Variable<String>(email);
+    map['state_code'] = Variable<String>(stateCode);
+    map['lga_name'] = Variable<String>(lgaName);
+    if (!nullToAbsent || pendingIdentityId != null) {
+      map['pending_identity_id'] = Variable<String>(pendingIdentityId);
+    }
+    if (!nullToAbsent || farmerId != null) {
+      map['farmer_id'] = Variable<String>(farmerId);
+    }
+    if (!nullToAbsent || statusMessage != null) {
+      map['status_message'] = Variable<String>(statusMessage);
+    }
+    if (!nullToAbsent || lastErrorCode != null) {
+      map['last_error_code'] = Variable<String>(lastErrorCode);
+    }
+    if (!nullToAbsent || lockoutUntilUtc != null) {
+      map['lockout_until_utc'] = Variable<DateTime>(lockoutUntilUtc);
+    }
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  RegistrationDraftsCompanion toCompanion(bool nullToAbsent) {
+    return RegistrationDraftsCompanion(
+      id: Value(id),
+      stepIndex: Value(stepIndex),
+      phone: Value(phone),
+      email: Value(email),
+      stateCode: Value(stateCode),
+      lgaName: Value(lgaName),
+      pendingIdentityId: pendingIdentityId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pendingIdentityId),
+      farmerId: farmerId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(farmerId),
+      statusMessage: statusMessage == null && nullToAbsent
+          ? const Value.absent()
+          : Value(statusMessage),
+      lastErrorCode: lastErrorCode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastErrorCode),
+      lockoutUntilUtc: lockoutUntilUtc == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lockoutUntilUtc),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory RegistrationDraft.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RegistrationDraft(
+      id: serializer.fromJson<int>(json['id']),
+      stepIndex: serializer.fromJson<int>(json['stepIndex']),
+      phone: serializer.fromJson<String>(json['phone']),
+      email: serializer.fromJson<String>(json['email']),
+      stateCode: serializer.fromJson<String>(json['stateCode']),
+      lgaName: serializer.fromJson<String>(json['lgaName']),
+      pendingIdentityId: serializer.fromJson<String?>(
+        json['pendingIdentityId'],
+      ),
+      farmerId: serializer.fromJson<String?>(json['farmerId']),
+      statusMessage: serializer.fromJson<String?>(json['statusMessage']),
+      lastErrorCode: serializer.fromJson<String?>(json['lastErrorCode']),
+      lockoutUntilUtc: serializer.fromJson<DateTime?>(json['lockoutUntilUtc']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'stepIndex': serializer.toJson<int>(stepIndex),
+      'phone': serializer.toJson<String>(phone),
+      'email': serializer.toJson<String>(email),
+      'stateCode': serializer.toJson<String>(stateCode),
+      'lgaName': serializer.toJson<String>(lgaName),
+      'pendingIdentityId': serializer.toJson<String?>(pendingIdentityId),
+      'farmerId': serializer.toJson<String?>(farmerId),
+      'statusMessage': serializer.toJson<String?>(statusMessage),
+      'lastErrorCode': serializer.toJson<String?>(lastErrorCode),
+      'lockoutUntilUtc': serializer.toJson<DateTime?>(lockoutUntilUtc),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  RegistrationDraft copyWith({
+    int? id,
+    int? stepIndex,
+    String? phone,
+    String? email,
+    String? stateCode,
+    String? lgaName,
+    Value<String?> pendingIdentityId = const Value.absent(),
+    Value<String?> farmerId = const Value.absent(),
+    Value<String?> statusMessage = const Value.absent(),
+    Value<String?> lastErrorCode = const Value.absent(),
+    Value<DateTime?> lockoutUntilUtc = const Value.absent(),
+    DateTime? updatedAt,
+  }) => RegistrationDraft(
+    id: id ?? this.id,
+    stepIndex: stepIndex ?? this.stepIndex,
+    phone: phone ?? this.phone,
+    email: email ?? this.email,
+    stateCode: stateCode ?? this.stateCode,
+    lgaName: lgaName ?? this.lgaName,
+    pendingIdentityId: pendingIdentityId.present
+        ? pendingIdentityId.value
+        : this.pendingIdentityId,
+    farmerId: farmerId.present ? farmerId.value : this.farmerId,
+    statusMessage: statusMessage.present
+        ? statusMessage.value
+        : this.statusMessage,
+    lastErrorCode: lastErrorCode.present
+        ? lastErrorCode.value
+        : this.lastErrorCode,
+    lockoutUntilUtc: lockoutUntilUtc.present
+        ? lockoutUntilUtc.value
+        : this.lockoutUntilUtc,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  RegistrationDraft copyWithCompanion(RegistrationDraftsCompanion data) {
+    return RegistrationDraft(
+      id: data.id.present ? data.id.value : this.id,
+      stepIndex: data.stepIndex.present ? data.stepIndex.value : this.stepIndex,
+      phone: data.phone.present ? data.phone.value : this.phone,
+      email: data.email.present ? data.email.value : this.email,
+      stateCode: data.stateCode.present ? data.stateCode.value : this.stateCode,
+      lgaName: data.lgaName.present ? data.lgaName.value : this.lgaName,
+      pendingIdentityId: data.pendingIdentityId.present
+          ? data.pendingIdentityId.value
+          : this.pendingIdentityId,
+      farmerId: data.farmerId.present ? data.farmerId.value : this.farmerId,
+      statusMessage: data.statusMessage.present
+          ? data.statusMessage.value
+          : this.statusMessage,
+      lastErrorCode: data.lastErrorCode.present
+          ? data.lastErrorCode.value
+          : this.lastErrorCode,
+      lockoutUntilUtc: data.lockoutUntilUtc.present
+          ? data.lockoutUntilUtc.value
+          : this.lockoutUntilUtc,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RegistrationDraft(')
+          ..write('id: $id, ')
+          ..write('stepIndex: $stepIndex, ')
+          ..write('phone: $phone, ')
+          ..write('email: $email, ')
+          ..write('stateCode: $stateCode, ')
+          ..write('lgaName: $lgaName, ')
+          ..write('pendingIdentityId: $pendingIdentityId, ')
+          ..write('farmerId: $farmerId, ')
+          ..write('statusMessage: $statusMessage, ')
+          ..write('lastErrorCode: $lastErrorCode, ')
+          ..write('lockoutUntilUtc: $lockoutUntilUtc, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    stepIndex,
+    phone,
+    email,
+    stateCode,
+    lgaName,
+    pendingIdentityId,
+    farmerId,
+    statusMessage,
+    lastErrorCode,
+    lockoutUntilUtc,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RegistrationDraft &&
+          other.id == this.id &&
+          other.stepIndex == this.stepIndex &&
+          other.phone == this.phone &&
+          other.email == this.email &&
+          other.stateCode == this.stateCode &&
+          other.lgaName == this.lgaName &&
+          other.pendingIdentityId == this.pendingIdentityId &&
+          other.farmerId == this.farmerId &&
+          other.statusMessage == this.statusMessage &&
+          other.lastErrorCode == this.lastErrorCode &&
+          other.lockoutUntilUtc == this.lockoutUntilUtc &&
+          other.updatedAt == this.updatedAt);
+}
+
+class RegistrationDraftsCompanion extends UpdateCompanion<RegistrationDraft> {
+  final Value<int> id;
+  final Value<int> stepIndex;
+  final Value<String> phone;
+  final Value<String> email;
+  final Value<String> stateCode;
+  final Value<String> lgaName;
+  final Value<String?> pendingIdentityId;
+  final Value<String?> farmerId;
+  final Value<String?> statusMessage;
+  final Value<String?> lastErrorCode;
+  final Value<DateTime?> lockoutUntilUtc;
+  final Value<DateTime> updatedAt;
+  const RegistrationDraftsCompanion({
+    this.id = const Value.absent(),
+    this.stepIndex = const Value.absent(),
+    this.phone = const Value.absent(),
+    this.email = const Value.absent(),
+    this.stateCode = const Value.absent(),
+    this.lgaName = const Value.absent(),
+    this.pendingIdentityId = const Value.absent(),
+    this.farmerId = const Value.absent(),
+    this.statusMessage = const Value.absent(),
+    this.lastErrorCode = const Value.absent(),
+    this.lockoutUntilUtc = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  RegistrationDraftsCompanion.insert({
+    this.id = const Value.absent(),
+    this.stepIndex = const Value.absent(),
+    this.phone = const Value.absent(),
+    this.email = const Value.absent(),
+    this.stateCode = const Value.absent(),
+    this.lgaName = const Value.absent(),
+    this.pendingIdentityId = const Value.absent(),
+    this.farmerId = const Value.absent(),
+    this.statusMessage = const Value.absent(),
+    this.lastErrorCode = const Value.absent(),
+    this.lockoutUntilUtc = const Value.absent(),
+    required DateTime updatedAt,
+  }) : updatedAt = Value(updatedAt);
+  static Insertable<RegistrationDraft> custom({
+    Expression<int>? id,
+    Expression<int>? stepIndex,
+    Expression<String>? phone,
+    Expression<String>? email,
+    Expression<String>? stateCode,
+    Expression<String>? lgaName,
+    Expression<String>? pendingIdentityId,
+    Expression<String>? farmerId,
+    Expression<String>? statusMessage,
+    Expression<String>? lastErrorCode,
+    Expression<DateTime>? lockoutUntilUtc,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (stepIndex != null) 'step_index': stepIndex,
+      if (phone != null) 'phone': phone,
+      if (email != null) 'email': email,
+      if (stateCode != null) 'state_code': stateCode,
+      if (lgaName != null) 'lga_name': lgaName,
+      if (pendingIdentityId != null) 'pending_identity_id': pendingIdentityId,
+      if (farmerId != null) 'farmer_id': farmerId,
+      if (statusMessage != null) 'status_message': statusMessage,
+      if (lastErrorCode != null) 'last_error_code': lastErrorCode,
+      if (lockoutUntilUtc != null) 'lockout_until_utc': lockoutUntilUtc,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  RegistrationDraftsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? stepIndex,
+    Value<String>? phone,
+    Value<String>? email,
+    Value<String>? stateCode,
+    Value<String>? lgaName,
+    Value<String?>? pendingIdentityId,
+    Value<String?>? farmerId,
+    Value<String?>? statusMessage,
+    Value<String?>? lastErrorCode,
+    Value<DateTime?>? lockoutUntilUtc,
+    Value<DateTime>? updatedAt,
+  }) {
+    return RegistrationDraftsCompanion(
+      id: id ?? this.id,
+      stepIndex: stepIndex ?? this.stepIndex,
+      phone: phone ?? this.phone,
+      email: email ?? this.email,
+      stateCode: stateCode ?? this.stateCode,
+      lgaName: lgaName ?? this.lgaName,
+      pendingIdentityId: pendingIdentityId ?? this.pendingIdentityId,
+      farmerId: farmerId ?? this.farmerId,
+      statusMessage: statusMessage ?? this.statusMessage,
+      lastErrorCode: lastErrorCode ?? this.lastErrorCode,
+      lockoutUntilUtc: lockoutUntilUtc ?? this.lockoutUntilUtc,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (stepIndex.present) {
+      map['step_index'] = Variable<int>(stepIndex.value);
+    }
+    if (phone.present) {
+      map['phone'] = Variable<String>(phone.value);
+    }
+    if (email.present) {
+      map['email'] = Variable<String>(email.value);
+    }
+    if (stateCode.present) {
+      map['state_code'] = Variable<String>(stateCode.value);
+    }
+    if (lgaName.present) {
+      map['lga_name'] = Variable<String>(lgaName.value);
+    }
+    if (pendingIdentityId.present) {
+      map['pending_identity_id'] = Variable<String>(pendingIdentityId.value);
+    }
+    if (farmerId.present) {
+      map['farmer_id'] = Variable<String>(farmerId.value);
+    }
+    if (statusMessage.present) {
+      map['status_message'] = Variable<String>(statusMessage.value);
+    }
+    if (lastErrorCode.present) {
+      map['last_error_code'] = Variable<String>(lastErrorCode.value);
+    }
+    if (lockoutUntilUtc.present) {
+      map['lockout_until_utc'] = Variable<DateTime>(lockoutUntilUtc.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RegistrationDraftsCompanion(')
+          ..write('id: $id, ')
+          ..write('stepIndex: $stepIndex, ')
+          ..write('phone: $phone, ')
+          ..write('email: $email, ')
+          ..write('stateCode: $stateCode, ')
+          ..write('lgaName: $lgaName, ')
+          ..write('pendingIdentityId: $pendingIdentityId, ')
+          ..write('farmerId: $farmerId, ')
+          ..write('statusMessage: $statusMessage, ')
+          ..write('lastErrorCode: $lastErrorCode, ')
+          ..write('lockoutUntilUtc: $lockoutUntilUtc, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppOutboxDatabase extends GeneratedDatabase {
   _$AppOutboxDatabase(QueryExecutor e) : super(e);
   $AppOutboxDatabaseManager get managers => $AppOutboxDatabaseManager(this);
   late final $LocalOutboxMutationsTable localOutboxMutations =
       $LocalOutboxMutationsTable(this);
+  late final $RegistrationDraftsTable registrationDrafts =
+      $RegistrationDraftsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [localOutboxMutations];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    localOutboxMutations,
+    registrationDrafts,
+  ];
 }
 
 typedef $$LocalOutboxMutationsTableCreateCompanionBuilder =
@@ -1747,10 +2466,371 @@ typedef $$LocalOutboxMutationsTableProcessedTableManager =
       LocalOutboxMutation,
       PrefetchHooks Function()
     >;
+typedef $$RegistrationDraftsTableCreateCompanionBuilder =
+    RegistrationDraftsCompanion Function({
+      Value<int> id,
+      Value<int> stepIndex,
+      Value<String> phone,
+      Value<String> email,
+      Value<String> stateCode,
+      Value<String> lgaName,
+      Value<String?> pendingIdentityId,
+      Value<String?> farmerId,
+      Value<String?> statusMessage,
+      Value<String?> lastErrorCode,
+      Value<DateTime?> lockoutUntilUtc,
+      required DateTime updatedAt,
+    });
+typedef $$RegistrationDraftsTableUpdateCompanionBuilder =
+    RegistrationDraftsCompanion Function({
+      Value<int> id,
+      Value<int> stepIndex,
+      Value<String> phone,
+      Value<String> email,
+      Value<String> stateCode,
+      Value<String> lgaName,
+      Value<String?> pendingIdentityId,
+      Value<String?> farmerId,
+      Value<String?> statusMessage,
+      Value<String?> lastErrorCode,
+      Value<DateTime?> lockoutUntilUtc,
+      Value<DateTime> updatedAt,
+    });
+
+class $$RegistrationDraftsTableFilterComposer
+    extends Composer<_$AppOutboxDatabase, $RegistrationDraftsTable> {
+  $$RegistrationDraftsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get stepIndex => $composableBuilder(
+    column: $table.stepIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get phone => $composableBuilder(
+    column: $table.phone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get stateCode => $composableBuilder(
+    column: $table.stateCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lgaName => $composableBuilder(
+    column: $table.lgaName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get pendingIdentityId => $composableBuilder(
+    column: $table.pendingIdentityId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get farmerId => $composableBuilder(
+    column: $table.farmerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get statusMessage => $composableBuilder(
+    column: $table.statusMessage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lastErrorCode => $composableBuilder(
+    column: $table.lastErrorCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lockoutUntilUtc => $composableBuilder(
+    column: $table.lockoutUntilUtc,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$RegistrationDraftsTableOrderingComposer
+    extends Composer<_$AppOutboxDatabase, $RegistrationDraftsTable> {
+  $$RegistrationDraftsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get stepIndex => $composableBuilder(
+    column: $table.stepIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get phone => $composableBuilder(
+    column: $table.phone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get stateCode => $composableBuilder(
+    column: $table.stateCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lgaName => $composableBuilder(
+    column: $table.lgaName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get pendingIdentityId => $composableBuilder(
+    column: $table.pendingIdentityId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get farmerId => $composableBuilder(
+    column: $table.farmerId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get statusMessage => $composableBuilder(
+    column: $table.statusMessage,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lastErrorCode => $composableBuilder(
+    column: $table.lastErrorCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lockoutUntilUtc => $composableBuilder(
+    column: $table.lockoutUntilUtc,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$RegistrationDraftsTableAnnotationComposer
+    extends Composer<_$AppOutboxDatabase, $RegistrationDraftsTable> {
+  $$RegistrationDraftsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get stepIndex =>
+      $composableBuilder(column: $table.stepIndex, builder: (column) => column);
+
+  GeneratedColumn<String> get phone =>
+      $composableBuilder(column: $table.phone, builder: (column) => column);
+
+  GeneratedColumn<String> get email =>
+      $composableBuilder(column: $table.email, builder: (column) => column);
+
+  GeneratedColumn<String> get stateCode =>
+      $composableBuilder(column: $table.stateCode, builder: (column) => column);
+
+  GeneratedColumn<String> get lgaName =>
+      $composableBuilder(column: $table.lgaName, builder: (column) => column);
+
+  GeneratedColumn<String> get pendingIdentityId => $composableBuilder(
+    column: $table.pendingIdentityId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get farmerId =>
+      $composableBuilder(column: $table.farmerId, builder: (column) => column);
+
+  GeneratedColumn<String> get statusMessage => $composableBuilder(
+    column: $table.statusMessage,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get lastErrorCode => $composableBuilder(
+    column: $table.lastErrorCode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get lockoutUntilUtc => $composableBuilder(
+    column: $table.lockoutUntilUtc,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$RegistrationDraftsTableTableManager
+    extends
+        RootTableManager<
+          _$AppOutboxDatabase,
+          $RegistrationDraftsTable,
+          RegistrationDraft,
+          $$RegistrationDraftsTableFilterComposer,
+          $$RegistrationDraftsTableOrderingComposer,
+          $$RegistrationDraftsTableAnnotationComposer,
+          $$RegistrationDraftsTableCreateCompanionBuilder,
+          $$RegistrationDraftsTableUpdateCompanionBuilder,
+          (
+            RegistrationDraft,
+            BaseReferences<
+              _$AppOutboxDatabase,
+              $RegistrationDraftsTable,
+              RegistrationDraft
+            >,
+          ),
+          RegistrationDraft,
+          PrefetchHooks Function()
+        > {
+  $$RegistrationDraftsTableTableManager(
+    _$AppOutboxDatabase db,
+    $RegistrationDraftsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RegistrationDraftsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RegistrationDraftsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RegistrationDraftsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> stepIndex = const Value.absent(),
+                Value<String> phone = const Value.absent(),
+                Value<String> email = const Value.absent(),
+                Value<String> stateCode = const Value.absent(),
+                Value<String> lgaName = const Value.absent(),
+                Value<String?> pendingIdentityId = const Value.absent(),
+                Value<String?> farmerId = const Value.absent(),
+                Value<String?> statusMessage = const Value.absent(),
+                Value<String?> lastErrorCode = const Value.absent(),
+                Value<DateTime?> lockoutUntilUtc = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => RegistrationDraftsCompanion(
+                id: id,
+                stepIndex: stepIndex,
+                phone: phone,
+                email: email,
+                stateCode: stateCode,
+                lgaName: lgaName,
+                pendingIdentityId: pendingIdentityId,
+                farmerId: farmerId,
+                statusMessage: statusMessage,
+                lastErrorCode: lastErrorCode,
+                lockoutUntilUtc: lockoutUntilUtc,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> stepIndex = const Value.absent(),
+                Value<String> phone = const Value.absent(),
+                Value<String> email = const Value.absent(),
+                Value<String> stateCode = const Value.absent(),
+                Value<String> lgaName = const Value.absent(),
+                Value<String?> pendingIdentityId = const Value.absent(),
+                Value<String?> farmerId = const Value.absent(),
+                Value<String?> statusMessage = const Value.absent(),
+                Value<String?> lastErrorCode = const Value.absent(),
+                Value<DateTime?> lockoutUntilUtc = const Value.absent(),
+                required DateTime updatedAt,
+              }) => RegistrationDraftsCompanion.insert(
+                id: id,
+                stepIndex: stepIndex,
+                phone: phone,
+                email: email,
+                stateCode: stateCode,
+                lgaName: lgaName,
+                pendingIdentityId: pendingIdentityId,
+                farmerId: farmerId,
+                statusMessage: statusMessage,
+                lastErrorCode: lastErrorCode,
+                lockoutUntilUtc: lockoutUntilUtc,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$RegistrationDraftsTable, RegistrationDraft>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppOutboxDatabase,
+                    $RegistrationDraftsTable,
+                    RegistrationDraft
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$RegistrationDraftsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppOutboxDatabase,
+      $RegistrationDraftsTable,
+      RegistrationDraft,
+      $$RegistrationDraftsTableFilterComposer,
+      $$RegistrationDraftsTableOrderingComposer,
+      $$RegistrationDraftsTableAnnotationComposer,
+      $$RegistrationDraftsTableCreateCompanionBuilder,
+      $$RegistrationDraftsTableUpdateCompanionBuilder,
+      (
+        RegistrationDraft,
+        BaseReferences<
+          _$AppOutboxDatabase,
+          $RegistrationDraftsTable,
+          RegistrationDraft
+        >,
+      ),
+      RegistrationDraft,
+      PrefetchHooks Function()
+    >;
 
 class $AppOutboxDatabaseManager {
   final _$AppOutboxDatabase _db;
   $AppOutboxDatabaseManager(this._db);
   $$LocalOutboxMutationsTableTableManager get localOutboxMutations =>
       $$LocalOutboxMutationsTableTableManager(_db, _db.localOutboxMutations);
+  $$RegistrationDraftsTableTableManager get registrationDrafts =>
+      $$RegistrationDraftsTableTableManager(_db, _db.registrationDrafts);
 }

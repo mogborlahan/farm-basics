@@ -3,8 +3,10 @@ using FarmBasics.Api.Audit;
 using FarmBasics.Api.Auth;
 using FarmBasics.Api.Geography;
 using FarmBasics.Api.Identity;
+using FarmBasics.Api.Integrations;
 using FarmBasics.Api.Persistence;
 using FarmBasics.Api.Platform;
+using FarmBasics.Api.Registration;
 using FarmBasics.Api.Sync;
 using FarmBasics.BuildingBlocks.Api;
 using FarmBasics.BuildingBlocks.Auth;
@@ -76,6 +78,7 @@ builder.Services
 
 builder.Services.AddAuthorization();
 builder.Services.AddFarmBasicsRateLimiting();
+builder.Services.AddFarmBasicsIntegrations(builder.Configuration);
 
 WebApplication app = builder.Build();
 
@@ -216,6 +219,7 @@ app.MapGet("/v1/admin/ping", [Authorize] (HttpContext httpContext, ICurrentIdent
 
 app.MapGeographyEndpoints();
 app.MapAuditEndpoints();
+app.MapSelfServiceRegistrationEndpoints();
 app.MapSyncSpikeEndpoints();
 app.MapMetrics("/metrics");
 

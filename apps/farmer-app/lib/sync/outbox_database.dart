@@ -35,14 +35,47 @@ class LocalOutboxMutations extends Table {
   DateTimeColumn get serverReceivedAt => dateTime().nullable()();
 }
 
-/// Drift-backed SQLite database for Farm Basics offline-first mutation capture.
-@DriftDatabase(tables: [LocalOutboxMutations])
+/// Non-sensitive self-service registration wizard draft (WP-21 / Rule 1: never stores raw NIN or OTP).
+@DataClassName('RegistrationDraft')
+class RegistrationDrafts extends Table {
+  @override
+  String get tableName => 'registration_draft';
+
+  IntColumn get id => integer()();
+  IntColumn get stepIndex => integer().withDefault(const Constant(0))();
+  TextColumn get phone => text().withDefault(const Constant(''))();
+  TextColumn get email => text().withDefault(const Constant(''))();
+  TextColumn get stateCode => text().withDefault(const Constant(''))();
+  TextColumn get lgaName => text().withDefault(const Constant(''))();
+  TextColumn get pendingIdentityId => text().nullable()();
+  TextColumn get farmerId => text().nullable()();
+  TextColumn get statusMessage => text().nullable()();
+  TextColumn get lastErrorCode => text().nullable()();
+  DateTimeColumn get lockoutUntilUtc => dateTime().nullable()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => <Column<Object>>{id};
+}
+
+/// Drift-backed SQLite database for Farm Basics offline-first mutation capture and registration state.
+@DriftDatabase(tables: [LocalOutboxMutations, RegistrationDrafts])
 class AppOutboxDatabase extends _$AppOutboxDatabase {
   /// Opens the database with an explicit [QueryExecutor] (supports in-memory tests).
   AppOutboxDatabase(super.e);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (Migrator m) => m.createAll(),
+        onUpgrade: (Migrator m, int from, int to) async {
+          if (from < 2) {
+            await m.createTable(registrationDrafts);
+          }
+        },
+      );
 
   /// Enqueues an offline mutation into the durable outbox.
   Future<int> enqueueMutation(LocalOutboxMutationsCompanion entry) {
@@ -63,7 +96,8 @@ class AppOutboxDatabase extends _$AppOutboxDatabase {
     required int seqId,
     required DateTime serverReceivedAt,
   }) {
-    return (update(localOutboxMutations)..where((t) => t.seqId.equals(seqId))).write(
+    return (update(localOutboxMutations)..where((t) => t.seqId.equals(seqId)))
+        .write(
       LocalOutboxMutationsCompanion(
         syncStatus: const Value('synced'),
         serverReceivedAt: Value(serverReceivedAt),
@@ -79,7 +113,8 @@ class AppOutboxDatabase extends _$AppOutboxDatabase {
     required DateTime nextRetryAt,
     required String errorCode,
   }) {
-    return (update(localOutboxMutations)..where((t) => t.seqId.equals(seqId))).write(
+    return (update(localOutboxMutations)..where((t) => t.seqId.equals(seqId)))
+        .write(
       LocalOutboxMutationsCompanion(
         syncStatus: const Value('pending'),
         retryCount: Value(nextRetryCount),
@@ -94,7 +129,8 @@ class AppOutboxDatabase extends _$AppOutboxDatabase {
     required int seqId,
     required String errorCode,
   }) {
-    return (update(localOutboxMutations)..where((t) => t.seqId.equals(seqId))).write(
+    return (update(localOutboxMutations)..where((t) => t.seqId.equals(seqId)))
+        .write(
       LocalOutboxMutationsCompanion(
         syncStatus: const Value('conflict_rejected'),
         lastErrorCode: Value(errorCode),
@@ -107,6 +143,22 @@ class AppOutboxDatabase extends _$AppOutboxDatabase {
     return (select(localOutboxMutations)
           ..where((t) => t.clientGuid.equals(clientGuid)))
         .getSingleOrNull();
+  }
+
+  /// Loads the persisted singleton self-service registration wizard draft (if any).
+  Future<RegistrationDraft?> loadRegistrationDraft() {
+    return (select(registrationDrafts)..where((t) => t.id.equals(1)))
+        .getSingleOrNull();
+  }
+
+  /// Saves or updates non-sensitive self-service registration wizard progress.
+  Future<void> saveRegistrationDraft(RegistrationDraftsCompanion draft) {
+    return into(registrationDrafts).insertOnConflictUpdate(draft);
+  }
+
+  /// Clears any persisted self-service registration draft.
+  Future<void> clearRegistrationDraft() {
+    return (delete(registrationDrafts)..where((t) => t.id.equals(1))).go();
   }
 }
 

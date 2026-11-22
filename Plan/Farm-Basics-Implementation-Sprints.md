@@ -240,20 +240,20 @@ Intra-sprint, at every phase/section boundary the agent **shall** re-apply the t
 
 ### Task 2.1 — WP-20: NIN provider and SMS clients: typed `HttpClient`, resilience, sandbox + mock
 
-- [ ] **S2.1.M1** (≈8 min) — Typed `HttpClient` for the NIN provider with resilience policies (retry/circuit) [Doc 05 §3–4; `01A` §10.1]
-- [ ] **S2.1.M2** (≈8 min) — Typed `HttpClient` for the SMS provider with resilience policies [Doc 05 §3–4]
-- [ ] **S2.1.M3** (≈6 min) — Sandbox mode + mocks for both providers so tests run offline [`01A` §10.1]
+- [x] **S2.1.M1** (≈8 min) — Typed `HttpClient` for the NIN provider with resilience policies (retry/circuit) [Doc 05 §3–4; `01A` §10.1]
+- [x] **S2.1.M2** (≈8 min) — Typed `HttpClient` for the SMS provider with resilience policies [Doc 05 §3–4]
+- [x] **S2.1.M3** (≈6 min) — Sandbox mode + mocks for both providers so tests run offline [`01A` §10.1]
 
 ### Task 2.2 — WP-21: Self-service registration, OTP, lockout, Flutter flow with preserved form state
 
-- [ ] **S2.2.M1** (≈8 min) — Registration endpoint + OTP issue/verify with rate limiting and lockout [Volume A FR-ID-001]
-- [ ] **S2.2.M2** (≈8 min) — Flutter registration wizard with form state preserved across offline/reconnect [Volume A FR-ID-001]
+- [x] **S2.2.M1** (≈8 min) — Registration endpoint + OTP issue/verify with rate limiting and lockout [Volume A FR-ID-001]
+- [x] **S2.2.M2** (≈8 min) — Flutter registration wizard with form state preserved across offline/reconnect [Volume A FR-ID-001]
 - [ ] **S2.2.M3** (≈6 min) — Demo: a real farmer registers on a real device [Volume A FR-ID-001]
 
 ### Task 2.3 — WP-22: Race test — two simultaneous registrations, one NIN → exactly one wins
 
-- [ ] **S2.3.M1** (≈8 min) — Genuinely-parallel race test: two simultaneous registrations with one NIN via the barrier-synchronised harness [Doc 12 §3.2]
-- [ ] **S2.3.M2** (≈6 min) — Assert exactly one winner; BR-A-01 holds under real contention [Doc 12 §3.2]
+- [x] **S2.3.M1** (≈8 min) — Genuinely-parallel race test: two simultaneous registrations with one NIN via the barrier-synchronised harness [Doc 12 §3.2]
+- [x] **S2.3.M2** (≈6 min) — Assert exactly one winner; BR-A-01 holds under real contention [Doc 12 §3.2]
 
 ---
 
