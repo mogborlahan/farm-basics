@@ -428,7 +428,7 @@ internal static partial class SelfServiceRegistrationEndpoints
             new ApiMeta(httpContext.TraceIdentifier)));
     }
 
-    private static bool TryNormalizeNigerianPhone(string? rawPhone, out string e164Phone)
+    internal static bool TryNormalizeNigerianPhone(string? rawPhone, out string e164Phone)
     {
         e164Phone = string.Empty;
         if (string.IsNullOrWhiteSpace(rawPhone))
@@ -449,24 +449,27 @@ internal static partial class SelfServiceRegistrationEndpoints
         return true;
     }
 
-    private static string GenerateSixDigitOtp()
+    internal static string GenerateSixDigitOtp()
     {
         int code = RandomNumberGenerator.GetInt32(0, 1_000_000);
         return code.ToString("D6", CultureInfo.InvariantCulture);
     }
 
-    private static string ComputeOtpHash(Guid identityId, string otp)
+    internal static string ComputeOtpHash(Guid identityId, string otp)
     {
         byte[] bytes = Encoding.UTF8.GetBytes($"{identityId:N}:{otp}");
         return Convert.ToHexStringLower(SHA256.HashData(bytes));
     }
 
-    private static IResult ErrorResult(HttpContext context, int statusCode, string code, string message)
+    internal static bool IsSixDigitOtp(string? otp)
+        => !string.IsNullOrWhiteSpace(otp) && SixDigitOtpRegex().IsMatch(otp.Trim());
+
+    internal static IResult ErrorResult(HttpContext context, int statusCode, string code, string message)
         => Results.Json(
             new ApiErrorResponse(new ApiErrorDetail(code, message), new ApiMeta(context.TraceIdentifier)),
             statusCode: statusCode);
 
-    private static IResult LockedResult(HttpContext context, int retryAfterSeconds)
+    internal static IResult LockedResult(HttpContext context, int retryAfterSeconds)
         => Results.Json(
             new ApiErrorResponse(
                 new ApiErrorDetail(
@@ -476,7 +479,7 @@ internal static partial class SelfServiceRegistrationEndpoints
                 new ApiMeta(context.TraceIdentifier)),
             statusCode: StatusCodes.Status429TooManyRequests);
 
-    private static async Task ExecuteTxSqlAsync(NpgsqlConnection conn, NpgsqlTransaction tx, string sql, CancellationToken cancellationToken)
+    internal static async Task ExecuteTxSqlAsync(NpgsqlConnection conn, NpgsqlTransaction tx, string sql, CancellationToken cancellationToken)
     {
         await using NpgsqlCommand cmd = conn.CreateCommand();
         cmd.Transaction = tx;
@@ -484,7 +487,7 @@ internal static partial class SelfServiceRegistrationEndpoints
         await cmd.ExecuteNonQueryAsync(cancellationToken);
     }
 
-    private static async Task<Guid?> TryInsertPendingIdentityAsync(
+    internal static Task<Guid?> TryInsertPendingIdentityAsync(
         NpgsqlConnection conn,
         NpgsqlTransaction tx,
         Guid candidateId,
@@ -492,6 +495,31 @@ internal static partial class SelfServiceRegistrationEndpoints
         string normalizedPhone,
         string? normalizedEmail,
         SelfServiceRegistrationRequest request,
+        CancellationToken cancellationToken)
+        => TryInsertPendingIdentityAsync(
+            conn,
+            tx,
+            candidateId,
+            lookup,
+            normalizedPhone,
+            normalizedEmail,
+            request.StateId,
+            request.LgaId,
+            request.WardId,
+            request.CommunityId,
+            cancellationToken);
+
+    internal static async Task<Guid?> TryInsertPendingIdentityAsync(
+        NpgsqlConnection conn,
+        NpgsqlTransaction tx,
+        Guid candidateId,
+        NinLookupResult lookup,
+        string normalizedPhone,
+        string? normalizedEmail,
+        Guid? stateId,
+        Guid? lgaId,
+        Guid? wardId,
+        Guid? communityId,
         CancellationToken cancellationToken)
     {
         await using NpgsqlCommand cmd = conn.CreateCommand();
@@ -518,10 +546,10 @@ internal static partial class SelfServiceRegistrationEndpoints
         NpgsqlParameter emailParam = cmd.Parameters.Add("email", NpgsqlDbType.Text);
         emailParam.Value = normalizedEmail is not null ? normalizedEmail : DBNull.Value;
 
-        AddNullableUuid(cmd, "stateId", request.StateId);
-        AddNullableUuid(cmd, "lgaId", request.LgaId);
-        AddNullableUuid(cmd, "wardId", request.WardId);
-        AddNullableUuid(cmd, "communityId", request.CommunityId);
+        AddNullableUuid(cmd, "stateId", stateId);
+        AddNullableUuid(cmd, "lgaId", lgaId);
+        AddNullableUuid(cmd, "wardId", wardId);
+        AddNullableUuid(cmd, "communityId", communityId);
 
         object? result = await cmd.ExecuteScalarAsync(cancellationToken);
         return result is Guid g ? g : null;
@@ -533,9 +561,9 @@ internal static partial class SelfServiceRegistrationEndpoints
         param.Value = value.HasValue ? value.Value : DBNull.Value;
     }
 
-    private sealed record ExistingIdentityState(Guid Id, string Status);
+    internal sealed record ExistingIdentityState(Guid Id, string Status);
 
-    private static async Task<ExistingIdentityState?> FindByNinVerificationRefAsync(
+    internal static async Task<ExistingIdentityState?> FindByNinVerificationRefAsync(
         NpgsqlConnection conn,
         NpgsqlTransaction tx,
         string ninVerificationRef,
@@ -559,7 +587,7 @@ internal static partial class SelfServiceRegistrationEndpoints
         return new ExistingIdentityState(reader.GetGuid(0), reader.GetString(1));
     }
 
-    private static async Task InsertOtpChallengeAsync(
+    internal static async Task InsertOtpChallengeAsync(
         NpgsqlConnection conn,
         NpgsqlTransaction tx,
         Guid identityId,
@@ -579,14 +607,14 @@ internal static partial class SelfServiceRegistrationEndpoints
         await cmd.ExecuteNonQueryAsync(cancellationToken);
     }
 
-    private sealed record OtpChallengeRow(
+    internal sealed record OtpChallengeRow(
         Guid Id,
         string OtpHash,
         int AttemptCount,
         DateTimeOffset? LockedUntil,
         DateTimeOffset ExpiresAt);
 
-    private static async Task<OtpChallengeRow?> LoadLatestOpenChallengeForUpdateAsync(
+    internal static async Task<OtpChallengeRow?> LoadLatestOpenChallengeForUpdateAsync(
         NpgsqlConnection conn,
         NpgsqlTransaction tx,
         Guid identityId,
@@ -622,7 +650,7 @@ internal static partial class SelfServiceRegistrationEndpoints
             reader.GetFieldValue<DateTimeOffset>(4));
     }
 
-    private static async Task RecordFailedOtpAttemptAsync(
+    internal static async Task RecordFailedOtpAttemptAsync(
         NpgsqlConnection conn,
         NpgsqlTransaction tx,
         Guid challengeId,
@@ -647,7 +675,7 @@ internal static partial class SelfServiceRegistrationEndpoints
         await cmd.ExecuteNonQueryAsync(cancellationToken);
     }
 
-    private static async Task MarkChallengeVerifiedAsync(
+    internal static async Task MarkChallengeVerifiedAsync(
         NpgsqlConnection conn,
         NpgsqlTransaction tx,
         Guid challengeId,
@@ -660,7 +688,7 @@ internal static partial class SelfServiceRegistrationEndpoints
         await cmd.ExecuteNonQueryAsync(cancellationToken);
     }
 
-    private static async Task<string> ActivateIdentityAndCreateFarmerProfileAsync(
+    internal static async Task<string> ActivateIdentityAndCreateFarmerProfileAsync(
         NpgsqlConnection conn,
         NpgsqlTransaction tx,
         Guid identityId,

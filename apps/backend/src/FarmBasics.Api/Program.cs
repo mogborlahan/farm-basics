@@ -1,6 +1,8 @@
 using System.Diagnostics;
+using FarmBasics.Api.Agents;
 using FarmBasics.Api.Audit;
 using FarmBasics.Api.Auth;
+using FarmBasics.Api.Fobs;
 using FarmBasics.Api.Geography;
 using FarmBasics.Api.Identity;
 using FarmBasics.Api.Integrations;
@@ -220,6 +222,9 @@ app.MapGet("/v1/admin/ping", [Authorize] (HttpContext httpContext, ICurrentIdent
 app.MapGeographyEndpoints();
 app.MapAuditEndpoints();
 app.MapSelfServiceRegistrationEndpoints();
+app.MapAgentOnboardingEndpoints();
+app.MapFobEndpoints();
+app.MapRegistrationAttestationEndpoints();
 app.MapSyncSpikeEndpoints();
 app.MapMetrics("/metrics");
 

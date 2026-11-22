@@ -263,25 +263,25 @@ Intra-sprint, at every phase/section boundary the agent **shall** re-apply the t
 
 ### Task 3.1 — WP-30: Tablet device binding; agent session; VoiceOTP; liveness compared, then discarded
 
-- [ ] **S3.1.M1** (≈8 min) — Tablet device binding (device fingerprint + binding record) [Volume A FR-ID-002; Doc 05 §3.3]
-- [ ] **S3.1.M2** (≈8 min) — Agent session + VoiceOTP flow [Volume A FR-ID-002; Doc 05 §3.3]
-- [ ] **S3.1.M3** (≈6 min) — Liveness compared, then discarded — verified, not asserted [Doc 05 §3.3]
+- [x] **S3.1.M1** (≈8 min) — Tablet device binding (device fingerprint + binding record) [Volume A FR-ID-002; Doc 05 §3.3]
+- [x] **S3.1.M2** (≈8 min) — Agent session + VoiceOTP flow [Volume A FR-ID-002; Doc 05 §3.3]
+- [x] **S3.1.M3** (≈6 min) — Liveness compared, then discarded — verified, not asserted [Doc 05 §3.3]
 
 ### Task 3.2 — WP-31: Fob lifecycle — no reactivation path exists at any privilege level
 
-- [ ] **S3.2.M1** (≈8 min) — Fob issuance and revocation states [Doc 02 §3.1]
-- [ ] **S3.2.M2** (≈8 min) — Enforce: no reactivation path at any privilege level; no remote reissue [BR-A-02; Doc 02 §3.1]
-- [ ] **S3.2.M3** (≈6 min) — Test proving revocation is permanent [Doc 02 §3.1]
+- [x] **S3.2.M1** (≈8 min) — Fob issuance and revocation states [Doc 02 §3.1]
+- [x] **S3.2.M2** (≈8 min) — Enforce: no reactivation path at any privilege level; no remote reissue [BR-A-02; Doc 02 §3.1]
+- [x] **S3.2.M3** (≈6 min) — Test proving revocation is permanent [Doc 02 §3.1]
 
 ### Task 3.3 — WP-32: Registration attestation record (explanation given, language, teach-back outcome)
 
-- [ ] **S3.3.M1** (≈8 min) — Registration attestation record: explanation given, language, teach-back outcome [Doc 15 §4.3, gap 5]
-- [ ] **S3.3.M2** (≈6 min) — Attestation record is auditable and append-only [Doc 15 §4.3]
+- [x] **S3.3.M1** (≈8 min) — Registration attestation record: explanation given, language, teach-back outcome [Doc 15 §4.3, gap 5]
+- [x] **S3.3.M2** (≈6 min) — Attestation record is auditable and append-only [Doc 15 §4.3]
 
 ### Task 3.4 — WP-33: Organization verification gate before any agent can be added
 
-- [ ] **S3.4.M1** (≈8 min) — Organization verification gate; agents creatable only after the org is verified [BR-A-03; Volume A]
-- [ ] **S3.4.M2** (≈6 min) — Test: agent add rejected before organization verification [BR-A-03]
+- [x] **S3.4.M1** (≈8 min) — Organization verification gate; agents creatable only after the org is verified [BR-A-03; Volume A]
+- [x] **S3.4.M2** (≈6 min) — Test: agent add rejected before organization verification [BR-A-03]
 
 ### Task 3.5 — WP-D04: `Doc/11A-LEGAL-Plain-Language-Summary-and-Pilot-Consent.md` — Plain-Language & Audio Summary of Terms/Privacy + Pilot Consent Sheet
 
