@@ -1,11 +1,11 @@
 using System.Globalization;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using FarmBasics.Api.Persistence;
+using FarmBasics.Api.Platform;
 using FarmBasics.BuildingBlocks.Api;
 using FarmBasics.BuildingBlocks.Auth;
 using Npgsql;
-using NpgsqlTypes;
 
 namespace FarmBasics.Api.Sync;
 
@@ -21,68 +21,6 @@ public sealed record SyncSpikeResult(
     DateTimeOffset ClientRecordedAt,
     DateTimeOffset ServerReceivedAt);
 
-internal sealed class SyncSpikeSchemaInitializer : IDisposable
-{
-    private readonly SemaphoreSlim _lock = new(1, 1);
-    private bool _initialized;
-
-    public void Dispose() => _lock.Dispose();
-
-    public async Task EnsureInitializedAsync(NpgsqlDataSource dataSource, CancellationToken cancellationToken)
-    {
-        if (_initialized)
-        {
-            return;
-        }
-
-        await _lock.WaitAsync(cancellationToken);
-        try
-        {
-            if (_initialized)
-            {
-                return;
-            }
-
-            await using NpgsqlCommand cmd = dataSource.CreateCommand("""
-                CREATE SCHEMA IF NOT EXISTS platform;
-
-                CREATE TABLE IF NOT EXISTS platform.idempotency_keys (
-                    id bigserial PRIMARY KEY,
-                    idempotency_key uuid NOT NULL,
-                    identity_id uuid NULL,
-                    route text NOT NULL,
-                    request_fingerprint char(64) NOT NULL,
-                    response_status_code integer NULL,
-                    response_body jsonb NULL,
-                    locked_until timestamptz NOT NULL DEFAULT (now() + interval '30 seconds'),
-                    expires_at timestamptz NOT NULL DEFAULT (now() + interval '24 hours'),
-                    created_at timestamptz NOT NULL DEFAULT now()
-                );
-
-                CREATE UNIQUE INDEX IF NOT EXISTS uq_idempotency_key_per_identity_route
-                    ON platform.idempotency_keys (idempotency_key, identity_id, route)
-                    NULLS NOT DISTINCT;
-
-                CREATE TABLE IF NOT EXISTS platform.sync_spike_records (
-                    id uuid PRIMARY KEY,
-                    client_guid uuid NOT NULL UNIQUE,
-                    entity_type text NOT NULL,
-                    payload_json jsonb NOT NULL,
-                    client_recorded_at timestamptz NOT NULL,
-                    server_received_at timestamptz NOT NULL DEFAULT now()
-                );
-                """);
-
-            await cmd.ExecuteNonQueryAsync(cancellationToken);
-            _initialized = true;
-        }
-        finally
-        {
-            _lock.Release();
-        }
-    }
-}
-
 internal static class SyncSpikeEndpoint
 {
     private const string RouteTemplate = "POST /v1/sync/spike-records";
@@ -97,18 +35,13 @@ internal static class SyncSpikeEndpoint
         HttpContext httpContext,
         SyncSpikeRequest request,
         DatabaseConnectionSource dbSource,
-        SyncSpikeSchemaInitializer schemaInitializer,
+        SchemaMigrationRunner migrationRunner,
         ICurrentIdentityAccessor identityAccessor,
         CancellationToken cancellationToken)
     {
-        string? rawKey = httpContext.Request.Headers["Idempotency-Key"].FirstOrDefault();
-        if (string.IsNullOrWhiteSpace(rawKey) || !Guid.TryParse(rawKey, out Guid idempotencyKey) || idempotencyKey == Guid.Empty)
+        if (!IdempotencyStore.TryValidateKeyHeader(httpContext.Request, out Guid idempotencyKey))
         {
-            return Results.Json(
-                new ApiErrorResponse(
-                    new ApiErrorDetail("IDEMPOTENCY_KEY_REQUIRED", "A valid UUID Idempotency-Key header is required."),
-                    new ApiMeta(httpContext.TraceIdentifier)),
-                statusCode: StatusCodes.Status400BadRequest);
+            return IdempotencyStore.MissingKeyResult(httpContext);
         }
 
         if (request.ClientGuid == Guid.Empty || string.IsNullOrWhiteSpace(request.EntityType) || string.IsNullOrWhiteSpace(request.PayloadJson))
@@ -143,7 +76,7 @@ internal static class SyncSpikeEndpoint
                 statusCode: StatusCodes.Status503ServiceUnavailable);
         }
 
-        await schemaInitializer.EnsureInitializedAsync(dataSource, cancellationToken);
+        await migrationRunner.EnsureMigratedAsync(dataSource, cancellationToken);
 
         CurrentIdentity? identity = identityAccessor.GetCurrentIdentity(httpContext.User);
         Guid? identityGuid = identity is not null && Guid.TryParse(identity.Subject, out Guid parsedSub)
@@ -155,28 +88,14 @@ internal static class SyncSpikeEndpoint
         await using NpgsqlConnection conn = await dataSource.OpenConnectionAsync(cancellationToken);
         await using NpgsqlTransaction tx = await conn.BeginTransactionAsync(cancellationToken);
 
-        long? lockedRowId = null;
-        await using (NpgsqlCommand claimCmd = conn.CreateCommand())
-        {
-            claimCmd.Transaction = tx;
-            claimCmd.CommandText = """
-                INSERT INTO platform.idempotency_keys (idempotency_key, identity_id, route, request_fingerprint)
-                VALUES (@key, @identityId, @route, @fp)
-                ON CONFLICT (idempotency_key, identity_id, route) DO NOTHING
-                RETURNING id;
-                """;
-            claimCmd.Parameters.AddWithValue("key", idempotencyKey);
-            NpgsqlParameter idParam = claimCmd.Parameters.Add("identityId", NpgsqlDbType.Uuid);
-            idParam.Value = identityGuid.HasValue ? identityGuid.Value : DBNull.Value;
-            claimCmd.Parameters.AddWithValue("route", RouteTemplate);
-            claimCmd.Parameters.AddWithValue("fp", fingerprint);
-
-            object? insertedId = await claimCmd.ExecuteScalarAsync(cancellationToken);
-            if (insertedId is long rowId)
-            {
-                lockedRowId = rowId;
-            }
-        }
+        long? lockedRowId = await IdempotencyStore.TryClaimAsync(
+            conn,
+            tx,
+            idempotencyKey,
+            identityGuid,
+            RouteTemplate,
+            fingerprint,
+            cancellationToken);
 
         if (lockedRowId.HasValue)
         {
@@ -222,20 +141,13 @@ internal static class SyncSpikeEndpoint
                 new ApiMeta(httpContext.TraceIdentifier));
             string serializedBody = JsonSerializer.Serialize(responseEnvelope, JsonOptions);
 
-            await using (NpgsqlCommand storeCmd = conn.CreateCommand())
-            {
-                storeCmd.Transaction = tx;
-                storeCmd.CommandText = """
-                    UPDATE platform.idempotency_keys
-                    SET response_status_code = @status,
-                        response_body = CAST(@body AS jsonb)
-                    WHERE id = @rowId;
-                    """;
-                storeCmd.Parameters.AddWithValue("status", StatusCodes.Status201Created);
-                storeCmd.Parameters.AddWithValue("body", serializedBody);
-                storeCmd.Parameters.AddWithValue("rowId", lockedRowId.Value);
-                await storeCmd.ExecuteNonQueryAsync(cancellationToken);
-            }
+            await IdempotencyStore.StoreResponseAsync(
+                conn,
+                tx,
+                lockedRowId.Value,
+                StatusCodes.Status201Created,
+                serializedBody,
+                cancellationToken);
 
             await tx.CommitAsync(cancellationToken);
             return Results.Text(serializedBody, "application/json", Encoding.UTF8, StatusCodes.Status201Created);
@@ -243,51 +155,21 @@ internal static class SyncSpikeEndpoint
 
         await tx.RollbackAsync(cancellationToken);
 
-        for (int attempt = 0; attempt < 60; attempt++)
+        IdempotencyLookupResult lookup = await IdempotencyStore.WaitForStoredResponseAsync(
+            conn,
+            idempotencyKey,
+            identityGuid,
+            RouteTemplate,
+            fingerprint,
+            cancellationToken);
+
+        return lookup.Outcome switch
         {
-            await using NpgsqlCommand readCmd = conn.CreateCommand();
-            readCmd.CommandText = """
-                SELECT request_fingerprint, response_status_code, response_body::text
-                FROM platform.idempotency_keys
-                WHERE idempotency_key = @key
-                  AND identity_id IS NOT DISTINCT FROM @identityId
-                  AND route = @route;
-                """;
-            readCmd.Parameters.AddWithValue("key", idempotencyKey);
-            NpgsqlParameter idParam = readCmd.Parameters.Add("identityId", NpgsqlDbType.Uuid);
-            idParam.Value = identityGuid.HasValue ? identityGuid.Value : DBNull.Value;
-            readCmd.Parameters.AddWithValue("route", RouteTemplate);
-
-            await using NpgsqlDataReader reader = await readCmd.ExecuteReaderAsync(cancellationToken);
-            if (await reader.ReadAsync(cancellationToken))
-            {
-                string storedFingerprint = reader.GetString(0).Trim();
-                int? storedStatus = reader.IsDBNull(1) ? null : reader.GetInt32(1);
-                string? storedBody = reader.IsDBNull(2) ? null : reader.GetString(2);
-
-                if (storedBody is not null && storedStatus.HasValue)
-                {
-                    if (!string.Equals(storedFingerprint, fingerprint, StringComparison.Ordinal))
-                    {
-                        return Results.Json(
-                            new ApiErrorResponse(
-                                new ApiErrorDetail("IDEMPOTENCY_KEY_REUSED", "Idempotency-Key cannot be reused with a different request payload."),
-                                new ApiMeta(httpContext.TraceIdentifier)),
-                            statusCode: StatusCodes.Status409Conflict);
-                    }
-
-                    return Results.Text(storedBody, "application/json", Encoding.UTF8, storedStatus.Value);
-                }
-            }
-
-            await Task.Delay(25, cancellationToken);
-        }
-
-        return Results.Json(
-            new ApiErrorResponse(
-                new ApiErrorDetail("IDEMPOTENCY_IN_FLIGHT", "A concurrent request with the same Idempotency-Key did not complete in time."),
-                new ApiMeta(httpContext.TraceIdentifier)),
-            statusCode: StatusCodes.Status409Conflict);
+            IdempotencyLookupOutcome.FingerprintMismatch => IdempotencyStore.KeyReusedResult(httpContext),
+            IdempotencyLookupOutcome.Completed when lookup.StatusCode.HasValue && lookup.ResponseBody is not null
+                => Results.Text(lookup.ResponseBody, "application/json", Encoding.UTF8, lookup.StatusCode.Value),
+            _ => IdempotencyStore.InFlightTimeoutResult(httpContext)
+        };
     }
 
     private static string ComputeFingerprint(SyncSpikeRequest request)
@@ -300,7 +182,6 @@ internal static class SyncSpikeEndpoint
             clientRecordedAtUtc = request.ClientRecordedAt.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture)
         }, JsonOptions);
 
-        byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(canonical));
-        return Convert.ToHexStringLower(hash);
+        return IdempotencyStore.ComputeFingerprint(canonical);
     }
 }

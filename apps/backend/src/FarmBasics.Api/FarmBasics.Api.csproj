@@ -10,4 +10,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Npgsql" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Persistence\Migrations\*.sql" />
+    <EmbeddedResource Include="Geography\Data\nigeria-states-lgas.json" />
+    <InternalsVisibleTo Include="FarmBasics.UnitTests" />
+    <InternalsVisibleTo Include="FarmBasics.IntegrationTests" />
+  </ItemGroup>
 </Project>

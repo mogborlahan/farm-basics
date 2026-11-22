@@ -1,13 +1,16 @@
 using System.Diagnostics;
-using System.Threading.RateLimiting;
+using FarmBasics.Api.Audit;
+using FarmBasics.Api.Auth;
+using FarmBasics.Api.Geography;
+using FarmBasics.Api.Identity;
+using FarmBasics.Api.Persistence;
+using FarmBasics.Api.Platform;
 using FarmBasics.Api.Sync;
 using FarmBasics.BuildingBlocks.Api;
 using FarmBasics.BuildingBlocks.Auth;
 using FarmBasics.BuildingBlocks.Logging;
-using FarmBasics.BuildingBlocks.Observability;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 using OpenTelemetry.Instrumentation.AspNetCore;
@@ -22,9 +25,10 @@ builder.Services.AddSerilog((_, loggerConfig) =>
     loggerConfig.ConfigureFarmBasicsLogging(serviceName: "FarmBasics.Api"));
 
 builder.Services.AddSingleton<ICurrentIdentityAccessor, JwtCurrentIdentityAccessor>();
-builder.Services.AddScoped<IAdminPermissionChecker, FailClosedAdminPermissionChecker>();
+builder.Services.AddScoped<IAdminPermissionChecker, PostgresAdminPermissionChecker>();
 builder.Services.AddSingleton(sp => new DatabaseConnectionSource(sp.GetRequiredService<IConfiguration>()));
-builder.Services.AddSingleton<SyncSpikeSchemaInitializer>();
+builder.Services.AddSingleton<SchemaMigrationRunner>();
+builder.Services.AddHostedService<DatabaseBootstrapAndPartitionService>();
 
 builder.Services.AddOpenTelemetry()
     .WithTracing(tracing => tracing
@@ -71,75 +75,35 @@ builder.Services
     });
 
 builder.Services.AddAuthorization();
-
-builder.Services.AddRateLimiter(options =>
-{
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-    options.OnRejected = async (context, cancellationToken) =>
-    {
-        context.HttpContext.Response.ContentType = "application/json";
-        ApiErrorResponse payload = new(
-            new ApiErrorDetail("RATE_LIMIT_EXCEEDED", "Too many requests. Please wait before trying again."),
-            new ApiMeta(context.HttpContext.TraceIdentifier));
-        await context.HttpContext.Response.WriteAsJsonAsync(payload, cancellationToken);
-    };
-
-    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
-    {
-        string partitionKey = httpContext.User.FindFirst("sub")?.Value
-                              ?? httpContext.Connection.RemoteIpAddress?.ToString()
-                              ?? "anonymous";
-        return RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey,
-            _ => new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = 100,
-                Window = TimeSpan.FromMinutes(1),
-                QueueLimit = 0
-            });
-    });
-});
+builder.Services.AddFarmBasicsRateLimiting();
 
 WebApplication app = builder.Build();
 
-app.Use(async (context, next) =>
-{
-    long startedAt = Stopwatch.GetTimestamp();
-    try
-    {
-        await next();
-    }
-    catch (Exception ex)
-    {
-        ILogger<Program> logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-        ApiLog.UnhandledException(logger, context.TraceIdentifier, ex);
-
-        if (!context.Response.HasStarted)
-        {
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            context.Response.ContentType = "application/json";
-            ApiErrorResponse error = new(
-                new ApiErrorDetail("INTERNAL_ERROR", "An unexpected error occurred."),
-                new ApiMeta(context.TraceIdentifier));
-            await context.Response.WriteAsJsonAsync(error, context.RequestAborted);
-        }
-    }
-    finally
-    {
-        double elapsedSeconds = Stopwatch.GetElapsedTime(startedAt).TotalSeconds;
-        string routePattern = (context.GetEndpoint() as RouteEndpoint)?.RoutePattern.RawText
-                              ?? context.Request.Path.Value
-                              ?? "/";
-        string method = context.Request.Method;
-        string statusClass = PlatformMetrics.ClassifyStatusCode(context.Response.StatusCode);
-
-        PlatformMetrics.HttpRequestDurationSeconds.WithLabels(method, routePattern).Observe(elapsedSeconds);
-        PlatformMetrics.HttpRequestsTotal.WithLabels(method, routePattern, statusClass).Inc();
-    }
-});
-
+app.UseFarmBasicsRequestPipeline();
 app.UseAuthentication();
 app.UseRateLimiter();
+app.Use(async (context, next) =>
+{
+    NpgsqlDataSource? dataSource = context.RequestServices.GetRequiredService<DatabaseConnectionSource>().DataSource;
+    if (dataSource is not null && context.User.Identity?.IsAuthenticated == true)
+    {
+        ICurrentIdentityAccessor identityAccessor = context.RequestServices.GetRequiredService<ICurrentIdentityAccessor>();
+        CurrentIdentity? identity = identityAccessor.GetCurrentIdentity(context.User);
+        if (identity is not null && Guid.TryParse(identity.Subject, out Guid subjectGuid) && subjectGuid != Guid.Empty)
+        {
+            SchemaMigrationRunner migrationRunner = context.RequestServices.GetRequiredService<SchemaMigrationRunner>();
+            await migrationRunner.EnsureMigratedAsync(dataSource, context.RequestAborted);
+            JitProvisioningOutcome jitOutcome = await IdentityJitProvisioningService.EnsureProvisionedAsync(
+                dataSource,
+                subjectGuid,
+                context.User,
+                context.RequestAborted);
+            context.Items[nameof(JitProvisioningOutcome)] = jitOutcome;
+        }
+    }
+
+    await next();
+});
 app.UseAuthorization();
 
 app.MapGet("/health/live", () =>
@@ -206,7 +170,9 @@ app.MapGet("/health/ready", async (DatabaseConnectionSource dbSource, ILogger<Pr
     }
 });
 
-app.MapGet("/v1/auth/me", [Authorize] (HttpContext httpContext, ICurrentIdentityAccessor identityAccessor) =>
+app.MapGet("/v1/auth/me", [Authorize] (
+    HttpContext httpContext,
+    ICurrentIdentityAccessor identityAccessor) =>
 {
     CurrentIdentity? identity = identityAccessor.GetCurrentIdentity(httpContext.User);
     if (identity is null)
@@ -218,51 +184,38 @@ app.MapGet("/v1/auth/me", [Authorize] (HttpContext httpContext, ICurrentIdentity
             statusCode: StatusCodes.Status401Unauthorized);
     }
 
+    JitProvisioningOutcome? jitOutcome =
+        httpContext.Items.TryGetValue(nameof(JitProvisioningOutcome), out object? rawOutcome)
+        && rawOutcome is JitProvisioningOutcome parsedOutcome
+            ? parsedOutcome
+            : null;
+
     return Results.Ok(new ApiResponse<object>(
         new
         {
             identity.Subject,
             identity.Issuer,
+            identityId = jitOutcome?.IdentityId,
+            jitProvisioned = jitOutcome?.Provisioned ?? false,
             permissionsSource = "live_database_recheck_required"
         },
         new ApiMeta(httpContext.TraceIdentifier)));
 });
 
-app.MapGet("/v1/admin/ping", [Authorize] async (
-    HttpContext httpContext,
-    ICurrentIdentityAccessor identityAccessor,
-    IAdminPermissionChecker permissionChecker,
-    CancellationToken cancellationToken) =>
+app.MapGet("/v1/admin/ping", [Authorize] (HttpContext httpContext, ICurrentIdentityAccessor identityAccessor) =>
 {
     CurrentIdentity? identity = identityAccessor.GetCurrentIdentity(httpContext.User);
-    if (identity is null)
-    {
-        return Results.Json(
-            new ApiErrorResponse(
-                new ApiErrorDetail("AUTHENTICATION_REQUIRED", "Authentication is required."),
-                new ApiMeta(httpContext.TraceIdentifier)),
-            statusCode: StatusCodes.Status401Unauthorized);
-    }
-
-    bool allowed = await permissionChecker.HasPermissionAsync(identity.Subject, "admin:ping", cancellationToken);
-    if (!allowed)
-    {
-        return Results.Json(
-            new ApiErrorResponse(
-                new ApiErrorDetail("PERMISSION_DENIED", "You do not have permission to access this admin endpoint."),
-                new ApiMeta(httpContext.TraceIdentifier)),
-            statusCode: StatusCodes.Status403Forbidden);
-    }
-
     return Results.Ok(new ApiResponse<object>(
         new
         {
             status = "authorized",
-            identity.Subject
+            subject = identity?.Subject
         },
         new ApiMeta(httpContext.TraceIdentifier)));
-});
+}).RequireAdminPermission("admin", "ping");
 
+app.MapGeographyEndpoints();
+app.MapAuditEndpoints();
 app.MapSyncSpikeEndpoints();
 app.MapMetrics("/metrics");
 

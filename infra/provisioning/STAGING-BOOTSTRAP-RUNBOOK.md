@@ -65,6 +65,8 @@ Point four `A` (and optional `AAAA`) records to the staging VM IP:
 
 ## 6. Zero-Cost Local Staging Track: Surface Pro 4 (`8 GB` RAM) + Tailscale + Backblaze B2
 
+> **Full post-install playbook:** If you have already installed Ubuntu Server `24.04 LTS` on your Surface Pro 4, follow the copy-pasteable Phase 0–6 operator guide in [SURFACE-PRO4-PROVISIONING-GUIDE.md](SURFACE-PRO4-PROVISIONING-GUIDE.md).
+
 Use this path when provisioning an existing **Surface Pro 4 (`8 GB` RAM, `x86_64`)** instead of a paid cloud VM (`$0`, no credit card required; **synthetic data only** per `P12` and Rule 19).
 
 ### 6.1 Surface Pro 4 Hardware & Ubuntu 24.04 LTS Server Setup

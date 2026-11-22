@@ -181,33 +181,33 @@ Intra-sprint, at every phase/section boundary the agent **shall** re-apply the t
 
 ### Task 1.1 — WP-10: Geography seeding pipeline with cross-source validation
 
-- [ ] **S1.1.M1** (≈8 min) — Geography model: State → Lga → Ward → Community with code constraints [Doc 06 §2.5]
-- [ ] **S1.1.M2** (≈8 min) — Seed Nigerian states + LGAs from the authoritative census listing [Doc 06 §2.5]
-- [ ] **S1.1.M3** (≈6 min) — Cross-source validation step flagging mismatches between sources [Doc 06 §2.5]
+- [x] **S1.1.M1** (≈8 min) — Geography model: State → Lga → Ward → Community with code constraints [Doc 06 §2.5]
+- [x] **S1.1.M2** (≈8 min) — Seed Nigerian states + LGAs from the authoritative census listing [Doc 06 §2.5]
+- [x] **S1.1.M3** (≈6 min) — Cross-source validation step flagging mismatches between sources [Doc 06 §2.5]
 
 ### Task 1.2 — WP-11: Identity/RoleProfile/Organization schema; `nin_verification_ref UNIQUE`; phone fix; JIT provisioning
 
-- [ ] **S1.2.M1** (≈8 min) — Identity, RoleProfile, Organization tables per Doc 02 §3.1 [Doc 02 §3.1]
-- [ ] **S1.2.M2** (≈8 min) — `nin_verification_ref UNIQUE`; drop phone `UNIQUE`, keep the index (shared household phones) [Doc 02 §3.1; Document 19 §3.1]
-- [ ] **S1.2.M3** (≈6 min) — JIT provisioning path for first-time users [Doc 02 §3.1]
+- [x] **S1.2.M1** (≈8 min) — Identity, RoleProfile, Organization tables per Doc 02 §3.1 [Doc 02 §3.1]
+- [x] **S1.2.M2** (≈8 min) — `nin_verification_ref UNIQUE`; drop phone `UNIQUE`, keep the index (shared household phones) [Doc 02 §3.1; Document 19 §3.1]
+- [x] **S1.2.M3** (≈6 min) — JIT provisioning path for first-time users [Doc 02 §3.1]
 
 ### Task 1.3 — WP-12: RBAC tables; authorization middleware re-querying `AdminRoleAssignment` on every request; fail-closed
 
-- [ ] **S1.3.M1** (≈8 min) — RBAC tables + `AdminRoleAssignment` [Doc 03 §1.7; `01A` §3.2]
-- [ ] **S1.3.M2** (≈8 min) — Authorization middleware re-queries permissions on every request; fail-closed [Doc 03 §1.7]
-- [ ] **S1.3.M3** (≈6 min) — Test: a revoked admin loses access immediately [Doc 03 §1.7]
+- [x] **S1.3.M1** (≈8 min) — RBAC tables + `AdminRoleAssignment` [Doc 03 §1.7; `01A` §3.2]
+- [x] **S1.3.M2** (≈8 min) — Authorization middleware re-queries permissions on every request; fail-closed [Doc 03 §1.7]
+- [x] **S1.3.M3** (≈6 min) — Test: a revoked admin loses access immediately [Doc 03 §1.7]
 
 ### Task 1.4 — WP-13: Partitioned audit log + automated partition-creation job; audit written in the same transaction
 
-- [ ] **S1.4.M1** (≈8 min) — Partitioned audit log table design per Doc 02 §9 [Doc 02 §9; `01A` §6.2]
-- [ ] **S1.4.M2** (≈8 min) — Automated partition-creation job so partitions never run out [Doc 02 §9]
-- [ ] **S1.4.M3** (≈6 min) — Audit writes in the same transaction as the business action [`01A` §6.2]
+- [x] **S1.4.M1** (≈8 min) — Partitioned audit log table design per Doc 02 §9 [Doc 02 §9; `01A` §6.2]
+- [x] **S1.4.M2** (≈8 min) — Automated partition-creation job so partitions never run out [Doc 02 §9]
+- [x] **S1.4.M3** (≈6 min) — Audit writes in the same transaction as the business action [`01A` §6.2]
 
 ### Task 1.5 — WP-14: Idempotency middleware; error envelope; per-endpoint rate limiting
 
-- [ ] **S1.5.M1** (≈8 min) — `Idempotency-Key` middleware on POST/PATCH with storage table [Doc 03 §1.4–1.5]
-- [ ] **S1.5.M2** (≈8 min) — Uniform error envelope across endpoints [Doc 03 §1.5]
-- [ ] **S1.5.M3** (≈6 min) — Per-endpoint rate limiting via `Microsoft.AspNetCore.RateLimiting` [Doc 03 §1.8 → `01A` §5.2; Doc 03 §15]
+- [x] **S1.5.M1** (≈8 min) — `Idempotency-Key` middleware on POST/PATCH with storage table [Doc 03 §1.4–1.5]
+- [x] **S1.5.M2** (≈8 min) — Uniform error envelope across endpoints [Doc 03 §1.5]
+- [x] **S1.5.M3** (≈6 min) — Per-endpoint rate limiting via `Microsoft.AspNetCore.RateLimiting` [Doc 03 §1.8 → `01A` §5.2; Doc 03 §15]
 
 ### Task 1.6 — WP-D03: `Doc/16A-OPS-Error-Code-and-Plain-Language-Copy-Catalog.md` — Canonical Error Code to Plain-Language & Localization Copy Catalog
 
