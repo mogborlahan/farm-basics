@@ -37,6 +37,64 @@ export interface TrustOverrideInput {
   isPermanent: boolean;
 }
 
+export interface FieldOpsAgentDto {
+  agentId: string;
+  fullName: string;
+  status: string;
+  organizationId: string;
+  organizationName: string;
+  organizationStatus: string;
+  activeBoundTablets: number;
+  minimumSampleSize: number;
+  totalLogs: number;
+  flaggedLogs: number;
+  isLogSampleSufficient: boolean;
+  flagRate: number | null;
+  totalReviews: number;
+  rejectedReviews: number;
+  isReviewSampleSufficient: boolean;
+  rejectionRate: number | null;
+  signalStatus: "insufficient_sample" | "normal" | "elevated";
+}
+
+export interface FieldOpsAgentsResponseDto {
+  minimumSampleSize: number;
+  effectiveScopeType: string;
+  agents: FieldOpsAgentDto[];
+}
+
+export interface FieldOpsTabletDto {
+  tabletId: string;
+  deviceSerial: string;
+  status: string;
+  organizationId: string | null;
+  organizationName: string | null;
+  assignedAgentId: string | null;
+  assignedAgentName: string | null;
+  boundAt: string | null;
+  deactivatedAt: string | null;
+  activeSessionCount: number;
+  lastSessionStartedAt: string | null;
+}
+
+export interface FieldOpsTabletsResponseDto {
+  effectiveScopeType: string;
+  tablets: FieldOpsTabletDto[];
+}
+
+export interface AnalyticsBaselineDto {
+  effectiveScopeType: string;
+  scopedRegionIds: string[];
+  computedLive: boolean;
+  totalFarmers: number;
+  verifiedFarmers: number;
+  productionUnitsCount: number;
+  measuredAreaHectares: number;
+  declaredAreaHectares: number;
+  activeCropCycles: number;
+  totalHarvestedKg: number;
+}
+
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
 
 export async function fetchHealthReady(): Promise<HealthReadyResponse> {
@@ -134,5 +192,66 @@ export async function createTrustOverride(
   const parsed = (await response.json()) as {
     data: { overrideId: string; overriddenTier: string };
   };
+  return parsed.data;
+}
+
+export async function fetchFieldOpsAgents(
+  accessToken: string,
+  organizationId?: string
+): Promise<FieldOpsAgentsResponseDto> {
+  const url = organizationId
+    ? `${apiBaseUrl}/v1/admin/field-ops/agents/${encodeURIComponent(organizationId)}`
+    : `${apiBaseUrl}/v1/admin/field-ops/agents`;
+
+  const response = await fetch(url, {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Field ops agents fetch returned HTTP ${response.status}`);
+  }
+
+  const parsed = (await response.json()) as { data: FieldOpsAgentsResponseDto };
+  return parsed.data;
+}
+
+export async function fetchFieldOpsTablets(
+  accessToken: string,
+  organizationId?: string
+): Promise<FieldOpsTabletsResponseDto> {
+  const query = organizationId ? `?organizationId=${encodeURIComponent(organizationId)}` : "";
+  const response = await fetch(`${apiBaseUrl}/v1/admin/field-ops/tablets${query}`, {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Field ops tablets fetch returned HTTP ${response.status}`);
+  }
+
+  const parsed = (await response.json()) as { data: FieldOpsTabletsResponseDto };
+  return parsed.data;
+}
+
+export async function fetchAnalyticsBaseline(
+  accessToken: string
+): Promise<AnalyticsBaselineDto> {
+  const response = await fetch(`${apiBaseUrl}/v1/admin/analytics/baseline`, {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Analytics baseline fetch returned HTTP ${response.status}`);
+  }
+
+  const parsed = (await response.json()) as { data: AnalyticsBaselineDto };
   return parsed.data;
 }

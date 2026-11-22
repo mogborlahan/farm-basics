@@ -220,6 +220,9 @@ internal static class FobEndpoints
             farmerIdentityId = reader.GetGuid(1);
         }
 
+        string? rawCaseRef = httpContext.Request.Headers[Support.SupportEndpoints.SupportCaseRefHeaderName].FirstOrDefault();
+        string? supportCaseRef = string.IsNullOrWhiteSpace(rawCaseRef) ? null : rawCaseRef.Trim();
+
         await AuditWriter.WriteAsync(
             conn,
             tx,
@@ -229,7 +232,7 @@ internal static class FobEndpoints
                 "fob_credential",
                 fobId,
                 callerId,
-                JsonSerializer.Serialize(new { farmerIdentityId, resultingStatus, revokedByAdmin = isAdminRevoker }, JsonOptions)),
+                JsonSerializer.Serialize(new { farmerIdentityId, resultingStatus, revokedByAdmin = isAdminRevoker, supportCaseRef }, JsonOptions)),
             cancellationToken);
 
         await tx.CommitAsync(cancellationToken);

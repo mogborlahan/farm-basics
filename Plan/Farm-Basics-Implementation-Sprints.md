@@ -488,26 +488,26 @@ All must hold before Sprint 5 begins (Document 19 §4):
 
 ### Task 9.1 — WP-90: Harvest batches and disposition
 
-- [ ] **S9.1.M1** (≈8 min) — Harvest batch entity + disposition workflow [Volume A; Volume E FR-GM-002]
+- [x] **S9.1.M1** (≈8 min) — Harvest batch entity + disposition workflow [Volume A; Volume E FR-GM-002]
 
 ### Task 9.2 — WP-91: Field Operations console — agents, tablets, quality signals (small-sample-aware)
 
-- [ ] **S9.2.M1** (≈8 min) — Field Ops console: agent roster, tablet fleet [Volume D FR-FO-001–003]
-- [ ] **S9.2.M2** (≈6 min) — Quality signals, small-sample-aware [Volume D FR-FO]
+- [x] **S9.2.M1** (≈8 min) — Field Ops console: agent roster, tablet fleet [Volume D FR-FO-001–003]
+- [x] **S9.2.M2** (≈6 min) — Quality signals, small-sample-aware [Volume D FR-FO]
 
 ### Task 9.3 — WP-92: Analytics baseline, scope-respecting
 
-- [ ] **S9.3.M1** (≈8 min) — Analytics baseline dashboard [Doc 03 §13]
-- [ ] **S9.3.M2** (≈6 min) — Scope enforced on reads: a Region admin sees only their region [Doc 03 §13]
+- [x] **S9.3.M1** (≈8 min) — Analytics baseline dashboard [Doc 03 §13]
+- [x] **S9.3.M2** (≈6 min) — Scope enforced on reads: a Region admin sees only their region [Doc 03 §13]
 
 ### Task 9.4 — WP-93: Support enablement — read-view, `support_case_ref`, fob revocation route (once decided)
 
-- [ ] **S9.4.M1** (≈8 min) — `CustomerSupportAgent` read-view + `support_case_ref` on audited actions [Doc 16 §9.2, gaps 1/3/4]
-- [ ] **S9.4.M2** (≈6 min) — Decision-recorded route for support-initiated fob revocation [Doc 16 gap 1]
+- [x] **S9.4.M1** (≈8 min) — `CustomerSupportAgent` read-view + `support_case_ref` on audited actions [Doc 16 §9.2, gaps 1/3/4]
+- [x] **S9.4.M2** (≈6 min) — Decision-recorded route for support-initiated fob revocation [Doc 16 gap 1]
 
 ### Task 9.5 — WP-94: In-person, agent-verified phone change flow
 
-- [ ] **S9.5.M1** (≈8 min) — In-person, agent-verified phone change flow (lost-phone path) [Doc 16 gap 6]
+- [x] **S9.5.M1** (≈8 min) — In-person, agent-verified phone change flow (lost-phone path) [Doc 16 gap 6]
 
 ---
 

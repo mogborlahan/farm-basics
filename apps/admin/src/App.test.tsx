@@ -194,4 +194,203 @@ describe("AdminShell", () => {
 
     expect(await screen.findByText("Trust override ov-1 applied (verified).")).toBeInTheDocument();
   });
+
+  it("switches to Field Operations console and renders small-sample suppression badge alongside tablet fleet", async () => {
+    const fetchMock = vi.fn().mockImplementation(async (url: string) => {
+      if (url.endsWith("/health/ready")) {
+        return {
+          ok: true,
+          json: async () => ({
+            status: "ready",
+            database: "reachable",
+            postgis: "3.5",
+            timestampUtc: "2026-11-22T19:20:00Z"
+          })
+        };
+      }
+      if (url.endsWith("/v1/auth/me")) {
+        return {
+          ok: true,
+          json: async () => ({
+            data: { subject: "field-ops-1", issuer: null, permissionsSource: "live_database_recheck_required" },
+            meta: { requestId: "req-fo-1" }
+          })
+        };
+      }
+      if (url.endsWith("/v1/admin/field-ops/agents")) {
+        return {
+          ok: true,
+          json: async () => ({
+            data: {
+              minimumSampleSize: 10,
+              effectiveScopeType: "organization",
+              agents: [
+                {
+                  agentId: "ag-low",
+                  fullName: "Amina Bello",
+                  status: "active",
+                  organizationId: "org-1",
+                  organizationName: "Kano Growers Co-op",
+                  organizationStatus: "verified",
+                  activeBoundTablets: 1,
+                  minimumSampleSize: 10,
+                  totalLogs: 4,
+                  flaggedLogs: 1,
+                  isLogSampleSufficient: false,
+                  flagRate: null,
+                  totalReviews: 2,
+                  rejectedReviews: 0,
+                  isReviewSampleSufficient: false,
+                  rejectionRate: null,
+                  signalStatus: "insufficient_sample"
+                },
+                {
+                  agentId: "ag-high",
+                  fullName: "Musa Ibrahim",
+                  status: "active",
+                  organizationId: "org-1",
+                  organizationName: "Kano Growers Co-op",
+                  organizationStatus: "verified",
+                  activeBoundTablets: 1,
+                  minimumSampleSize: 10,
+                  totalLogs: 12,
+                  flaggedLogs: 3,
+                  isLogSampleSufficient: true,
+                  flagRate: 0.25,
+                  totalReviews: 0,
+                  rejectedReviews: 0,
+                  isReviewSampleSufficient: false,
+                  rejectionRate: null,
+                  signalStatus: "elevated"
+                }
+              ]
+            },
+            meta: { requestId: "req-fo-2" }
+          })
+        };
+      }
+      if (url.endsWith("/v1/admin/field-ops/tablets")) {
+        return {
+          ok: true,
+          json: async () => ({
+            data: {
+              effectiveScopeType: "organization",
+              tablets: [
+                {
+                  tabletId: "tab-1",
+                  deviceSerial: "TAB-KANO-001",
+                  status: "active",
+                  organizationId: "org-1",
+                  organizationName: "Kano Growers Co-op",
+                  assignedAgentId: "ag-low",
+                  assignedAgentName: "Amina Bello",
+                  boundAt: "2026-11-22T18:00:00Z",
+                  deactivatedAt: null,
+                  activeSessionCount: 1,
+                  lastSessionStartedAt: "2026-11-22T18:05:00Z"
+                }
+              ]
+            },
+            meta: { requestId: "req-fo-3" }
+          })
+        };
+      }
+      return { ok: false, status: 404 };
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const mockManager = createMockManager({
+      access_token: "field-ops-jwt",
+      profile: { sub: "field-ops-1" }
+    } as unknown as User);
+
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } }
+    });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider manager={mockManager}>
+          <AdminShell />
+        </AuthProvider>
+      </QueryClientProvider>
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Field Operations" }));
+
+    expect(await screen.findByText("Insufficient sample (n < 10)")).toBeInTheDocument();
+    expect(screen.getByText("25.0%")).toBeInTheDocument();
+    expect(screen.getByText("TAB-KANO-001")).toBeInTheDocument();
+  });
+
+  it("switches to Analytics console and renders region scope indicator with separated measured/declared hectares", async () => {
+    const fetchMock = vi.fn().mockImplementation(async (url: string) => {
+      if (url.endsWith("/health/ready")) {
+        return {
+          ok: true,
+          json: async () => ({
+            status: "ready",
+            database: "reachable",
+            postgis: "3.5",
+            timestampUtc: "2026-11-22T19:25:00Z"
+          })
+        };
+      }
+      if (url.endsWith("/v1/auth/me")) {
+        return {
+          ok: true,
+          json: async () => ({
+            data: { subject: "region-admin-1", issuer: null, permissionsSource: "live_database_recheck_required" },
+            meta: { requestId: "req-an-1" }
+          })
+        };
+      }
+      if (url.endsWith("/v1/admin/analytics/baseline")) {
+        return {
+          ok: true,
+          json: async () => ({
+            data: {
+              effectiveScopeType: "region",
+              scopedRegionIds: ["11111111-1111-1111-1111-111111111111"],
+              computedLive: true,
+              totalFarmers: 42,
+              verifiedFarmers: 39,
+              productionUnitsCount: 51,
+              measuredAreaHectares: 64.25,
+              declaredAreaHectares: 12.5,
+              activeCropCycles: 28,
+              totalHarvestedKg: 14500.5
+            },
+            meta: { requestId: "req-an-2" }
+          })
+        };
+      }
+      return { ok: false, status: 404 };
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const mockManager = createMockManager({
+      access_token: "region-jwt",
+      profile: { sub: "region-admin-1" }
+    } as unknown as User);
+
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } }
+    });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider manager={mockManager}>
+          <AdminShell />
+        </AuthProvider>
+      </QueryClientProvider>
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Analytics" }));
+
+    expect(await screen.findByText("Region Scope (1)")).toBeInTheDocument();
+    expect(screen.getByText("64.25 ha")).toBeInTheDocument();
+    expect(screen.getByText("12.50 ha")).toBeInTheDocument();
+    expect(screen.getByText("14500.5 kg")).toBeInTheDocument();
+  });
 });

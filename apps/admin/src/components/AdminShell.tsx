@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchCurrentIdentity, fetchHealthReady } from "../api/client";
 import { useAuth } from "../auth/AuthProvider";
+import { AnalyticsWorkspace } from "./AnalyticsWorkspace";
+import { FieldOpsWorkspace } from "./FieldOpsWorkspace";
 import { ReviewTrustWorkspace } from "./ReviewTrustWorkspace";
 
 /**
@@ -42,6 +44,8 @@ export function AdminShell() {
 
   const showReviewTrustWorkspace =
     activeConsoleId === "review-ops" || activeConsoleId === "identity-trust";
+  const showFieldOpsWorkspace = activeConsoleId === "field-ops";
+  const showAnalyticsWorkspace = activeConsoleId === "analytics";
 
   return (
     <div className="min-h-screen flex bg-cream text-ink-900">
@@ -89,7 +93,7 @@ export function AdminShell() {
         </div>
 
         <p className="text-xs text-ink-300 pt-6 border-t border-white/10">
-          Sprint 4 Review &amp; Trust · DS2 Tokens
+          Sprint 9 Operations &amp; Analytics · DS2 Tokens
         </p>
       </aside>
 
@@ -127,6 +131,10 @@ export function AdminShell() {
 
         {showReviewTrustWorkspace ? (
           <ReviewTrustWorkspace accessToken={user?.access_token ?? ""} />
+        ) : showFieldOpsWorkspace ? (
+          <FieldOpsWorkspace accessToken={user?.access_token ?? ""} />
+        ) : showAnalyticsWorkspace ? (
+          <AnalyticsWorkspace accessToken={user?.access_token ?? ""} />
         ) : (
           <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             <article className="rounded-xl border border-ink-150 bg-white p-6">

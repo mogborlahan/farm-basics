@@ -81,6 +81,9 @@ internal static class CropCycleEndpoints
         app.MapPost("/v1/crop-cycles/{cycleId:guid}/harvest-batches", HandleCreateHarvestBatchAsync)
             .RequireAuthorization();
 
+        app.MapGet("/v1/crop-cycles/{cycleId:guid}/harvest-batches", HandleListHarvestBatchesAsync)
+            .RequireAuthorization();
+
         app.MapPatch("/v1/harvest-batches/{batchId:guid}/disposition", HandleUpdateBatchDispositionAsync)
             .RequireAuthorization();
     }
@@ -893,6 +896,111 @@ internal static class CropCycleEndpoints
             statusCode: StatusCodes.Status201Created);
     }
 
+    private static async Task<IResult> HandleListHarvestBatchesAsync(
+        Guid cycleId,
+        HttpContext httpContext,
+        ICurrentIdentityAccessor identityAccessor,
+        DatabaseConnectionSource dbSource,
+        SchemaMigrationRunner migrationRunner,
+        CancellationToken cancellationToken)
+    {
+        if (!AgentOnboardingEndpoints.TryGetCallerGuid(httpContext, identityAccessor, out Guid callerId))
+        {
+            return SelfServiceRegistrationEndpoints.ErrorResult(httpContext, StatusCodes.Status401Unauthorized, "AUTHENTICATION_REQUIRED", "Authenticated farmer identity is required.");
+        }
+
+        if (cycleId == Guid.Empty)
+        {
+            return SelfServiceRegistrationEndpoints.ErrorResult(httpContext, StatusCodes.Status400BadRequest, "VALIDATION_ERROR", "CropCycle identifier is invalid.");
+        }
+
+        NpgsqlDataSource? dataSource = dbSource.DataSource;
+        if (dataSource is null)
+        {
+            return SelfServiceRegistrationEndpoints.ErrorResult(httpContext, StatusCodes.Status503ServiceUnavailable, "SERVICE_UNAVAILABLE", "Database is not configured.");
+        }
+
+        await migrationRunner.EnsureMigratedAsync(dataSource, cancellationToken);
+
+        await using NpgsqlConnection conn = await dataSource.OpenConnectionAsync(cancellationToken);
+        await using NpgsqlTransaction tx = await conn.BeginTransactionAsync(cancellationToken);
+
+        CycleMetadata? meta = await LoadCycleMetadataAsync(conn, tx, cycleId, forUpdate: false, cancellationToken);
+        if (meta is null)
+        {
+            await tx.RollbackAsync(cancellationToken);
+            return SelfServiceRegistrationEndpoints.ErrorResult(httpContext, StatusCodes.Status404NotFound, "RESOURCE_NOT_FOUND", "CropCycle was not found.");
+        }
+
+        if (meta.OwnerIdentityId != callerId)
+        {
+            await tx.RollbackAsync(cancellationToken);
+            return SelfServiceRegistrationEndpoints.ErrorResult(httpContext, StatusCodes.Status403Forbidden, "PERMISSION_DENIED", "You do not own this CropCycle.");
+        }
+
+        List<object> batches = [];
+        decimal totalHarvestedKg = 0m;
+        int openBatchCount = 0;
+
+        await using (NpgsqlCommand cmd = conn.CreateCommand())
+        {
+            cmd.Transaction = tx;
+            cmd.CommandText = """
+                SELECT id, quantity_kg, grade, moisture_pct, harvest_date, disposition, created_at
+                FROM field.harvest_batch
+                WHERE crop_cycle_id = @cycleId
+                ORDER BY harvest_date ASC, created_at ASC;
+                """;
+            cmd.Parameters.AddWithValue("cycleId", cycleId);
+
+            await using NpgsqlDataReader reader = await cmd.ExecuteReaderAsync(cancellationToken);
+            while (await reader.ReadAsync(cancellationToken))
+            {
+                decimal qty = reader.GetDecimal(1);
+                string disp = reader.GetString(5);
+                totalHarvestedKg += qty;
+                if (string.Equals(disp, "open", StringComparison.Ordinal))
+                {
+                    openBatchCount++;
+                }
+
+                batches.Add(new
+                {
+                    harvestBatchId = reader.GetGuid(0),
+                    quantityKg = qty,
+                    grade = reader.IsDBNull(2) ? null : reader.GetString(2),
+                    moisturePct = reader.IsDBNull(3) ? (decimal?)null : reader.GetDecimal(3),
+                    harvestDate = reader.GetFieldValue<DateOnly>(4),
+                    disposition = disp,
+                    createdAt = reader.GetFieldValue<DateTimeOffset>(6)
+                });
+            }
+        }
+
+        await tx.CommitAsync(cancellationToken);
+
+        decimal expectedCycleYieldKg = Math.Round(meta.AreaHa * meta.ExpectedYieldPerHaKg, 2, MidpointRounding.AwayFromZero);
+        decimal? yieldVariancePct = expectedCycleYieldKg > 0m
+            ? Math.Round((totalHarvestedKg - expectedCycleYieldKg) / expectedCycleYieldKg * 100m, 2, MidpointRounding.AwayFromZero)
+            : null;
+
+        return Results.Ok(new ApiResponse<object>(
+            new
+            {
+                cropCycleId = cycleId,
+                cropName = meta.Ranges.CommonName,
+                cycleStage = meta.Stage,
+                unitSystemType = meta.UnitSystemType,
+                supportsContinuousHarvest = true,
+                totalHarvestedKg,
+                expectedCycleYieldKg,
+                yieldVariancePct,
+                openBatchCount,
+                batches
+            },
+            new ApiMeta(httpContext.TraceIdentifier)));
+    }
+
     private static async Task<IResult> HandleUpdateBatchDispositionAsync(
         Guid batchId,
         UpdateBatchDispositionRequest request,
@@ -924,11 +1032,16 @@ internal static class CropCycleEndpoints
         await using NpgsqlConnection conn = await dataSource.OpenConnectionAsync(cancellationToken);
         await using NpgsqlTransaction tx = await conn.BeginTransactionAsync(cancellationToken);
 
+        Guid ownerId = Guid.Empty;
+        string cycleStage = string.Empty;
+        string previousDisposition = string.Empty;
+        bool batchFound = false;
+
         await using (NpgsqlCommand ownerCmd = conn.CreateCommand())
         {
             ownerCmd.Transaction = tx;
             ownerCmd.CommandText = """
-                SELECT pu.farm_identity_id
+                SELECT pu.farm_identity_id, cc.stage::text, hb.disposition
                 FROM field.harvest_batch hb
                 JOIN field.crop_cycle cc ON cc.id = hb.crop_cycle_id
                 JOIN field.production_unit pu ON pu.id = cc.production_unit_id
@@ -936,16 +1049,33 @@ internal static class CropCycleEndpoints
                 FOR UPDATE OF hb;
                 """;
             ownerCmd.Parameters.AddWithValue("id", batchId);
-            if (await ownerCmd.ExecuteScalarAsync(cancellationToken) is not Guid ownerId)
+
+            await using NpgsqlDataReader reader = await ownerCmd.ExecuteReaderAsync(cancellationToken);
+            if (await reader.ReadAsync(cancellationToken))
             {
-                await tx.RollbackAsync(cancellationToken);
-                return SelfServiceRegistrationEndpoints.ErrorResult(httpContext, StatusCodes.Status404NotFound, "RESOURCE_NOT_FOUND", "Harvest batch was not found.");
+                batchFound = true;
+                ownerId = reader.GetGuid(0);
+                cycleStage = reader.GetString(1);
+                previousDisposition = reader.GetString(2);
             }
-            if (ownerId != callerId)
-            {
-                await tx.RollbackAsync(cancellationToken);
-                return SelfServiceRegistrationEndpoints.ErrorResult(httpContext, StatusCodes.Status403Forbidden, "PERMISSION_DENIED", "You do not own this harvest batch.");
-            }
+        }
+
+        if (!batchFound)
+        {
+            await tx.RollbackAsync(cancellationToken);
+            return SelfServiceRegistrationEndpoints.ErrorResult(httpContext, StatusCodes.Status404NotFound, "RESOURCE_NOT_FOUND", "Harvest batch was not found.");
+        }
+
+        if (ownerId != callerId)
+        {
+            await tx.RollbackAsync(cancellationToken);
+            return SelfServiceRegistrationEndpoints.ErrorResult(httpContext, StatusCodes.Status403Forbidden, "PERMISSION_DENIED", "You do not own this harvest batch.");
+        }
+
+        if (cycleStage is "closed" or "abandoned")
+        {
+            await tx.RollbackAsync(cancellationToken);
+            return SelfServiceRegistrationEndpoints.ErrorResult(httpContext, StatusCodes.Status409Conflict, "CYCLE_NOT_OPEN", "Harvest batch disposition cannot be modified after a crop cycle is closed or abandoned.");
         }
 
         await using (NpgsqlCommand updCmd = conn.CreateCommand())
@@ -960,12 +1090,18 @@ internal static class CropCycleEndpoints
         await AuditWriter.WriteAsync(
             conn,
             tx,
-            new AuditRecord("field", "harvest_batch.disposition_updated", "harvest_batch", batchId, callerId, JsonSerializer.Serialize(new { disposition }, JsonOptions)),
+            new AuditRecord(
+                "field",
+                "harvest_batch.disposition_updated",
+                "harvest_batch",
+                batchId,
+                callerId,
+                JsonSerializer.Serialize(new { previousDisposition, disposition }, JsonOptions)),
             cancellationToken);
 
         await tx.CommitAsync(cancellationToken);
 
-        return Results.Ok(new ApiResponse<object>(new { harvestBatchId = batchId, disposition }, new ApiMeta(httpContext.TraceIdentifier)));
+        return Results.Ok(new ApiResponse<object>(new { harvestBatchId = batchId, previousDisposition, disposition }, new ApiMeta(httpContext.TraceIdentifier)));
     }
 
     private static async Task<List<object>> EvaluateStageExitBlockersAsync(
