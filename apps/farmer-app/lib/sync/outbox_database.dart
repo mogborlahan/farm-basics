@@ -145,6 +145,23 @@ class AppOutboxDatabase extends _$AppOutboxDatabase {
         .getSingleOrNull();
   }
 
+  /// Loads all persisted outbox rows matching an entity type and parent entity ID in FIFO order.
+  Future<List<LocalOutboxMutation>> getMutationsForParent({
+    required String entityType,
+    required String parentEntityLocalId,
+  }) {
+    return (select(localOutboxMutations)
+          ..where(
+            (t) =>
+                t.entityType.equals(entityType) &
+                t.parentEntityLocalId.equals(parentEntityLocalId),
+          )
+          ..orderBy(<OrderingTerm Function(LocalOutboxMutations)>[
+            (LocalOutboxMutations t) => OrderingTerm.asc(t.seqId),
+          ]))
+        .get();
+  }
+
   /// Loads the persisted singleton self-service registration wizard draft (if any).
   Future<RegistrationDraft?> loadRegistrationDraft() {
     return (select(registrationDrafts)..where((t) => t.id.equals(1)))

@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:material_ui/material_ui.dart';
 
+import 'boundary/boundary_walk_screen.dart';
 import 'registration/registration_api_client.dart';
 import 'registration/registration_wizard_screen.dart';
+import 'sync/offline_sync_engine.dart';
 import 'sync/outbox_database.dart';
 
 void main() {
@@ -94,6 +96,31 @@ class _SyncSpikeHomePage extends StatelessWidget {
                     );
                   },
                   child: const Text('Self-Service Registration'),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 52,
+                child: OutlinedButton(
+                  onPressed: () {
+                    final AppOutboxDatabase db = AppOutboxDatabase(
+                      openPersistentOutboxExecutor(),
+                    );
+                    final Dio dio = Dio(BaseOptions(baseUrl: apiBaseUrl));
+                    final OfflineSyncEngine syncEngine = OfflineSyncEngine(
+                      database: db,
+                      dio: dio,
+                    );
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => BoundaryWalkScreen(
+                          database: db,
+                          syncEngine: syncEngine,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Walk Field Boundary'),
                 ),
               ),
             ],

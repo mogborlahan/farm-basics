@@ -137,7 +137,7 @@ class OfflineSyncEngine {
         );
 
         final int statusCode = response.statusCode ?? 0;
-        if (statusCode == 200 || statusCode == 201) {
+        if (statusCode == 200 || statusCode == 201 || statusCode == 202) {
           final Map<String, dynamic> body = _asJsonMap(response.data);
           final Map<String, dynamic> data = _asJsonMap(body['data']);
           final String? recordId = data['recordId'] as String?;

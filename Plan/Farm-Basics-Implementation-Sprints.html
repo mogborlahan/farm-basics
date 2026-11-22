@@ -758,44 +758,44 @@ body{
 </blockquote>
 <h3 id="task-51--wp-50-production_unit-schema-exactly-per-02b-32">Task 5.1 — WP-50: <code>production_unit</code> schema exactly per 02B §3.2</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.1.M1</strong> (≈8 min) — <code>production_unit</code> table with all four capture-shape enum values [02B §3.1–3.2]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.1.M2</strong> (≈8 min) — <code>chk_capture_shape</code> and <code>chk_medium_class</code> CHECK constraints present from day one [02B §3.2]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.1.M3</strong> (≈8 min) — Derive trigger: area server-derived from geography, never client-supplied [02B §3.2]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.1.M4</strong> (≈8 min) — Raw SQL migration reviewed line-by-line against 02B DDL; flag <code>cea.*</code> off so only <code>gps_walked_boundary</code> is enabled [02B §3.2; <code>01A</code> §6.1; Document 19 §6]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S5.1.M1</strong> (≈8 min) — <code>production_unit</code> table with all four capture-shape enum values [02B §3.1–3.2]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S5.1.M2</strong> (≈8 min) — <code>chk_capture_shape</code> and <code>chk_medium_class</code> CHECK constraints present from day one [02B §3.2]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S5.1.M3</strong> (≈8 min) — Derive trigger: area server-derived from geography, never client-supplied [02B §3.2]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S5.1.M4</strong> (≈8 min) — Raw SQL migration reviewed line-by-line against 02B DDL; flag <code>cea.*</code> off so only <code>gps_walked_boundary</code> is enabled [02B §3.2; <code>01A</code> §6.1; Document 19 §6]</label></li>
 </ul>
 <h3 id="task-52--wp-51-tracking-session-and-idempotent-batch-point-sync">Task 5.2 — WP-51: Tracking session and idempotent batch point sync</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.2.M1</strong> (≈8 min) — Tracking session entity; client-recorded timestamps preserved [Volume A FR-FB-001; Doc 03 §3]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.2.M2</strong> (≈8 min) — Idempotent batch point sync with <code>ClientGuid</code> + sequence ordering [Volume A FR-FB-001]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.2.M3</strong> (≈8 min) — Server pipeline: accuracy filter, outlier removal, simplification, ring closure [Volume A FR-FB-001]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S5.2.M1</strong> (≈8 min) — Tracking session entity; client-recorded timestamps preserved [Volume A FR-FB-001; Doc 03 §3]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S5.2.M2</strong> (≈8 min) — Idempotent batch point sync with <code>ClientGuid</code> + sequence ordering [Volume A FR-FB-001]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S5.2.M3</strong> (≈8 min) — Server pipeline: accuracy filter, outlier removal, simplification, ring closure [Volume A FR-FB-001]</label></li>
 </ul>
 <h3 id="task-53--wp-52-geodesic-area-server-side-via-postgis-self-intersection-repair-3-or-reject-raw-points-retained">Task 5.3 — WP-52: Geodesic area server-side via PostGIS; self-intersection repair &lt;3% or reject; raw points retained</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.3.M1</strong> (≈8 min) — Geodesic area via PostGIS <code>geography</code>; client-supplied area ignored [Volume A F-FB-04/05; Doc 12 §4.4]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.3.M2</strong> (≈8 min) — Self-intersection: repair if &lt;3%, else reject [Doc 12 §4.4]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.3.M3</strong> (≈6 min) — Raw points retained alongside derived geometry [Volume A F-FB-05]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S5.3.M1</strong> (≈8 min) — Geodesic area via PostGIS <code>geography</code>; client-supplied area ignored [Volume A F-FB-04/05; Doc 12 §4.4]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S5.3.M2</strong> (≈8 min) — Self-intersection: repair if &lt;3%, else reject [Doc 12 §4.4]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S5.3.M3</strong> (≈6 min) — Raw points retained alongside derived geometry [Volume A F-FB-05]</label></li>
 </ul>
 <h3 id="task-54--wp-53-flutter-walk-ui--gps-states-pauseresume-almost-complete-non-text-cue-fully-offline">Task 5.4 — WP-53: Flutter walk UI — GPS states, pause/resume, "almost complete" non-text cue, fully offline</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.4.M1</strong> (≈8 min) — Flutter walk UI: GPS states (acquiring/active/paused) [Volume A §15.1; Doc 14 §3]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.4.M2</strong> (≈8 min) — Pause/resume; "almost complete" cue via tone/vibration, not text only [Doc 14 §3]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.4.M3</strong> (≈6 min) — Fully offline walk with local storage [Volume A §15.1]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S5.4.M1</strong> (≈8 min) — Flutter walk UI: GPS states (acquiring/active/paused) [Volume A §15.1; Doc 14 §3]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S5.4.M2</strong> (≈8 min) — Pause/resume; "almost complete" cue via tone/vibration, not text only [Doc 14 §3]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S5.4.M3</strong> (≈6 min) — Fully offline walk with local storage [Volume A §15.1]</label></li>
 </ul>
 <h3 id="task-55--wp-54-adversarial-geometry-suite--large-high-latitude-self-crossing-tiny-5-tolerance">Task 5.5 — WP-54: Adversarial geometry suite — large, high-latitude, self-crossing, tiny; ±5% tolerance</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.5.M1</strong> (≈8 min) — Area accuracy tests: large and high-latitude polygons within ±5% [Doc 12 §4.4]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.5.M2</strong> (≈6 min) — Figure-eights and near-zero-area polygons: repair or reject [Doc 12 §4.4]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S5.5.M1</strong> (≈8 min) — Area accuracy tests: large and high-latitude polygons within ±5% [Doc 12 §4.4]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S5.5.M2</strong> (≈6 min) — Figure-eights and near-zero-area polygons: repair or reject [Doc 12 §4.4]</label></li>
 </ul>
 <h3 id="task-56--wp-55-offline-suite--sync-after-days-offline-mid-walk-connectivity-loss-duplicate-guid-real-timestamps-preserved">Task 5.6 — WP-55: Offline suite — sync after days offline, mid-walk connectivity loss, duplicate GUID, real timestamps preserved</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.6.M1</strong> (≈8 min) — Sync after days offline works [Doc 12 §4.2]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.6.M2</strong> (≈8 min) — Mid-walk connectivity loss and resume [Doc 12 §4.2]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.6.M3</strong> (≈6 min) — Duplicate GUID rejected as replay; real timestamps preserved [Doc 12 §4.2]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S5.6.M1</strong> (≈8 min) — Sync after days offline works [Doc 12 §4.2]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S5.6.M2</strong> (≈8 min) — Mid-walk connectivity loss and resume [Doc 12 §4.2]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S5.6.M3</strong> (≈6 min) — Duplicate GUID rejected as replay; real timestamps preserved [Doc 12 §4.2]</label></li>
 </ul>
 <h3 id="task-57--wp-56-consumer-audit-tests-for-null-boundarycentroid">Task 5.7 — WP-56: Consumer-audit tests for null <code>boundary</code>/<code>centroid</code></h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.7.M1</strong> (≈8 min) — Consumer-audit test per row of 02B §5 against units with null <code>boundary</code> and null <code>centroid</code> [02B §5, §8]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S5.7.M2</strong> (≈6 min) — Tests committed before any consumer depends on null geometry [BR-E-04; 02B §5]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S5.7.M1</strong> (≈8 min) — Consumer-audit test per row of 02B §5 against units with null <code>boundary</code> and null <code>centroid</code> [02B §5, §8]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S5.7.M2</strong> (≈6 min) — Tests committed before any consumer depends on null geometry [BR-E-04; 02B §5]</label></li>
 </ul>
 <hr />
 <h2 id="sprint-7--crop-lifecycle-m1">Sprint 7 — Crop lifecycle (M1)</h2>

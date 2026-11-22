@@ -9,6 +9,7 @@ using FarmBasics.Api.Integrations;
 using FarmBasics.Api.MasterData;
 using FarmBasics.Api.Persistence;
 using FarmBasics.Api.Platform;
+using FarmBasics.Api.ProductionUnits;
 using FarmBasics.Api.Registration;
 using FarmBasics.Api.Reviews;
 using FarmBasics.Api.Sync;
@@ -232,6 +233,7 @@ app.MapRegistrationAttestationEndpoints();
 app.MapReviewEngineEndpoints();
 app.MapMasterDataEndpoints();
 app.MapNotificationAndCapabilityEndpoints();
+app.MapProductionUnitEndpoints();
 app.MapSyncSpikeEndpoints();
 app.MapMetrics("/metrics");
 

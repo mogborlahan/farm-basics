@@ -273,6 +273,32 @@ internal static class NotificationAndCapabilityEndpoints
         return Results.Ok(new ApiResponse<IReadOnlyList<object>>(modules, new ApiMeta(httpContext.TraceIdentifier)));
     }
 
+    internal static async Task<bool> IsCapabilityEnabledAsync(
+        NpgsqlConnection conn,
+        NpgsqlTransaction? tx,
+        string moduleCode,
+        Guid? organizationId,
+        CancellationToken cancellationToken)
+    {
+        await using NpgsqlCommand cmd = conn.CreateCommand();
+        cmd.Transaction = tx;
+        cmd.CommandText = """
+            SELECT COALESCE(org_ov.enabled, global_ov.enabled, cm.enabled_by_default)
+            FROM platform.capability_module cm
+            LEFT JOIN platform.capability_module_override global_ov
+              ON global_ov.module_code = cm.module_code AND global_ov.scope_type = 'global'
+            LEFT JOIN platform.capability_module_override org_ov
+              ON org_ov.module_code = cm.module_code AND org_ov.scope_type = 'organization' AND org_ov.scope_ref_id = @orgId
+            WHERE cm.module_code = @moduleCode;
+            """;
+        cmd.Parameters.AddWithValue("moduleCode", moduleCode);
+        NpgsqlParameter orgParam = cmd.Parameters.Add("orgId", NpgsqlDbType.Uuid);
+        orgParam.Value = organizationId.HasValue ? organizationId.Value : DBNull.Value;
+
+        object? scalar = await cmd.ExecuteScalarAsync(cancellationToken);
+        return scalar is bool enabled && enabled;
+    }
+
     private static async Task<IResult> HandleSetCapabilityOverrideAsync(
         string moduleCode,
         UpsertCapabilityOverrideRequest request,

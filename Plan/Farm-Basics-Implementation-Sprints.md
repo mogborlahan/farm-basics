@@ -387,44 +387,44 @@ All must hold before Sprint 5 begins (Document 19 §4):
 
 ### Task 5.1 — WP-50: `production_unit` schema exactly per 02B §3.2
 
-- [ ] **S5.1.M1** (≈8 min) — `production_unit` table with all four capture-shape enum values [02B §3.1–3.2]
-- [ ] **S5.1.M2** (≈8 min) — `chk_capture_shape` and `chk_medium_class` CHECK constraints present from day one [02B §3.2]
-- [ ] **S5.1.M3** (≈8 min) — Derive trigger: area server-derived from geography, never client-supplied [02B §3.2]
-- [ ] **S5.1.M4** (≈8 min) — Raw SQL migration reviewed line-by-line against 02B DDL; flag `cea.*` off so only `gps_walked_boundary` is enabled [02B §3.2; `01A` §6.1; Document 19 §6]
+- [x] **S5.1.M1** (≈8 min) — `production_unit` table with all four capture-shape enum values [02B §3.1–3.2]
+- [x] **S5.1.M2** (≈8 min) — `chk_capture_shape` and `chk_medium_class` CHECK constraints present from day one [02B §3.2]
+- [x] **S5.1.M3** (≈8 min) — Derive trigger: area server-derived from geography, never client-supplied [02B §3.2]
+- [x] **S5.1.M4** (≈8 min) — Raw SQL migration reviewed line-by-line against 02B DDL; flag `cea.*` off so only `gps_walked_boundary` is enabled [02B §3.2; `01A` §6.1; Document 19 §6]
 
 ### Task 5.2 — WP-51: Tracking session and idempotent batch point sync
 
-- [ ] **S5.2.M1** (≈8 min) — Tracking session entity; client-recorded timestamps preserved [Volume A FR-FB-001; Doc 03 §3]
-- [ ] **S5.2.M2** (≈8 min) — Idempotent batch point sync with `ClientGuid` + sequence ordering [Volume A FR-FB-001]
-- [ ] **S5.2.M3** (≈8 min) — Server pipeline: accuracy filter, outlier removal, simplification, ring closure [Volume A FR-FB-001]
+- [x] **S5.2.M1** (≈8 min) — Tracking session entity; client-recorded timestamps preserved [Volume A FR-FB-001; Doc 03 §3]
+- [x] **S5.2.M2** (≈8 min) — Idempotent batch point sync with `ClientGuid` + sequence ordering [Volume A FR-FB-001]
+- [x] **S5.2.M3** (≈8 min) — Server pipeline: accuracy filter, outlier removal, simplification, ring closure [Volume A FR-FB-001]
 
 ### Task 5.3 — WP-52: Geodesic area server-side via PostGIS; self-intersection repair <3% or reject; raw points retained
 
-- [ ] **S5.3.M1** (≈8 min) — Geodesic area via PostGIS `geography`; client-supplied area ignored [Volume A F-FB-04/05; Doc 12 §4.4]
-- [ ] **S5.3.M2** (≈8 min) — Self-intersection: repair if <3%, else reject [Doc 12 §4.4]
-- [ ] **S5.3.M3** (≈6 min) — Raw points retained alongside derived geometry [Volume A F-FB-05]
+- [x] **S5.3.M1** (≈8 min) — Geodesic area via PostGIS `geography`; client-supplied area ignored [Volume A F-FB-04/05; Doc 12 §4.4]
+- [x] **S5.3.M2** (≈8 min) — Self-intersection: repair if <3%, else reject [Doc 12 §4.4]
+- [x] **S5.3.M3** (≈6 min) — Raw points retained alongside derived geometry [Volume A F-FB-05]
 
 ### Task 5.4 — WP-53: Flutter walk UI — GPS states, pause/resume, "almost complete" non-text cue, fully offline
 
-- [ ] **S5.4.M1** (≈8 min) — Flutter walk UI: GPS states (acquiring/active/paused) [Volume A §15.1; Doc 14 §3]
-- [ ] **S5.4.M2** (≈8 min) — Pause/resume; "almost complete" cue via tone/vibration, not text only [Doc 14 §3]
-- [ ] **S5.4.M3** (≈6 min) — Fully offline walk with local storage [Volume A §15.1]
+- [x] **S5.4.M1** (≈8 min) — Flutter walk UI: GPS states (acquiring/active/paused) [Volume A §15.1; Doc 14 §3]
+- [x] **S5.4.M2** (≈8 min) — Pause/resume; "almost complete" cue via tone/vibration, not text only [Doc 14 §3]
+- [x] **S5.4.M3** (≈6 min) — Fully offline walk with local storage [Volume A §15.1]
 
 ### Task 5.5 — WP-54: Adversarial geometry suite — large, high-latitude, self-crossing, tiny; ±5% tolerance
 
-- [ ] **S5.5.M1** (≈8 min) — Area accuracy tests: large and high-latitude polygons within ±5% [Doc 12 §4.4]
-- [ ] **S5.5.M2** (≈6 min) — Figure-eights and near-zero-area polygons: repair or reject [Doc 12 §4.4]
+- [x] **S5.5.M1** (≈8 min) — Area accuracy tests: large and high-latitude polygons within ±5% [Doc 12 §4.4]
+- [x] **S5.5.M2** (≈6 min) — Figure-eights and near-zero-area polygons: repair or reject [Doc 12 §4.4]
 
 ### Task 5.6 — WP-55: Offline suite — sync after days offline, mid-walk connectivity loss, duplicate GUID, real timestamps preserved
 
-- [ ] **S5.6.M1** (≈8 min) — Sync after days offline works [Doc 12 §4.2]
-- [ ] **S5.6.M2** (≈8 min) — Mid-walk connectivity loss and resume [Doc 12 §4.2]
-- [ ] **S5.6.M3** (≈6 min) — Duplicate GUID rejected as replay; real timestamps preserved [Doc 12 §4.2]
+- [x] **S5.6.M1** (≈8 min) — Sync after days offline works [Doc 12 §4.2]
+- [x] **S5.6.M2** (≈8 min) — Mid-walk connectivity loss and resume [Doc 12 §4.2]
+- [x] **S5.6.M3** (≈6 min) — Duplicate GUID rejected as replay; real timestamps preserved [Doc 12 §4.2]
 
 ### Task 5.7 — WP-56: Consumer-audit tests for null `boundary`/`centroid`
 
-- [ ] **S5.7.M1** (≈8 min) — Consumer-audit test per row of 02B §5 against units with null `boundary` and null `centroid` [02B §5, §8]
-- [ ] **S5.7.M2** (≈6 min) — Tests committed before any consumer depends on null geometry [BR-E-04; 02B §5]
+- [x] **S5.7.M1** (≈8 min) — Consumer-audit test per row of 02B §5 against units with null `boundary` and null `centroid` [02B §5, §8]
+- [x] **S5.7.M2** (≈6 min) — Tests committed before any consumer depends on null geometry [BR-E-04; 02B §5]
 
 ---
 
