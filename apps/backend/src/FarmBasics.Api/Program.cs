@@ -2,6 +2,7 @@ using System.Diagnostics;
 using FarmBasics.Api.Agents;
 using FarmBasics.Api.Audit;
 using FarmBasics.Api.Auth;
+using FarmBasics.Api.CropCycles;
 using FarmBasics.Api.Fobs;
 using FarmBasics.Api.Geography;
 using FarmBasics.Api.Identity;
@@ -234,6 +235,7 @@ app.MapReviewEngineEndpoints();
 app.MapMasterDataEndpoints();
 app.MapNotificationAndCapabilityEndpoints();
 app.MapProductionUnitEndpoints();
+app.MapCropCycleEndpoints();
 app.MapSyncSpikeEndpoints();
 app.MapMetrics("/metrics");
 

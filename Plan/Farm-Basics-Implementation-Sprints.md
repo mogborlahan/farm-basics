@@ -434,27 +434,27 @@ All must hold before Sprint 5 begins (Document 19 §4):
 
 ### Task 7.1 — WP-70: `CropProfile` governed master data + pilot-crop seed
 
-- [ ] **S7.1.M1** (≈8 min) — `CropProfile` master data governed via `MasterDataChangeRequest` (no self-approval) [Volume A §4.2; Doc 02 §7]
-- [ ] **S7.1.M2** (≈8 min) — Pilot-crop seeding with agronomist-validated content [Doc 06 §3]
+- [x] **S7.1.M1** (≈8 min) — `CropProfile` master data governed via `MasterDataChangeRequest` (no self-approval) [Volume A §4.2; Doc 02 §7]
+- [x] **S7.1.M2** (≈8 min) — Pilot-crop seeding with agronomist-validated content [Doc 06 §3]
 
 ### Task 7.2 — WP-71: `CropCycle` state machine; one-active-cycle-per-open-field index
 
-- [ ] **S7.2.M1** (≈8 min) — `CropCycle` state machine, forward-only stage transitions [Doc 12 §4.3; 02B §3.3]
-- [ ] **S7.2.M2** (≈8 min) — 100% of valid and invalid transitions tested [Doc 12 §4.3]
-- [ ] **S7.2.M3** (≈6 min) — Partial unique index: one active cycle per open field [BR-A-07; 02B §3.3]
-- [ ] **S7.2.M4** (≈6 min) — Race test proving BR-A-07 under real contention [02B §3.3]
+- [x] **S7.2.M1** (≈8 min) — `CropCycle` state machine, forward-only stage transitions [Doc 12 §4.3; 02B §3.3]
+- [x] **S7.2.M2** (≈8 min) — 100% of valid and invalid transitions tested [Doc 12 §4.3]
+- [x] **S7.2.M3** (≈6 min) — Partial unique index: one active cycle per open field [BR-A-07; 02B §3.3]
+- [x] **S7.2.M4** (≈6 min) — Race test proving BR-A-07 under real contention [02B §3.3]
 
 ### Task 7.3 — WP-72: Task catalog, `OperationLog` validation (OK/Warning/Flag), override never erases the original flag
 
-- [ ] **S7.3.M1** (≈8 min) — Task catalog seeded from the stage model [Volume A §4.3]
-- [ ] **S7.3.M2** (≈8 min) — `OperationLog` validation engine: OK / Warning / Flag [Volume A §4.3]
-- [ ] **S7.3.M3** (≈6 min) — Override that never overwrites the original flag [Volume A §4.3]
+- [x] **S7.3.M1** (≈8 min) — Task catalog seeded from the stage model [Volume A §4.3]
+- [x] **S7.3.M2** (≈8 min) — `OperationLog` validation engine: OK / Warning / Flag [Volume A §4.3]
+- [x] **S7.3.M3** (≈6 min) — Override that never overwrites the original flag [Volume A §4.3]
 
 ### Task 7.4 — WP-73: Flutter task list, flag/override UX, real task date preserved
 
-- [ ] **S7.4.M1** (≈8 min) — Flutter task list with validation states [Volume A §15.2]
-- [ ] **S7.4.M2** (≈8 min) — Plain-language flag explanation + override UX [Volume A §15.2]
-- [ ] **S7.4.M3** (≈6 min) — Real task date preserved offline [Volume A §15.2]
+- [x] **S7.4.M1** (≈8 min) — Flutter task list with validation states [Volume A §15.2]
+- [x] **S7.4.M2** (≈8 min) — Plain-language flag explanation + override UX [Volume A §15.2]
+- [x] **S7.4.M3** (≈6 min) — Real task date preserved offline [Volume A §15.2]
 
 ---
 

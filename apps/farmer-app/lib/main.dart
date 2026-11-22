@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'boundary/boundary_walk_screen.dart';
+import 'crop_cycles/crop_task_list_screen.dart';
 import 'registration/registration_api_client.dart';
 import 'registration/registration_wizard_screen.dart';
 import 'sync/offline_sync_engine.dart';
@@ -121,6 +122,31 @@ class _SyncSpikeHomePage extends StatelessWidget {
                     );
                   },
                   child: const Text('Walk Field Boundary'),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 52,
+                child: OutlinedButton(
+                  onPressed: () {
+                    final AppOutboxDatabase db = AppOutboxDatabase(
+                      openPersistentOutboxExecutor(),
+                    );
+                    final Dio dio = Dio(BaseOptions(baseUrl: apiBaseUrl));
+                    final OfflineSyncEngine syncEngine = OfflineSyncEngine(
+                      database: db,
+                      dio: dio,
+                    );
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => CropTaskListScreen(
+                          database: db,
+                          syncEngine: syncEngine,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Crop Cycle Tasks'),
                 ),
               ),
             ],
