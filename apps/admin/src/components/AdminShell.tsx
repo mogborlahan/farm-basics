@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchCurrentIdentity, fetchHealthReady } from "../api/client";
 import { useAuth } from "../auth/AuthProvider";
+import { ReviewTrustWorkspace } from "./ReviewTrustWorkspace";
 
 /**
  * Thirteen canonical Admin & Operations consoles per Part B §2 and D-23.
@@ -23,6 +25,7 @@ const CANONICAL_CONSOLES = [
 
 export function AdminShell() {
   const { user, isLoading, errorMessage, signIn, signOut } = useAuth();
+  const [activeConsoleId, setActiveConsoleId] = useState<string>("master-data");
 
   const healthQuery = useQuery({
     queryKey: ["health-ready"],
@@ -36,6 +39,9 @@ export function AdminShell() {
     enabled: Boolean(user?.access_token),
     retry: false
   });
+
+  const showReviewTrustWorkspace =
+    activeConsoleId === "review-ops" || activeConsoleId === "identity-trust";
 
   return (
     <div className="min-h-screen flex bg-cream text-ink-900">
@@ -61,23 +67,29 @@ export function AdminShell() {
             13 Canonical Consoles
           </p>
           <ul className="space-y-1 text-sm">
-            {CANONICAL_CONSOLES.map((consoleItem, index) => (
-              <li
-                key={consoleItem.id}
-                className={
-                  index === 0
-                    ? "rounded-lg px-3 py-2 bg-white/10 text-white font-semibold"
-                    : "rounded-lg px-3 py-1.5 text-ink-300"
-                }
-              >
-                {consoleItem.label}
-              </li>
-            ))}
+            {CANONICAL_CONSOLES.map((consoleItem) => {
+              const isSelected = consoleItem.id === activeConsoleId;
+              return (
+                <li key={consoleItem.id}>
+                  <button
+                    type="button"
+                    onClick={() => setActiveConsoleId(consoleItem.id)}
+                    className={
+                      isSelected
+                        ? "w-full text-left rounded-lg px-3 py-2 bg-white/10 text-white font-semibold"
+                        : "w-full text-left rounded-lg px-3 py-1.5 text-ink-300 hover:bg-white/5"
+                    }
+                  >
+                    {consoleItem.label}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </div>
 
         <p className="text-xs text-ink-300 pt-6 border-t border-white/10">
-          Sprint 0 Shell · DS2 Tokens
+          Sprint 4 Review &amp; Trust · DS2 Tokens
         </p>
       </aside>
 
@@ -113,74 +125,78 @@ export function AdminShell() {
           </div>
         </header>
 
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          <article className="rounded-xl border border-ink-150 bg-white p-6">
-            <h2 className="text-lg font-bold">API &amp; PostGIS Readiness</h2>
-            {healthQuery.isPending && (
-              <p className="mt-3 text-sm text-ink-500">Checking /health/ready...</p>
-            )}
-            {healthQuery.isError && (
-              <p className="mt-3 text-sm font-semibold text-clay">
-                Unavailable: {(healthQuery.error as Error).message}
-              </p>
-            )}
-            {healthQuery.data && (
-              <dl className="mt-3 space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <dt className="text-ink-500">Status</dt>
-                  <dd className="font-bold text-forest">{healthQuery.data.status}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-ink-500">Database</dt>
-                  <dd className="font-mono">{healthQuery.data.database}</dd>
-                </div>
-                {healthQuery.data.postgis && (
-                  <div className="flex justify-between gap-2">
-                    <dt className="text-ink-500">PostGIS</dt>
-                    <dd className="font-mono text-right">{healthQuery.data.postgis}</dd>
-                  </div>
-                )}
-              </dl>
-            )}
-          </article>
-
-          <article className="rounded-xl border border-ink-150 bg-white p-6">
-            <h2 className="text-lg font-bold">Authenticated Session</h2>
-            {isLoading && <p className="mt-3 text-sm text-ink-500">Loading session...</p>}
-            {errorMessage && (
-              <p className="mt-3 text-sm font-semibold text-clay">
-                Auth error: {errorMessage}
-              </p>
-            )}
-            {!isLoading && !user && (
-              <p className="mt-3 text-sm text-ink-700">
-                Not signed in. Admin routes require Keycloak authentication and MFA, followed by a
-                live server-side database check on every request.
-              </p>
-            )}
-            {user && (
-              <div className="mt-3 space-y-2 text-sm">
-                <p>
-                  <span className="text-ink-500">OIDC Subject:</span>{" "}
-                  <span className="font-mono">{user.profile.sub}</span>
+        {showReviewTrustWorkspace ? (
+          <ReviewTrustWorkspace accessToken={user?.access_token ?? ""} />
+        ) : (
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <article className="rounded-xl border border-ink-150 bg-white p-6">
+              <h2 className="text-lg font-bold">API &amp; PostGIS Readiness</h2>
+              {healthQuery.isPending && (
+                <p className="mt-3 text-sm text-ink-500">Checking /health/ready...</p>
+              )}
+              {healthQuery.isError && (
+                <p className="mt-3 text-sm font-semibold text-clay">
+                  Unavailable: {(healthQuery.error as Error).message}
                 </p>
-                {meQuery.data && (
+              )}
+              {healthQuery.data && (
+                <dl className="mt-3 space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <dt className="text-ink-500">Status</dt>
+                    <dd className="font-bold text-forest">{healthQuery.data.status}</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-ink-500">Database</dt>
+                    <dd className="font-mono">{healthQuery.data.database}</dd>
+                  </div>
+                  {healthQuery.data.postgis && (
+                    <div className="flex justify-between gap-2">
+                      <dt className="text-ink-500">PostGIS</dt>
+                      <dd className="font-mono text-right">{healthQuery.data.postgis}</dd>
+                    </div>
+                  )}
+                </dl>
+              )}
+            </article>
+
+            <article className="rounded-xl border border-ink-150 bg-white p-6">
+              <h2 className="text-lg font-bold">Authenticated Session</h2>
+              {isLoading && <p className="mt-3 text-sm text-ink-500">Loading session...</p>}
+              {errorMessage && (
+                <p className="mt-3 text-sm font-semibold text-clay">
+                  Auth error: {errorMessage}
+                </p>
+              )}
+              {!isLoading && !user && (
+                <p className="mt-3 text-sm text-ink-700">
+                  Not signed in. Admin routes require Keycloak authentication and MFA, followed by a
+                  live server-side database check on every request.
+                </p>
+              )}
+              {user && (
+                <div className="mt-3 space-y-2 text-sm">
                   <p>
-                    <span className="text-ink-500">API Identity Check:</span>{" "}
-                    <span className="font-mono text-forest">
-                      {meQuery.data.data.permissionsSource}
-                    </span>
+                    <span className="text-ink-500">OIDC Subject:</span>{" "}
+                    <span className="font-mono">{user.profile.sub}</span>
                   </p>
-                )}
-                {meQuery.isError && (
-                  <p className="text-clay font-semibold">
-                    API check failed: {(meQuery.error as Error).message}
-                  </p>
-                )}
-              </div>
-            )}
-          </article>
-        </section>
+                  {meQuery.data && (
+                    <p>
+                      <span className="text-ink-500">API Identity Check:</span>{" "}
+                      <span className="font-mono text-forest">
+                        {meQuery.data.data.permissionsSource}
+                      </span>
+                    </p>
+                  )}
+                  {meQuery.isError && (
+                    <p className="text-clay font-semibold">
+                      API check failed: {(meQuery.error as Error).message}
+                    </p>
+                  )}
+                </div>
+              )}
+            </article>
+          </section>
+        )}
       </main>
     </div>
   );

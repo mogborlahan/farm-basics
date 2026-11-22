@@ -308,24 +308,24 @@ Intra-sprint, at every phase/section boundary the agent **shall** re-apply the t
 
 ### Task 4.1 — WP-40: Review engine — categories, locking assignment with COI exclusion, SLA job, verdict write-back registry
 
-- [ ] **S4.1.M1** (≈8 min) — Review categories + `ReviewQueueItem` lifecycle [Doc 01 §9; Doc 02 §3.2]
-- [ ] **S4.1.M2** (≈8 min) — Locking assignment with COI exclusion; concurrency-safe [Doc 02 §3.2]
-- [ ] **S4.1.M3** (≈6 min) — SLA job + verdict write-back registry [Doc 01 §9]
+- [x] **S4.1.M1** (≈8 min) — Review categories + `ReviewQueueItem` lifecycle [Doc 01 §9; Doc 02 §3.2]
+- [x] **S4.1.M2** (≈8 min) — Locking assignment with COI exclusion; concurrency-safe [Doc 02 §3.2]
+- [x] **S4.1.M3** (≈6 min) — SLA job + verdict write-back registry [Doc 01 §9]
 
 ### Task 4.2 — WP-41: NIN-mismatch review end to end, plus admin console queue and time-boxed trust override
 
-- [ ] **S4.2.M1** (≈8 min) — NIN-mismatch review flow end to end [Volume D FR-IT-001/002]
-- [ ] **S4.2.M2** (≈8 min) — Admin console review queue + time-boxed trust override [Volume D FR-IT-001/002]
+- [x] **S4.2.M1** (≈8 min) — NIN-mismatch review flow end to end [Volume D FR-IT-001/002]
+- [x] **S4.2.M2** (≈8 min) — Admin console review queue + time-boxed trust override [Volume D FR-IT-001/002]
 
 ### Task 4.3 — WP-42: `MasterDataChangeRequest` with DB-enforced no-self-approval
 
-- [ ] **S4.3.M1** (≈8 min) — `MasterDataChangeRequest` entity + workflow [Doc 02 §7]
-- [ ] **S4.3.M2** (≈6 min) — DB-enforced no-self-approval constraint [Doc 02 §7]
+- [x] **S4.3.M1** (≈8 min) — `MasterDataChangeRequest` entity + workflow [Doc 02 §7]
+- [x] **S4.3.M2** (≈6 min) — DB-enforced no-self-approval constraint [Doc 02 §7]
 
 ### Task 4.4 — WP-43: Notification layer; Capability Modules infrastructure
 
-- [ ] **S4.4.M1** (≈8 min) — Notification layer: templates, dispatch, dedup [Master §18]
-- [ ] **S4.4.M2** (≈6 min) — Capability Modules infrastructure scaffold [Master §18]
+- [x] **S4.4.M1** (≈8 min) — Notification layer: templates, dispatch, dedup [Master §18]
+- [x] **S4.4.M2** (≈6 min) — Capability Modules infrastructure scaffold [Master §18]
 
 ### Task 4.5 — WP-D06: `Doc/06A-DATA-Content-Governance-and-Lifecycle-Spec.md` — Knowledge Bank & Master-Data Content Governance Workflow Specification
 

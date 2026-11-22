@@ -5,6 +5,7 @@ using FarmBasics.Api.Integrations;
 using FarmBasics.Api.Persistence;
 using FarmBasics.Api.Platform;
 using FarmBasics.Api.Registration;
+using FarmBasics.Api.Reviews;
 using FarmBasics.BuildingBlocks.Api;
 using FarmBasics.BuildingBlocks.Auth;
 using Npgsql;
@@ -956,9 +957,42 @@ internal static class AgentOnboardingEndpoints
 
             case NinLookupStatus.FuzzyMatch:
                 {
-                    Guid reviewQueueItemId = Guid.NewGuid();
+                    Guid pendingIdentityId = Guid.NewGuid();
                     await using NpgsqlConnection fuzzyConn = await dataSource.OpenConnectionAsync(cancellationToken);
                     await using NpgsqlTransaction fuzzyTx = await fuzzyConn.BeginTransactionAsync(cancellationToken);
+
+                    Guid? insertedFuzzyId = await SelfServiceRegistrationEndpoints.TryInsertPendingIdentityAsync(
+                        fuzzyConn,
+                        fuzzyTx,
+                        pendingIdentityId,
+                        lookup,
+                        normalizedPhone,
+                        string.IsNullOrWhiteSpace(request.Email) ? null : request.Email.Trim(),
+                        request.StateId,
+                        request.LgaId,
+                        request.WardId,
+                        request.CommunityId,
+                        cancellationToken);
+                    if (!insertedFuzzyId.HasValue && !string.IsNullOrWhiteSpace(lookup.VerificationRef))
+                    {
+                        SelfServiceRegistrationEndpoints.ExistingIdentityState? existingFuzzy =
+                            await SelfServiceRegistrationEndpoints.FindByNinVerificationRefAsync(fuzzyConn, fuzzyTx, lookup.VerificationRef, cancellationToken);
+                        if (existingFuzzy is not null)
+                        {
+                            pendingIdentityId = existingFuzzy.Id;
+                        }
+                    }
+
+                    Guid reviewQueueItemId = await ReviewEngineEndpoints.EnqueueReviewItemAsync(
+                        fuzzyConn,
+                        fuzzyTx,
+                        "IDENTITY_NIN_MISMATCH",
+                        "identity",
+                        pendingIdentityId,
+                        submittedByIdentityId: agentId,
+                        priority: "normal",
+                        cancellationToken);
+
                     await AuditWriter.WriteAsync(
                         fuzzyConn,
                         fuzzyTx,
@@ -968,7 +1002,7 @@ internal static class AgentOnboardingEndpoints
                             "review_queue_item",
                             reviewQueueItemId,
                             agentId,
-                            JsonSerializer.Serialize(new { reviewCategory = "IDENTITY_NIN_MISMATCH", confidenceScore = lookup.ConfidenceScore }, JsonOptions)),
+                            JsonSerializer.Serialize(new { reviewCategory = "IDENTITY_NIN_MISMATCH", identityId = pendingIdentityId, confidenceScore = lookup.ConfidenceScore }, JsonOptions)),
                         cancellationToken);
                     await fuzzyTx.CommitAsync(cancellationToken);
 
@@ -978,6 +1012,7 @@ internal static class AgentOnboardingEndpoints
                             {
                                 status = "under_review",
                                 code = "NIN_LOOKUP_UNDER_REVIEW",
+                                identityId = pendingIdentityId,
                                 reviewQueueItemId
                             },
                             new ApiMeta(httpContext.TraceIdentifier)),

@@ -6,9 +6,11 @@ using FarmBasics.Api.Fobs;
 using FarmBasics.Api.Geography;
 using FarmBasics.Api.Identity;
 using FarmBasics.Api.Integrations;
+using FarmBasics.Api.MasterData;
 using FarmBasics.Api.Persistence;
 using FarmBasics.Api.Platform;
 using FarmBasics.Api.Registration;
+using FarmBasics.Api.Reviews;
 using FarmBasics.Api.Sync;
 using FarmBasics.BuildingBlocks.Api;
 using FarmBasics.BuildingBlocks.Auth;
@@ -81,6 +83,8 @@ builder.Services
 builder.Services.AddAuthorization();
 builder.Services.AddFarmBasicsRateLimiting();
 builder.Services.AddFarmBasicsIntegrations(builder.Configuration);
+builder.Services.AddSingleton<IReviewVerdictHandler, IdentityNinMismatchVerdictHandler>();
+builder.Services.AddSingleton<ReviewVerdictWriteBackRegistry>();
 
 WebApplication app = builder.Build();
 
@@ -225,6 +229,9 @@ app.MapSelfServiceRegistrationEndpoints();
 app.MapAgentOnboardingEndpoints();
 app.MapFobEndpoints();
 app.MapRegistrationAttestationEndpoints();
+app.MapReviewEngineEndpoints();
+app.MapMasterDataEndpoints();
+app.MapNotificationAndCapabilityEndpoints();
 app.MapSyncSpikeEndpoints();
 app.MapMetrics("/metrics");
 

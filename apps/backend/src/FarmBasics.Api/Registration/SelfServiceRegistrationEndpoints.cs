@@ -7,6 +7,7 @@ using FarmBasics.Api.Audit;
 using FarmBasics.Api.Integrations;
 using FarmBasics.Api.Persistence;
 using FarmBasics.Api.Platform;
+using FarmBasics.Api.Reviews;
 using FarmBasics.BuildingBlocks.Api;
 using Npgsql;
 using NpgsqlTypes;
@@ -109,12 +110,43 @@ internal static partial class SelfServiceRegistrationEndpoints
 
             case NinLookupStatus.FuzzyMatch:
                 {
-                    Guid reviewQueueItemId = Guid.NewGuid();
+                    Guid reviewQueueItemId;
+                    Guid pendingIdentityId = Guid.NewGuid();
                     await using NpgsqlConnection fuzzyConn = await dataSource.OpenConnectionAsync(cancellationToken);
                     await using NpgsqlTransaction fuzzyTx = await fuzzyConn.BeginTransactionAsync(cancellationToken);
+
+                    Guid? insertedFuzzyId = await TryInsertPendingIdentityAsync(
+                        fuzzyConn,
+                        fuzzyTx,
+                        pendingIdentityId,
+                        lookup,
+                        normalizedPhone,
+                        normalizedEmail,
+                        request,
+                        cancellationToken);
+                    if (!insertedFuzzyId.HasValue && !string.IsNullOrWhiteSpace(lookup.VerificationRef))
+                    {
+                        ExistingIdentityState? existingFuzzy = await FindByNinVerificationRefAsync(fuzzyConn, fuzzyTx, lookup.VerificationRef, cancellationToken);
+                        if (existingFuzzy is not null)
+                        {
+                            pendingIdentityId = existingFuzzy.Id;
+                        }
+                    }
+
+                    reviewQueueItemId = await ReviewEngineEndpoints.EnqueueReviewItemAsync(
+                        fuzzyConn,
+                        fuzzyTx,
+                        "IDENTITY_NIN_MISMATCH",
+                        "identity",
+                        pendingIdentityId,
+                        submittedByIdentityId: pendingIdentityId,
+                        priority: "normal",
+                        cancellationToken);
+
                     string auditPayload = JsonSerializer.Serialize(new
                     {
                         reviewCategory = "IDENTITY_NIN_MISMATCH",
+                        identityId = pendingIdentityId,
                         confidenceScore = lookup.ConfidenceScore
                     }, JsonOptions);
 
@@ -137,6 +169,7 @@ internal static partial class SelfServiceRegistrationEndpoints
                             {
                                 status = "under_review",
                                 code = "NIN_LOOKUP_UNDER_REVIEW",
+                                identityId = pendingIdentityId,
                                 reviewQueueItemId,
                                 message = "Your registration is under review and is typically resolved within 48 hours."
                             },
