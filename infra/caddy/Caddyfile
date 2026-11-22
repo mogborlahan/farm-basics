@@ -1,0 +1,73 @@
+# Farm Basics Caddy Reverse Proxy (01A §5, 04A-ENG §2, §7)
+# D-10b (Cloudflare API proxy) is OFF by default per D-19: Caddy serves the origin directly.
+# If D-10b is ever activated post-counsel sign-off, configure trusted_proxies for Cloudflare origin IP ranges ONLY.
+
+(security_headers) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+}
+
+{$API_DOMAIN:localhost} {
+	import security_headers
+
+	# Never expose Prometheus scrape endpoint on the public edge (Tier 1 internal only)
+	handle /metrics* {
+		respond 404
+	}
+
+	# Tier 2 identity-gated admin routes -> oauth2-proxy -> Keycloak (fail-closed)
+	handle /oauth2/* {
+		reverse_proxy oauth2-proxy:4180
+	}
+
+	handle /v1/admin/* {
+		forward_auth oauth2-proxy:4180 {
+			uri /oauth2/auth
+			copy_headers X-Auth-Request-User X-Auth-Request-Email Authorization
+		}
+		reverse_proxy api:8080
+	}
+
+	handle /health/* {
+		reverse_proxy api:8080
+	}
+
+	handle /v1/* {
+		reverse_proxy api:8080
+	}
+
+	handle {
+		respond "Not Found" 404
+	}
+}
+
+{$ADMIN_DOMAIN:admin.localhost} {
+	import security_headers
+	reverse_proxy admin:8080
+}
+
+{$AUTH_DOMAIN:auth.localhost} {
+	import security_headers
+	reverse_proxy keycloak:8080
+}
+
+{$GRAFANA_DOMAIN:grafana.localhost} {
+	import security_headers
+
+	handle /oauth2/* {
+		reverse_proxy oauth2-proxy:4180
+	}
+
+	handle {
+		forward_auth oauth2-proxy:4180 {
+			uri /oauth2/auth
+			copy_headers X-Auth-Request-User X-Auth-Request-Email
+		}
+		reverse_proxy grafana:3000
+	}
+}

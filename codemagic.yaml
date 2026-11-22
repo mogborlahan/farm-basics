@@ -1,0 +1,43 @@
+# Codemagic mobile build pipeline (01A-ENG §7.2, §11 item 5, D-09)
+# Free-tier exhaustion fallback documented in Doc/01A-ENG §7.2:
+#   self-hosted GitHub Actions Linux/macOS runner + Fastlane.
+
+workflows:
+  farmer-app-ci:
+    name: Farm Basics Flutter CI (Android & Web)
+    max_build_duration: 45
+    instance_type: linux_x2
+    triggering:
+      events:
+        - push
+        - pull_request
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: true
+    environment:
+      flutter: "3.50.1"
+    scripts:
+      - name: Verify exact dependency pins (Rule 14)
+        script: |
+          cd apps/farmer-app
+          if grep -nE '^\s+[a-z0-9_]+:\s*["\x27]?(\^|~|any)' pubspec.yaml; then
+            echo "ERROR: Floating pub.dev version specifiers are forbidden per AGENTS.md Rule 14."
+            exit 1
+          fi
+      - name: Get packages & generate Drift outbox code
+        script: |
+          cd apps/farmer-app
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
+      - name: Analyze & run offline-sync tests
+        script: |
+          cd apps/farmer-app
+          flutter analyze
+          flutter test
+      - name: Build Android APK (release smoke)
+        script: |
+          cd apps/farmer-app
+          flutter build apk --release
+    artifacts:
+      - apps/farmer-app/build/**/outputs/**/*.apk

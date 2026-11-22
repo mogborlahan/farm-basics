@@ -20,6 +20,38 @@ This repository contains the public landing page plus the internal blueprint: th
   - `Part A — Platform Operations.md` and `Part B — Administration & Governance.md` - unified system spec and admin console spec. Note: these two filenames use an em-dash, not a hyphen
 - `Archived/` - superseded v1-era specs and pre-flatten re-downloads (`Re-downloaded-superseded/`); cross-reference only
 - `site/` - the static landing page (HTML and CSS plus `netlify.toml` header/cache policy, no build step)
+- `apps/backend/` - ASP.NET Core `.NET 10` API + BuildingBlocks (`FarmBasics.sln`) with Serilog secret redaction, identity-only Keycloak JWT validation, rate limiting, `/health/ready` PostGIS check, and `/metrics` Prometheus instrumentation
+- `apps/admin/` - React 19 + Vite + TypeScript + Tailwind v4 (Design System 2 tokens) + Keycloak PKCE shell
+- `apps/farmer-app/` - Flutter offline-first app (`WP-04` walking skeleton: `drift` `local_outbox_mutation` SQLite outbox, `dio` SHA-256 certificate-pinning adapter `D-14`, `OfflineSyncEngine` FIFO drain & idempotent replay tests)
+- `infra/` - zero-trust Docker Compose topology (only `caddy` publishes 80/443), Caddy, Keycloak realm import, `oauth2-proxy`, PostGIS 15/3.5 init, Prometheus (`30d`), Alertmanager, Grafana, SOPS/age config (`.sops.yaml`, `.env.sops.yaml`), Blue/Green `deploy.sh`, and `backup/` (`wal-g-backup.sh`, `wal-g-restore-drill.sh`)
+- `tests/` - `FarmBasics.UnitTests` (Serilog redaction, fail-closed auth, race harness) and `FarmBasics.IntegrationTests` (Testcontainers `postgis/postgis:15-3.5`, geodesic `ST_Area`, 50-iteration barrier-synchronised DB & `POST /v1/sync/spike-records` idempotency tests)
+- `.github/workflows/ci.yml` & `codemagic.yaml` - seven non-skippable CI stages (`ci-required-gate`) and Flutter mobile CI pipeline
+
+## Local Verification (Sprint 0)
+
+```powershell
+dotnet restore FarmBasics.sln --configfile NuGet.Config
+dotnet build FarmBasics.sln --configuration Release --no-restore
+dotnet test tests/FarmBasics.UnitTests/FarmBasics.UnitTests.csproj --configuration Release --no-build
+dotnet test tests/FarmBasics.IntegrationTests/FarmBasics.IntegrationTests.csproj --configuration Release --no-build
+dotnet format FarmBasics.sln --verify-no-changes --no-restore
+
+pnpm --dir apps/admin run typecheck
+pnpm --dir apps/admin run lint
+pnpm --dir apps/admin run test
+pnpm --dir apps/admin run build
+
+pushd apps\farmer-app
+flutter pub get
+dart run build_runner build --delete-conflicting-outputs
+flutter analyze
+flutter test
+popd
+
+docker compose -f infra/docker-compose.yml --env-file infra/.env.example config --quiet
+docker build -f apps/backend/Dockerfile -t farmbasics-api:local .
+docker build -f apps/admin/Dockerfile -t farmbasics-admin:local .
+```
 
 ## Live
 

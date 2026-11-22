@@ -13,6 +13,7 @@ sessions/
 .env
 .env.*
 !.env.example
+!.env.sops.yaml
 *.pem
 *.key
 *.p12
@@ -36,3 +37,28 @@ Thumbs.db
 
 # Archify generated diagrams (skill output, regenerable)
 .archify/
+
+# .NET build & test artifacts
+bin/
+obj/
+*.user
+*.suo
+TestResults/
+coverage/
+
+# Node / React admin console artifacts
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+
+# Flutter / Dart artifacts
+.dart_tool/
+.packages
+apps/farmer-app/build/
+
+# Plaintext runtime env files (never commit unencrypted; .env.sops.yaml and .env.example stay tracked)
+infra/.env
+infra/.env.local
+!infra/.env.example
+

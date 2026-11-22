@@ -1,0 +1,257 @@
+name: CI (Seven Non-Skippable Stages)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  # Stage 1: Build (Doc 07 §3)
+  stage-1-build:
+    name: "Stage 1: Build"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.15.0"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "12.8.1"
+
+      - name: Restore & build .NET solution (warnings as errors)
+        run: |
+          dotnet restore FarmBasics.sln --configfile NuGet.Config
+          dotnet build FarmBasics.sln --configuration Release --no-restore
+
+      - name: Build React Admin Console
+        working-directory: apps/admin
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run build
+
+      - name: Validate Docker Compose & Dockerfiles
+        run: |
+          docker compose -f infra/docker-compose.yml --env-file infra/.env.example config --quiet
+          docker build -f apps/backend/Dockerfile -t farmbasics-api:ci .
+          docker build -f apps/admin/Dockerfile -t farmbasics-admin:ci .
+
+  # Stage 2: Unit tests (Doc 07 §3, 01A §10.3 Serilog redaction)
+  stage-2-unit-tests:
+    name: "Stage 2: Unit Tests & Redaction"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Run unit tests (incl. Serilog redaction & JWT isolation)
+        run: |
+          dotnet restore FarmBasics.sln --configfile NuGet.Config
+          dotnet test tests/FarmBasics.UnitTests/FarmBasics.UnitTests.csproj --configuration Release --no-restore
+
+  # Stage 3: Static analysis & secret/log redaction scan (Doc 07 §3, 01A §7.1)
+  stage-3-sast:
+    name: "Stage 3: SAST & Secret Scan"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run Gitleaks secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Scan source code for unredacted sensitive-field log sinks (01A §7.1)
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Fail if logger calls log raw_nin/password/otp/pin directly via string interpolation ($")
+          if grep -rnE 'Log(Information|Warning|Error|Critical|Debug)\s*\(\s*\$"' apps/backend/src; then
+            echo "::error::Interpolated strings are forbidden in Serilog log calls (use structured templates protected by SensitiveDataLogEventEnricher)."
+            exit 1
+          fi
+          echo "Sensitive log-sink static check passed."
+
+  # Stage 4: Dependency vulnerability & exact-pinning scan (Doc 07 §3, Rule 14)
+  stage-4-dependency-scan:
+    name: "Stage 4: Dependency Scan & Pin Check"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.15.0"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "12.8.1"
+
+      - name: Verify exact version pins (no ^, ~, * or :latest tags)
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -nE 'Version="[^"]*(\*|\^|~)' Directory.Packages.props; then
+            echo "::error::Floating NuGet versions forbidden per Rule 14."
+            exit 1
+          fi
+          if grep -nE '":\s*"[\^~*]' apps/admin/package.json; then
+            echo "::error::Floating npm versions forbidden per Rule 14."
+            exit 1
+          fi
+          if grep -nE 'image:\s*\S+:latest' infra/docker-compose.yml; then
+            echo "::error::Docker :latest image tags are forbidden."
+            exit 1
+          fi
+          if [ -f apps/farmer-app/pubspec.yaml ] && grep -nE '^\s+[a-z0-9_]+:\s*["\x27]?(\^|~|any)' apps/farmer-app/pubspec.yaml; then
+            echo "::error::Floating pub.dev versions in apps/farmer-app/pubspec.yaml are forbidden per Rule 14."
+            exit 1
+          fi
+
+      - name: Check .NET packages for known vulnerabilities
+        run: |
+          dotnet restore FarmBasics.sln --configfile NuGet.Config
+          VULN_OUT=$(dotnet list FarmBasics.sln package --vulnerable --include-transitive)
+          echo "$VULN_OUT"
+          if echo "$VULN_OUT" | grep -qiE '\b(Critical|High)\b'; then
+            echo "::error::High or Critical vulnerable NuGet packages detected."
+            exit 1
+          fi
+
+      - name: Audit Admin Console npm dependencies
+        working-directory: apps/admin
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm audit --audit-level=high
+
+  # Stage 5: Database migration & PostGIS baseline validation (Doc 07 §3, 01A §6.1)
+  stage-5-migration-validation:
+    name: "Stage 5: DB & PostGIS Validation"
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:15-3.5
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci_ephemeral_postgres_pw
+          POSTGRES_DB: farmbasics
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d farmbasics"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify PostgreSQL 15+ and PostGIS extension readiness
+        env:
+          PGPASSWORD: ci_ephemeral_postgres_pw
+        run: |
+          psql -h localhost -U postgres -d farmbasics -f infra/postgres/init-databases.sql
+          psql -h localhost -U postgres -d farmbasics -c "SELECT version(), PostGIS_Version();"
+
+  # Stage 6: Integration tests via Testcontainers postgis/postgis + genuine-parallel race harness
+  stage-6-integration-tests:
+    name: "Stage 6: PostGIS Integration & Concurrency Tests"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Run Testcontainers PostGIS & 50-iteration concurrency tests
+        run: |
+          dotnet restore FarmBasics.sln --configfile NuGet.Config
+          dotnet test tests/FarmBasics.IntegrationTests/FarmBasics.IntegrationTests.csproj --configuration Release --no-restore
+
+  # Stage 7: Lint, formatting, typecheck, frontend tests & UTF-8 integrity (Doc 07 §3, F-04)
+  stage-7-lint-format:
+    name: "Stage 7: Lint, Format & UTF-8 Check"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.15.0"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "12.8.1"
+
+      - name: Verify .NET formatting
+        run: |
+          dotnet restore FarmBasics.sln --configfile NuGet.Config
+          dotnet format FarmBasics.sln --verify-no-changes --no-restore
+
+      - name: Lint, typecheck & test Admin Console
+        working-directory: apps/admin
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run lint
+          pnpm run typecheck
+          pnpm run test
+
+      - name: Verify shell script syntax (infra)
+        run: bash -n infra/deploy.sh infra/backup/wal-g-backup.sh infra/backup/wal-g-restore-drill.sh infra/provisioning/bootstrap-vm.sh infra/provisioning/verify-staging-m0.sh
+
+      - name: Verify UTF-8 integrity (U+FFFD count == 0 across repo)
+        run: |
+          python3 - <<'PY'
+          import pathlib, sys
+          bad = []
+          for p in pathlib.Path('.').rglob('*'):
+              if p.is_file() and p.suffix.lower() in {'.md', '.html', '.cs', '.ts', '.tsx', '.yml', '.yaml', '.json'}:
+                  if any(part in {'node_modules', 'bin', 'obj', 'dist', '.git'} for part in p.parts):
+                      continue
+                  data = p.read_text(encoding='utf-8')
+                  if '\ufffd' in data:
+                      bad.append(str(p))
+          if bad:
+              print("U+FFFD detected in:", bad)
+              sys.exit(1)
+          print("UTF-8 check passed across repository.")
+          PY
+
+  # Branch-protection aggregate target: cannot skip any of the 7 stages
+  ci-required-gate:
+    name: "CI Non-Skippable Gate"
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - stage-1-build
+      - stage-2-unit-tests
+      - stage-3-sast
+      - stage-4-dependency-scan
+      - stage-5-migration-validation
+      - stage-6-integration-tests
+      - stage-7-lint-format
+    steps:
+      - name: Assert all 7 CI stages succeeded
+        shell: bash
+        run: |
+          for result in \
+            "${{ needs.stage-1-build.result }}" \
+            "${{ needs.stage-2-unit-tests.result }}" \
+            "${{ needs.stage-3-sast.result }}" \
+            "${{ needs.stage-4-dependency-scan.result }}" \
+            "${{ needs.stage-5-migration-validation.result }}" \
+            "${{ needs.stage-6-integration-tests.result }}" \
+            "${{ needs.stage-7-lint-format.result }}"; do
+            if [ "$result" != "success" ]; then
+              echo "::error::At least one non-skippable CI stage did not succeed ($result)."
+              exit 1
+            fi
+          done
+          echo "All 7 CI stages passed."

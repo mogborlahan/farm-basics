@@ -1,0 +1,83 @@
+{
+  "realm": "farm-basics",
+  "enabled": true,
+  "registrationAllowed": false,
+  "resetPasswordAllowed": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "sslRequired": "external",
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 28800,
+  "ssoSessionMaxLifespan": 28800,
+  "offlineSessionIdleTimeout": 2592000,
+  "requiredActions": [
+    {
+      "alias": "CONFIGURE_TOTP",
+      "name": "Configure OTP",
+      "providerId": "CONFIGURE_TOTP",
+      "enabled": true,
+      "defaultAction": false,
+      "priority": 10
+    }
+  ],
+  "groups": [
+    {
+      "name": "platform-admins",
+      "attributes": {
+        "mfa_required": ["true"],
+        "authority_note": ["Runtime permissions always come from admin.admin_role_assignment in DB, never from Keycloak claims."]
+      }
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "farm-basics-admin",
+      "name": "Farm Basics Admin Console",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      },
+      "redirectUris": [
+        "http://localhost:5173/auth/callback",
+        "http://localhost:8080/auth/callback",
+        "https://admin.staging.farmbasics.ng/auth/callback"
+      ],
+      "webOrigins": [
+        "http://localhost:5173",
+        "http://localhost:8080",
+        "https://admin.staging.farmbasics.ng"
+      ]
+    },
+    {
+      "clientId": "farm-basics-oauth2-proxy",
+      "name": "Farm Basics Tier 2 Gate Proxy",
+      "enabled": true,
+      "publicClient": false,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": [
+        "http://localhost:8080/oauth2/callback",
+        "https://api.staging.farmbasics.ng/oauth2/callback",
+        "https://grafana.staging.farmbasics.ng/oauth2/callback"
+      ]
+    },
+    {
+      "clientId": "farm-basics-mobile",
+      "name": "Farm Basics Farmer & Agent App",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "use.refresh.tokens": "true"
+      },
+      "redirectUris": [
+        "ng.farmbasics.app://oauth2redirect/*"
+      ]
+    }
+  ]
+}

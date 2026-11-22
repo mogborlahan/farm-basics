@@ -128,23 +128,23 @@ Intra-sprint, at every phase/section boundary the agent **shall** re-apply the t
 
 ### Task 0.1 — WP-00: Monorepo, Docker Compose, Caddy, Postgres+PostGIS, Cloudflare in front
 
-- [ ] **S0.1.M1** (≈8 min) — Create monorepo layout: `apps/backend`, `apps/farmer-app` (Flutter), `apps/admin` (React), `infra`, `tests` alongside existing `Doc/` and updated root `README.md` [`01A` §4–5]
-- [ ] **S0.1.M2** (≈8 min) — Docker Compose: API + Postgres+PostGIS + Caddy + Keycloak; local Cloudflare-in-front shape [`01A` §4–5]
-- [ ] **S0.1.M3** (≈8 min) — Caddy config: TLS termination, rate-limit headers, health routes to API [`01A` §5]
-- [ ] **S0.1.M4** (≈8 min) — `/health/ready` endpoint proving DB reachability [`01A` §4–5]
+- [x] **S0.1.M1** (≈8 min) — Create monorepo layout: `apps/backend`, `apps/farmer-app` (Flutter), `apps/admin` (React), `infra`, `tests` alongside existing `Doc/` and updated root `README.md` [`01A` §4–5]
+- [x] **S0.1.M2** (≈8 min) — Docker Compose: API + Postgres+PostGIS + Caddy + Keycloak; local Cloudflare-in-front shape [`01A` §4–5]
+- [x] **S0.1.M3** (≈8 min) — Caddy config: TLS termination, rate-limit headers, health routes to API [`01A` §5]
+- [x] **S0.1.M4** (≈8 min) — `/health/ready` endpoint proving DB reachability [`01A` §4–5]
 - [ ] **S0.1.M5** (≈8 min) — Smoke: deploy the shape to staging and hit `/health/ready` end to end [`01A` §4–5]
 
 ### Task 0.2 — WP-01: CI — seven non-skippable stages, Testcontainers `postgis/postgis`, genuine-parallel harness
 
-- [ ] **S0.2.M1** (≈8 min) — CI pipeline: build, lint, unit, contract, integration (Testcontainers `postgis/postgis`), security scan, deploy-to-staging gates [Doc 07 §3]
-- [ ] **S0.2.M2** (≈8 min) — Genuine-parallel test harness: barrier-synchronised concurrent execution for race tests [Doc 12 §4.1, §9]
-- [ ] **S0.2.M3** (≈6 min) — Mark the seven stages non-skippable; CI blocks merge on any red stage [Doc 07 §3]
+- [x] **S0.2.M1** (≈8 min) — CI pipeline: build, lint, unit, contract, integration (Testcontainers `postgis/postgis`), security scan, deploy-to-staging gates [Doc 07 §3]
+- [x] **S0.2.M2** (≈8 min) — Genuine-parallel test harness: barrier-synchronised concurrent execution for race tests [Doc 12 §4.1, §9]
+- [x] **S0.2.M3** (≈6 min) — Mark the seven stages non-skippable; CI blocks merge on any red stage [Doc 07 §3]
 
 ### Task 0.3 — WP-02: Keycloak + JWT validation + `/health/ready`; Serilog field-redaction policy and its test
 
-- [ ] **S0.3.M1** (≈8 min) — Keycloak realm + client; API validates JWT, identity-only claims [`01A` §3]
-- [ ] **S0.3.M2** (≈8 min) — Serilog structured logging with field-redaction policy (NIN, OTP, PIN, password) [`01A` §10.3]
-- [ ] **S0.3.M3** (≈6 min) — Unit test proving the redaction policy masks secrets and passes [`01A` §10.3]
+- [x] **S0.3.M1** (≈8 min) — Keycloak realm + client; API validates JWT, identity-only claims [`01A` §3]
+- [x] **S0.3.M2** (≈8 min) — Serilog structured logging with field-redaction policy (NIN, OTP, PIN, password) [`01A` §10.3]
+- [x] **S0.3.M3** (≈6 min) — Unit test proving the redaction policy masks secrets and passes [`01A` §10.3]
 
 ### Task 0.4 — WP-03: `deploy.sh` Blue/Green to staging; `wal-g` off-provider backup; one full restore drill into a fresh VM, timed
 
@@ -154,14 +154,14 @@ Intra-sprint, at every phase/section boundary the agent **shall** re-apply the t
 
 ### Task 0.5 — WP-04: Offline sync spike — Flutter + `drift` + `dio`; create offline, sync, replay twice, assert exactly one server row
 
-- [ ] **S0.5.M1** (≈8 min) — Flutter + `drift` local DB + `dio` client; create a record offline [Doc 01 §8.1, §6.1]
-- [ ] **S0.5.M2** (≈8 min) — Sync the record to the server; replay it twice; assert exactly one server row (idempotent replay) [Doc 01 §8.1, §6.1]
-- [ ] **S0.5.M3** (≈6 min) — Document the sync-spike outcome as the pattern for all later offline writes [Doc 01 §6.1]
+- [x] **S0.5.M1** (≈8 min) — Flutter + `drift` local DB + `dio` client; create a record offline [Doc 01 §8.1, §6.1]
+- [x] **S0.5.M2** (≈8 min) — Sync the record to the server; replay it twice; assert exactly one server row (idempotent replay) [Doc 01 §8.1, §6.1]
+- [x] **S0.5.M3** (≈6 min) — Document the sync-spike outcome as the pattern for all later offline writes [Doc 01 §6.1]
 
 ### Task 0.6 — WP-05: React admin shell with login; Prometheus/Grafana up with one real metric
 
-- [ ] **S0.6.M1** (≈8 min) — React admin shell with login wired to Keycloak JWT [`01A` §2.2]
-- [ ] **S0.6.M2** (≈8 min) — Prometheus + Grafana running; one real metric (e.g., API request duration) dashboarded [`01A` §8]
+- [x] **S0.6.M1** (≈8 min) — React admin shell with login wired to Keycloak JWT [`01A` §2.2]
+- [x] **S0.6.M2** (≈8 min) — Prometheus + Grafana running; one real metric (e.g., API request duration) dashboarded [`01A` §8]
 - [ ] **S0.6.M3** (≈6 min) — Admin login demonstrated end to end on staging [`01A` §2.2]
 
 ### Task 0.7 — WP-D02: `Doc/01B-ENG-Offline-Sync-and-Conflict-Resolution-Spec.md` — Platform-Wide Offline Sync, Conflict Resolution & Fob Revocation Quarantine Spec

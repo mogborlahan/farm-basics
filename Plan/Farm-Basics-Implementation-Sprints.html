@@ -495,23 +495,23 @@ body{
 </ul>
 <h3 id="task-01--wp-00-monorepo-docker-compose-caddy-postgrespostgis-cloudflare-in-front">Task 0.1 — WP-00: Monorepo, Docker Compose, Caddy, Postgres+PostGIS, Cloudflare in front</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S0.1.M1</strong> (≈8 min) — Create monorepo layout: <code>apps/backend</code>, <code>apps/farmer-app</code> (Flutter), <code>apps/admin</code> (React), <code>infra</code>, <code>tests</code> alongside existing <code>Doc/</code> and updated root <code>README.md</code> [<code>01A</code> §4–5]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S0.1.M2</strong> (≈8 min) — Docker Compose: API + Postgres+PostGIS + Caddy + Keycloak; local Cloudflare-in-front shape [<code>01A</code> §4–5]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S0.1.M3</strong> (≈8 min) — Caddy config: TLS termination, rate-limit headers, health routes to API [<code>01A</code> §5]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S0.1.M4</strong> (≈8 min) — <code>/health/ready</code> endpoint proving DB reachability [<code>01A</code> §4–5]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S0.1.M1</strong> (≈8 min) — Create monorepo layout: <code>apps/backend</code>, <code>apps/farmer-app</code> (Flutter), <code>apps/admin</code> (React), <code>infra</code>, <code>tests</code> alongside existing <code>Doc/</code> and updated root <code>README.md</code> [<code>01A</code> §4–5]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S0.1.M2</strong> (≈8 min) — Docker Compose: API + Postgres+PostGIS + Caddy + Keycloak; local Cloudflare-in-front shape [<code>01A</code> §4–5]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S0.1.M3</strong> (≈8 min) — Caddy config: TLS termination, rate-limit headers, health routes to API [<code>01A</code> §5]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S0.1.M4</strong> (≈8 min) — <code>/health/ready</code> endpoint proving DB reachability [<code>01A</code> §4–5]</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S0.1.M5</strong> (≈8 min) — Smoke: deploy the shape to staging and hit <code>/health/ready</code> end to end [<code>01A</code> §4–5]</label></li>
 </ul>
 <h3 id="task-02--wp-01-ci--seven-non-skippable-stages-testcontainers-postgispostgis-genuine-parallel-harness">Task 0.2 — WP-01: CI — seven non-skippable stages, Testcontainers <code>postgis/postgis</code>, genuine-parallel harness</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S0.2.M1</strong> (≈8 min) — CI pipeline: build, lint, unit, contract, integration (Testcontainers <code>postgis/postgis</code>), security scan, deploy-to-staging gates [Doc 07 §3]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S0.2.M2</strong> (≈8 min) — Genuine-parallel test harness: barrier-synchronised concurrent execution for race tests [Doc 12 §4.1, §9]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S0.2.M3</strong> (≈6 min) — Mark the seven stages non-skippable; CI blocks merge on any red stage [Doc 07 §3]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S0.2.M1</strong> (≈8 min) — CI pipeline: build, lint, unit, contract, integration (Testcontainers <code>postgis/postgis</code>), security scan, deploy-to-staging gates [Doc 07 §3]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S0.2.M2</strong> (≈8 min) — Genuine-parallel test harness: barrier-synchronised concurrent execution for race tests [Doc 12 §4.1, §9]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S0.2.M3</strong> (≈6 min) — Mark the seven stages non-skippable; CI blocks merge on any red stage [Doc 07 §3]</label></li>
 </ul>
 <h3 id="task-03--wp-02-keycloak--jwt-validation--healthready-serilog-field-redaction-policy-and-its-test">Task 0.3 — WP-02: Keycloak + JWT validation + <code>/health/ready</code>; Serilog field-redaction policy and its test</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S0.3.M1</strong> (≈8 min) — Keycloak realm + client; API validates JWT, identity-only claims [<code>01A</code> §3]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S0.3.M2</strong> (≈8 min) — Serilog structured logging with field-redaction policy (NIN, OTP, PIN, password) [<code>01A</code> §10.3]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S0.3.M3</strong> (≈6 min) — Unit test proving the redaction policy masks secrets and passes [<code>01A</code> §10.3]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S0.3.M1</strong> (≈8 min) — Keycloak realm + client; API validates JWT, identity-only claims [<code>01A</code> §3]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S0.3.M2</strong> (≈8 min) — Serilog structured logging with field-redaction policy (NIN, OTP, PIN, password) [<code>01A</code> §10.3]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S0.3.M3</strong> (≈6 min) — Unit test proving the redaction policy masks secrets and passes [<code>01A</code> §10.3]</label></li>
 </ul>
 <h3 id="task-04--wp-03-deploysh-bluegreen-to-staging-wal-g-off-provider-backup-one-full-restore-drill-into-a-fresh-vm-timed">Task 0.4 — WP-03: <code>deploy.sh</code> Blue/Green to staging; <code>wal-g</code> off-provider backup; one full restore drill into a fresh VM, timed</h3>
 <ul class="task-list">
@@ -521,14 +521,14 @@ body{
 </ul>
 <h3 id="task-05--wp-04-offline-sync-spike--flutter--drift--dio-create-offline-sync-replay-twice-assert-exactly-one-server-row">Task 0.5 — WP-04: Offline sync spike — Flutter + <code>drift</code> + <code>dio</code>; create offline, sync, replay twice, assert exactly one server row</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S0.5.M1</strong> (≈8 min) — Flutter + <code>drift</code> local DB + <code>dio</code> client; create a record offline [Doc 01 §8.1, §6.1]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S0.5.M2</strong> (≈8 min) — Sync the record to the server; replay it twice; assert exactly one server row (idempotent replay) [Doc 01 §8.1, §6.1]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S0.5.M3</strong> (≈6 min) — Document the sync-spike outcome as the pattern for all later offline writes [Doc 01 §6.1]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S0.5.M1</strong> (≈8 min) — Flutter + <code>drift</code> local DB + <code>dio</code> client; create a record offline [Doc 01 §8.1, §6.1]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S0.5.M2</strong> (≈8 min) — Sync the record to the server; replay it twice; assert exactly one server row (idempotent replay) [Doc 01 §8.1, §6.1]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S0.5.M3</strong> (≈6 min) — Document the sync-spike outcome as the pattern for all later offline writes [Doc 01 §6.1]</label></li>
 </ul>
 <h3 id="task-06--wp-05-react-admin-shell-with-login-prometheusgrafana-up-with-one-real-metric">Task 0.6 — WP-05: React admin shell with login; Prometheus/Grafana up with one real metric</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S0.6.M1</strong> (≈8 min) — React admin shell with login wired to Keycloak JWT [<code>01A</code> §2.2]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S0.6.M2</strong> (≈8 min) — Prometheus + Grafana running; one real metric (e.g., API request duration) dashboarded [<code>01A</code> §8]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S0.6.M1</strong> (≈8 min) — React admin shell with login wired to Keycloak JWT [<code>01A</code> §2.2]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S0.6.M2</strong> (≈8 min) — Prometheus + Grafana running; one real metric (e.g., API request duration) dashboarded [<code>01A</code> §8]</label></li>
 <li><label><input type="checkbox" class="fb-check" /><strong>S0.6.M3</strong> (≈6 min) — Admin login demonstrated end to end on staging [<code>01A</code> §2.2]</label></li>
 </ul>
 <h3 id="task-07--wp-d02-doc01b-eng-offline-sync-and-conflict-resolution-specmd--platform-wide-offline-sync-conflict-resolution--fob-revocation-quarantine-spec">Task 0.7 — WP-D02: <code>Doc/01B-ENG-Offline-Sync-and-Conflict-Resolution-Spec.md</code> — Platform-Wide Offline Sync, Conflict Resolution &amp; Fob Revocation Quarantine Spec</h3>

@@ -1,0 +1,10 @@
+# Local workstation development override only (never deploy to staging/production).
+# Usage: docker compose -f docker-compose.yml -f docker-compose.local.yml --env-file .env.example up -d
+services:
+  caddy:
+    ports:
+      - "127.0.0.1:8080:80"
+
+  keycloak:
+    ports:
+      - "127.0.0.1:8180:8080"

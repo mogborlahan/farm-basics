@@ -1,0 +1,7 @@
+# SOPS + age encryption policy (D-13, 01A §5.4).
+# Non-production staging/local age recipient provisioned at %LOCALAPPDATA%\Farm-Basics\sops-staging-age.txt.
+# Encrypt: sops --config infra/.sops.yaml --encrypt --input-type yaml --output-type yaml <tmp.env.yaml> > infra/.env.sops.yaml
+creation_rules:
+  - path_regex: \.env\.sops\.yaml$
+    age: >-
+      age1rz9vvpuj3z8w75vpnm76tr7j08fm9y2rsqn9263u4muatcrk6pkqzedl7z

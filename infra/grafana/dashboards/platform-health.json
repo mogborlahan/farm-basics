@@ -1,0 +1,33 @@
+{
+  "title": "Farm Basics — Platform Health (Sprint 0)",
+  "uid": "farmbasics-s0-health",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "15s",
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "API Request Duration p95 (seconds)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(farmbasics_http_request_duration_seconds_bucket[5m])) by (le, route))",
+          "legendFormat": "{{route}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "HTTP Requests Rate by Status Class (409 vs 4xx vs 5xx)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(farmbasics_http_requests_total[5m])) by (status_class, route)",
+          "legendFormat": "{{status_class}} {{route}}"
+        }
+      ]
+    }
+  ]
+}

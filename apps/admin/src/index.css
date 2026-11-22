@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+/* Design System 2 (§23) authoritative semantic tokens — Doc/Farm-Basics-Design-System-2.md */
+@theme {
+  --color-forest: #126A3A;
+  --color-sage: #5C9247;
+  --color-gold: #FDBB26;
+  --color-cream: #F4F1EA;
+  --color-clay: #B8471F;
+  --color-irrigation: #3E7C99;
+
+  --color-ink-900: #1F2A22;
+  --color-ink-700: #3D473F;
+  --color-ink-500: #6B7568;
+  --color-ink-300: #A9AFA3;
+  --color-ink-150: #D8D6CB;
+  --color-ink-050: #F4F1EA;
+
+  --color-surface-dark: #1F2A22;
+  --color-print-gold: #E0A81E;
+
+  --font-display: "Sora", "Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-sans: "Atkinson Hyperlegible", "Noto Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-cream);
+  color: var(--color-ink-900);
+}
