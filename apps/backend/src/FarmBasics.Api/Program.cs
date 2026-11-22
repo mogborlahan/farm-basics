@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using FarmBasics.Api.Accounts;
 using FarmBasics.Api.Agents;
 using FarmBasics.Api.Audit;
 using FarmBasics.Api.Auth;
@@ -37,6 +38,7 @@ builder.Services.AddScoped<IAdminPermissionChecker, PostgresAdminPermissionCheck
 builder.Services.AddSingleton(sp => new DatabaseConnectionSource(sp.GetRequiredService<IConfiguration>()));
 builder.Services.AddSingleton<SchemaMigrationRunner>();
 builder.Services.AddHostedService<DatabaseBootstrapAndPartitionService>();
+builder.Services.AddHostedService<OutboxLedgerBackgroundService>();
 
 builder.Services.AddOpenTelemetry()
     .WithTracing(tracing => tracing
@@ -236,6 +238,7 @@ app.MapMasterDataEndpoints();
 app.MapNotificationAndCapabilityEndpoints();
 app.MapProductionUnitEndpoints();
 app.MapCropCycleEndpoints();
+app.MapAccountsEndpoints();
 app.MapSyncSpikeEndpoints();
 app.MapMetrics("/metrics");
 

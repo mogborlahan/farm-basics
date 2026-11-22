@@ -464,21 +464,21 @@ All must hold before Sprint 5 begins (Document 19 §4):
 
 ### Task 8.1 — WP-80: Chart of Accounts; `JournalEntry`; deferred balance trigger; UPDATE/DELETE denied at DB privilege level
 
-- [ ] **S8.1.M1** (≈8 min) — Chart of Accounts with accountant sign-off first [Doc 02 §6.4; Doc 06 §4]
-- [ ] **S8.1.M2** (≈8 min) — `JournalEntry`/lines with double-entry enforcement [Doc 02 §6.4]
-- [ ] **S8.1.M3** (≈8 min) — Deferred balance trigger; `UPDATE`/`DELETE` denied at the DB privilege level [Doc 02 §6.4; Doc 12 §3.1]
+- [x] **S8.1.M1** (≈8 min) — Chart of Accounts with accountant sign-off first [Doc 02 §6.4; Doc 06 §4]
+- [x] **S8.1.M2** (≈8 min) — `JournalEntry`/lines with double-entry enforcement [Doc 02 §6.4]
+- [x] **S8.1.M3** (≈8 min) — Deferred balance trigger; `UPDATE`/`DELETE` denied at the DB privilege level [Doc 02 §6.4; Doc 12 §3.1]
 
 ### Task 8.2 — WP-81: Posting rules as config; outbox + Hangfire; cost-centre dimension
 
-- [ ] **S8.2.M1** (≈8 min) — Config-driven posting rules [`01A` §6.3]
-- [ ] **S8.2.M2** (≈8 min) — Outbox + Hangfire worker, exactly-once posting, survives a restart [`01A` §6.3]
-- [ ] **S8.2.M3** (≈6 min) — Cost-centre dimension on postings [`01A` §6.3]
+- [x] **S8.2.M1** (≈8 min) — Config-driven posting rules [`01A` §6.3]
+- [x] **S8.2.M2** (≈8 min) — Outbox + Hangfire worker, exactly-once posting, survives a restart [`01A` §6.3]
+- [x] **S8.2.M3** (≈6 min) — Cost-centre dimension on postings [`01A` §6.3]
 
 ### Task 8.3 — WP-82: `AccountBalance` cache; nightly reconciliation that alerts, never silently fixes; computed statements
 
-- [ ] **S8.3.M1** (≈8 min) — `AccountBalance` cache [Doc 02 §5.4–5.5]
-- [ ] **S8.3.M2** (≈8 min) — Nightly reconciliation that alerts on drift rather than silently fixing [Doc 02 §5.5; Doc 08 §10]
-- [ ] **S8.3.M3** (≈6 min) — Computed P&L / balance sheet / trial balance [Doc 02 §5.4–5.5]
+- [x] **S8.3.M1** (≈8 min) — `AccountBalance` cache [Doc 02 §5.4–5.5]
+- [x] **S8.3.M2** (≈8 min) — Nightly reconciliation that alerts on drift rather than silently fixing [Doc 02 §5.5; Doc 08 §10]
+- [x] **S8.3.M3** (≈6 min) — Computed P&L / balance sheet / trial balance [Doc 02 §5.4–5.5]
 
 ---
 

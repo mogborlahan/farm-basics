@@ -25,6 +25,10 @@ public static class PlatformMetrics
             Buckets = Histogram.ExponentialBuckets(0.005, 2, 12)
         });
 
+    public static readonly Counter LedgerReconciliationDriftTotal = Metrics.CreateCounter(
+        "farmbasics_ledger_reconciliation_drift_total",
+        "CRITICAL count of AccountBalance cache divergences detected against journal_entry_line.");
+
     public static string ClassifyStatusCode(int statusCode) => statusCode switch
     {
         409 => "409_conflict",
