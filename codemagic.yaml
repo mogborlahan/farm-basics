@@ -41,3 +41,90 @@ workflows:
           flutter build apk --release
     artifacts:
       - apps/farmer-app/build/**/outputs/**/*.apk
+
+  farmer-app-android-internal:
+    name: Farm Basics Farmer App (Android Internal Track Staged Release · WP-B1)
+    instance_type: linux_x2
+    max_build_duration: 45
+    environment:
+      flutter: "3.50.1"
+      groups:
+        - android_keystore
+        - google_play_service_account
+      vars:
+        CERT_PINS_PROD_PRIMARY: ""
+        CERT_PINS_PROD_BACKUP: ""
+    triggering:
+      events:
+        - tag
+      tag_patterns:
+        - pattern: 'mobile-v*'
+          include: true
+    scripts:
+      - name: Verify exact dependency pins & localization/widget suite (Rule 14)
+        script: |
+          cd apps/farmer-app
+          flutter pub get
+          flutter analyze --fatal-infos --fatal-warnings
+          flutter test
+      - name: Build signed Android App Bundle (.aab) with dual TLS pins
+        script: |
+          cd apps/farmer-app
+          if [ -z "${CERT_PINS_PROD_PRIMARY:-}" ] || [ -z "${CERT_PINS_PROD_BACKUP:-}" ]; then
+            echo "ERROR: Both CERT_PINS_PROD_PRIMARY and CERT_PINS_PROD_BACKUP must be set before pilot release (Doc 01A §7.2)."
+            exit 1
+          fi
+          flutter build appbundle --release \
+            --dart-define="CERT_PINS_SHA256=${CERT_PINS_PROD_PRIMARY},${CERT_PINS_PROD_BACKUP}"
+    artifacts:
+      - apps/farmer-app/build/**/outputs/**/*.aab
+      - apps/farmer-app/build/**/outputs/mapping.txt
+    publishing:
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal
+        rollout_fraction: 0.1
+        submit_as_draft: true
+
+  farmer-app-ios-testflight:
+    name: Farm Basics Farmer App (iOS TestFlight Pilot · WP-B1)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      flutter: "3.50.1"
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.farmbasics.farmerapp
+      groups:
+        - app_store_connect
+      vars:
+        CERT_PINS_PROD_PRIMARY: ""
+        CERT_PINS_PROD_BACKUP: ""
+    triggering:
+      events:
+        - tag
+      tag_patterns:
+        - pattern: 'mobile-v*'
+          include: true
+    scripts:
+      - name: Run Flutter analyze and unit/widget tests
+        script: |
+          cd apps/farmer-app
+          flutter pub get
+          flutter analyze --fatal-infos --fatal-warnings
+          flutter test
+      - name: Build signed IPA with dual TLS pins
+        script: |
+          cd apps/farmer-app
+          if [ -z "${CERT_PINS_PROD_PRIMARY:-}" ] || [ -z "${CERT_PINS_PROD_BACKUP:-}" ]; then
+            echo "ERROR: Both CERT_PINS_PROD_PRIMARY and CERT_PINS_PROD_BACKUP must be set before pilot release (Doc 01A §7.2)."
+            exit 1
+          fi
+          flutter build ipa --release \
+            --dart-define="CERT_PINS_SHA256=${CERT_PINS_PROD_PRIMARY},${CERT_PINS_PROD_BACKUP}"
+    artifacts:
+      - apps/farmer-app/build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true

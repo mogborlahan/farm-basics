@@ -517,15 +517,15 @@ All must hold before Sprint 5 begins (Document 19 §4):
 
 ### Task 10.1 — WP-A0: Dashboards; CRITICAL invariant canaries; Alertmanager routing off the VM; SLO tracking
 
-- [ ] **S10.1.M1** (≈8 min) — Grafana operational dashboards + SLO tracking panels [Doc 08 §5.1, §8]
-- [ ] **S10.1.M2** (≈8 min) — Wire CRITICAL invariant-violation canaries (unbalanced journal entry, partition missing, reconciliation drift) [Doc 08 §5.1]
-- [ ] **S10.1.M3** (≈6 min) — Verify Alertmanager routes outbound alerts through external off-VM channels [`01A` §8.2; Doc 08 §8]
+- [x] **S10.1.M1** (≈8 min) — Grafana operational dashboards + SLO tracking panels [Doc 08 §5.1, §8]
+- [x] **S10.1.M2** (≈8 min) — Wire CRITICAL invariant-violation canaries (unbalanced journal entry, partition missing, reconciliation drift) [Doc 08 §5.1]
+- [x] **S10.1.M3** (≈6 min) — Verify Alertmanager routes outbound alerts through external off-VM channels [`01A` §8.2; Doc 08 §8]
 
 ### Task 10.2 — WP-A1: k6 baseline load test; SAST/DAST pass; dependency and secret scan clean
 
-- [ ] **S10.2.M1** (≈8 min) — k6 baseline load test + rerun concurrency race suites at full iteration counts [Doc 12 §4.1]
-- [ ] **S10.2.M2** (≈8 min) — SAST/DAST security pass + authorization review [Doc 04 §14]
-- [ ] **S10.2.M3** (≈6 min) — Dependency audit (14-day cooldown rule) and secret/redaction scan clean [Doc 04 §14; `01A` §7.1]
+- [x] **S10.2.M1** (≈8 min) — k6 baseline load test + rerun concurrency race suites at full iteration counts [Doc 12 §4.1]
+- [x] **S10.2.M2** (≈8 min) — SAST/DAST security pass + authorization review [Doc 04 §14]
+- [x] **S10.2.M3** (≈6 min) — Dependency audit (14-day cooldown rule) and secret/redaction scan clean [Doc 04 §14; `01A` §7.1]
 
 ### Task 10.3 — WP-A2: Full DR rehearsal — restore from `wal-g` to a fresh VM, redeploy, repoint, timed against 4-hour RTO
 
@@ -534,8 +534,8 @@ All must hold before Sprint 5 begins (Document 19 §4):
 
 ### Task 10.4 — WP-A3: Accessibility audit and icon-comprehension prep
 
-- [ ] **S10.4.M1** (≈8 min) — WCAG AA / DS2 contrast (13.1:1 outdoor tokens) and touch-target (48dp/56dp) audit [Doc 14 §3; `Farm-Basics-Design-System-2.md` §19]
-- [ ] **S10.4.M2** (≈8 min) — Low-literacy icon-comprehension test protocol and non-reader test pack preparation [Doc 14 §4]
+- [x] **S10.4.M1** (≈8 min) — WCAG AA / DS2 contrast (13.1:1 outdoor tokens) and touch-target (48dp/56dp) audit [Doc 14 §3; `Farm-Basics-Design-System-2.md` §19]
+- [x] **S10.4.M2** (≈8 min) — Low-literacy icon-comprehension test protocol and non-reader test pack preparation [Doc 14 §4]
 
 ---
 
@@ -545,22 +545,22 @@ All must hold before Sprint 5 begins (Document 19 §4):
 
 ### Task 11.1 — WP-B0: Pilot telemetry (boundary success rate, sustained logging, sync failures)
 
-- [ ] **S11.1.M1** (≈8 min) — Telemetry hooks for boundary walk first-attempt success rate, sustained task logging, and offline sync failure rates [Doc 13 §6–7]
-- [ ] **S11.1.M2** (≈6 min) — Pilot cohort observation dashboard wired without exposing raw farmer PII [Doc 13 §6]
+- [x] **S11.1.M1** (≈8 min) — Telemetry hooks for boundary walk first-attempt success rate, sustained task logging, and offline sync failure rates [Doc 13 §6–7]
+- [x] **S11.1.M2** (≈6 min) — Pilot cohort observation dashboard wired without exposing raw farmer PII [Doc 13 §6]
 
 ### Task 11.2 — WP-B1: Pilot-language localization; Codemagic internal track, TestFlight, staged rollout; certificate-pinning rotation checklist
 
-- [ ] **S11.2.M1** (≈8 min) — Pilot-language localization bundle wired via `flutter_localizations` + native-speaker verification [`01A` §2.1; Doc 16 §16]
-- [ ] **S11.2.M2** (≈8 min) — Codemagic internal track, TestFlight, and staged-rollout release pipeline verified [`01A` §7.2; Doc 07 §8.2]
-- [ ] **S11.2.M3** (≈6 min) — TLS certificate-pinning rotation checklist verified in release runbook [`01A` §2.1]
+- [x] **S11.2.M1** (≈8 min) — Pilot-language localization bundle wired via `flutter_localizations` + native-speaker verification [`01A` §2.1; Doc 16 §16]
+- [x] **S11.2.M2** (≈8 min) — Codemagic internal track, TestFlight, and staged-rollout release pipeline verified [`01A` §7.2; Doc 07 §8.2]
+- [x] **S11.2.M3** (≈6 min) — TLS certificate-pinning rotation checklist verified in release runbook [`01A` §2.1]
 
 ### Task 11.3 — WP-B2: Break-glass credential provisioned and drilled
 
-- [ ] **S11.3.M1** (≈8 min) — Provision sealed offline Type-1 break-glass credential (`04A` §6) and execute end-to-end Keycloak-down recovery drill with retroactive `BreakGlassAction` audit logging [`01A` §3.3; `04A` §6]
+- [x] **S11.3.M1** (≈8 min) — Provision sealed offline Type-1 break-glass credential (`04A` §6) and execute end-to-end Keycloak-down recovery drill with retroactive `BreakGlassAction` audit logging [`01A` §3.3; `04A` §6]
 
 ### Task 11.4 — WP-B3: Runbook and support-script verification
 
-- [ ] **S11.4.M1** (≈8 min) — Verify Documents 09, 15, and 16 procedures and support scripts against actual shipped Phase 1 behavior [Doc 09; Doc 15; Doc 16]
+- [x] **S11.4.M1** (≈8 min) — Verify Documents 09, 15, and 16 procedures and support scripts against actual shipped Phase 1 behavior [Doc 09; Doc 15; Doc 16]
 
 ### Task 11.5 — WP-D09: `Doc/13A-QA-Pilot-Baseline-and-Remediation-Protocol.md` — Pilot Agronomic Baseline Instrument & Participant Remediation Reserve Protocol
 

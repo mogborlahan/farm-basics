@@ -1,0 +1,121 @@
+{
+  "title": "Farm Basics — CRITICAL Invariants & Operability Canaries (Sprint 10)",
+  "uid": "farmbasics-s10-invariants",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "15s",
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Unbalanced Journal Entries (ALT-13-01)",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "farmbasics_invariant_unbalanced_journal_entries",
+          "legendFormat": "Unbalanced"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": 0 },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Missing Monthly Partitions (Audit/Ledger)",
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 0 },
+      "targets": [
+        {
+          "expr": "farmbasics_invariant_missing_monthly_partitions",
+          "legendFormat": "Missing"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": 0 },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Self-Approved Master Data (ALT-AD06)",
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "farmbasics_invariant_self_approved_master_data",
+          "legendFormat": "Self-Approved"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": 0 },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Open Reconciliation Drift Alerts (ALT-13-02)",
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 0 },
+      "targets": [
+        {
+          "expr": "farmbasics_invariant_reconciliation_open_alerts",
+          "legendFormat": "Open Drift"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": 0 },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Reconciliation Drift Cumulative Detections",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "targets": [
+        {
+          "expr": "farmbasics_ledger_reconciliation_drift_total",
+          "legendFormat": "Drift total"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Invariant Canary Sweep Health (1 = Healthy)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "targets": [
+        {
+          "expr": "farmbasics_invariant_canary_last_run_success",
+          "legendFormat": "Last Run Success"
+        }
+      ]
+    }
+  ]
+}

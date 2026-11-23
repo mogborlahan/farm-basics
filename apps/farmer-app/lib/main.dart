@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 
 import 'boundary/boundary_walk_screen.dart';
 import 'crop_cycles/crop_task_list_screen.dart';
+import 'l10n/farm_basics_localizations.dart';
 import 'registration/registration_api_client.dart';
 import 'registration/registration_wizard_screen.dart';
 import 'sync/offline_sync_engine.dart';
@@ -17,9 +18,11 @@ class FarmBasicsApp extends StatelessWidget {
   const FarmBasicsApp({
     super.key,
     this.apiBaseUrl = 'http://localhost:8080',
+    this.locale = const Locale('en', 'NG'),
   });
 
   final String apiBaseUrl;
+  final Locale locale;
 
   // Doc/Farm-Basics-Design-System-2.md §23 tokens.
   static const Color creamCanvas = Color(0xFFF4F1EA);
@@ -30,6 +33,15 @@ class FarmBasicsApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Farm Basics',
+      supportedLocales: const <Locale>[Locale('en', 'NG')],
+      localizationsDelegates: FarmBasicsLocalizations.localizationsDelegates,
+      builder: (BuildContext context, Widget? child) {
+        return FarmBasicsLocalizations.wrapWithLocale(
+          context: context,
+          locale: locale,
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
       theme: ThemeData(
         scaffoldBackgroundColor: creamCanvas,
         colorScheme: ColorScheme.fromSeed(

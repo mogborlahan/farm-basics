@@ -7,6 +7,7 @@ using FarmBasics.Api.Platform;
 using FarmBasics.Api.Registration;
 using FarmBasics.BuildingBlocks.Api;
 using FarmBasics.BuildingBlocks.Auth;
+using FarmBasics.BuildingBlocks.Observability;
 using Npgsql;
 using NpgsqlTypes;
 
@@ -356,6 +357,8 @@ internal static class ProductionUnitEndpoints
             await invCmd.ExecuteNonQueryAsync(cancellationToken);
             await tx.CommitAsync(cancellationToken);
 
+            PlatformMetrics.PilotBoundaryWalkOutcomesTotal.WithLabels("invalid").Inc();
+
             return SelfServiceRegistrationEndpoints.ErrorResult(httpContext, StatusCodes.Status422UnprocessableEntity, "INSUFFICIENT_POINTS", "At least 3 distinct valid GPS points are required to close a field boundary.");
         }
 
@@ -413,6 +416,7 @@ internal static class ProductionUnitEndpoints
 
         if (analysis.Status == BoundaryAnalysisStatus.NeedsReview)
         {
+            PlatformMetrics.PilotBoundaryWalkOutcomesTotal.WithLabels("review_required").Inc();
             return Results.Ok(new ApiResponse<object>(
                 new
                 {
@@ -636,6 +640,8 @@ internal static class ProductionUnitEndpoints
             cancellationToken);
 
         await tx.CommitAsync(cancellationToken);
+
+        PlatformMetrics.PilotBoundaryWalkOutcomesTotal.WithLabels("confirmed").Inc();
 
         return Results.Json(
             new ApiResponse<object>(

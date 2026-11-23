@@ -1,0 +1,97 @@
+{
+  "title": "Farm Basics — Pilot Cohort Observation (Zero Raw PII · Sprint 11)",
+  "uid": "farmbasics-s11-pilot",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Boundary Walk First-Attempt Confirmation Rate",
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(farmbasics_pilot_boundary_walk_outcomes_total{outcome=\"confirmed\"}) / clamp_min(sum(farmbasics_pilot_boundary_walk_outcomes_total), 1) * 100",
+          "legendFormat": "Confirmed %"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              { "color": "red", "value": 0 },
+              { "color": "yellow", "value": 60 },
+              { "color": "green", "value": 80 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Offline Sync Success Ratio",
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(farmbasics_pilot_sync_outcomes_total{outcome=\"succeeded\"}) / clamp_min(sum(farmbasics_pilot_sync_outcomes_total), 1) * 100",
+          "legendFormat": "Sync Success %"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              { "color": "red", "value": 0 },
+              { "color": "yellow", "value": 90 },
+              { "color": "green", "value": 98 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Operation Logs (Flag Share)",
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(farmbasics_pilot_operation_logs_total{status=\"flag\"}) / clamp_min(sum(farmbasics_pilot_operation_logs_total), 1) * 100",
+          "legendFormat": "Flag %"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Boundary Walk Outcomes by Status (Confirmed vs Review vs Invalid)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "targets": [
+        {
+          "expr": "sum(rate(farmbasics_pilot_boundary_walk_outcomes_total[15m])) by (outcome)",
+          "legendFormat": "{{outcome}}"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Crop Task Logs & Offline Sync Outcomes Rate",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "targets": [
+        {
+          "expr": "sum(rate(farmbasics_pilot_operation_logs_total[15m])) by (status)",
+          "legendFormat": "task:{{status}}"
+        },
+        {
+          "expr": "sum(rate(farmbasics_pilot_sync_outcomes_total[15m])) by (outcome)",
+          "legendFormat": "sync:{{outcome}}"
+        }
+      ]
+    }
+  ]
+}

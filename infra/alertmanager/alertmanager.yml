@@ -1,14 +1,56 @@
-# Alertmanager off-VM routing baseline (01A §8.2, 04A-ENG §5)
-# Replace placeholder webhook URL in SOPS-encrypted staging/prod configuration before M0 exit.
+# Alertmanager off-VM routing configuration (01A §8.2, 04A-ENG §5, 08-ENG §7)
+# All receivers MUST route off the single host VM (zero localhost/127.0.0.1 targets).
+# Replace placeholder external webhook URLs in SOPS-encrypted staging/prod secrets before M2 launch (F-32).
 route:
   receiver: off-vm-ops-webhook
-  group_by: ["alertname", "severity"]
+  group_by: ["alertname", "severity", "code"]
   group_wait: 15s
   group_interval: 2m
   repeat_interval: 1h
+  routes:
+    - matchers:
+        - severity = "critical"
+      receiver: off-vm-critical-pager
+      group_wait: 0s
+      group_interval: 30s
+      repeat_interval: 5m
+    - matchers:
+        - severity = "high"
+      receiver: off-vm-high-ops
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 1h
+    - matchers:
+        - severity = "medium"
+      receiver: off-vm-medium-digest
+      group_wait: 5m
+      group_interval: 30m
+      repeat_interval: 12h
+
+inhibit_rules:
+  - source_matchers:
+      - severity = "critical"
+    target_matchers:
+      - severity = "medium"
+    equal: ["alertname"]
 
 receivers:
   - name: off-vm-ops-webhook
     webhook_configs:
-      - url: "https://alerts.example.invalid/webhook"
+      - url: "https://alerts.example.invalid/webhook/ops"
+        send_resolved: true
+
+  - name: off-vm-critical-pager
+    webhook_configs:
+      - url: "https://alerts.example.invalid/webhook/critical-24x7"
+        send_resolved: true
+
+  - name: off-vm-high-ops
+    webhook_configs:
+      - url: "https://alerts.example.invalid/webhook/high"
+        send_resolved: true
+
+  - name: off-vm-medium-digest
+    webhook_configs:
+      - url: "https://alerts.example.invalid/webhook/medium-digest"
         send_resolved: true

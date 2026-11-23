@@ -6,6 +6,7 @@ using FarmBasics.Api.Platform;
 using FarmBasics.Api.Registration;
 using FarmBasics.BuildingBlocks.Api;
 using FarmBasics.BuildingBlocks.Auth;
+using FarmBasics.BuildingBlocks.Observability;
 using Npgsql;
 using NpgsqlTypes;
 
@@ -550,6 +551,8 @@ internal static class CropCycleEndpoints
             cancellationToken);
 
         await tx.CommitAsync(cancellationToken);
+
+        PlatformMetrics.PilotOperationLogsTotal.WithLabels(validation.Status).Inc();
 
         return Results.Json(
             new ApiResponse<object>(

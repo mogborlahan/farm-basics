@@ -1,27 +1,95 @@
 {
-  "title": "Farm Basics — Platform Health (Sprint 0)",
+  "title": "Farm Basics — Platform Health & SLOs (Sprint 10)",
   "uid": "farmbasics-s0-health",
   "schemaVersion": 39,
-  "version": 1,
+  "version": 2,
   "refresh": "15s",
   "panels": [
     {
       "id": 1,
-      "type": "timeseries",
-      "title": "API Request Duration p95 (seconds)",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "type": "stat",
+      "title": "API 30d Availability SLO (Target 99.5%)",
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 0 },
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, sum(rate(farmbasics_http_request_duration_seconds_bucket[5m])) by (le, route))",
-          "legendFormat": "{{route}}"
+          "expr": "(1 - (sum(rate(farmbasics_http_requests_total{status_class=\"5xx\"}[1h])) / clamp_min(sum(rate(farmbasics_http_requests_total[1h])), 0.001))) * 100",
+          "legendFormat": "Availability %"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              { "color": "red", "value": 0 },
+              { "color": "yellow", "value": 99.0 },
+              { "color": "green", "value": 99.5 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "API p99 Latency (Target < 2.0s)",
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 0 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(farmbasics_http_request_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p99"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": 0 },
+              { "color": "yellow", "value": 1.2 },
+              { "color": "red", "value": 2.0 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "5xx Error Budget Burn Ratio",
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 0 },
+      "targets": [
+        {
+          "expr": "(sum(rate(farmbasics_http_requests_total{status_class=\"5xx\"}[5m])) / clamp_min(sum(rate(farmbasics_http_requests_total[5m])), 0.001)) / 0.005",
+          "legendFormat": "Burn Multiple (1.0 = budget rate)"
         }
       ]
     },
     {
-      "id": 2,
+      "id": 4,
+      "type": "timeseries",
+      "title": "API Request Duration p50 / p95 / p99 (seconds)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(farmbasics_http_request_duration_seconds_bucket[5m])) by (le, route))",
+          "legendFormat": "p50 {{route}}"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(farmbasics_http_request_duration_seconds_bucket[5m])) by (le, route))",
+          "legendFormat": "p95 {{route}}"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(farmbasics_http_request_duration_seconds_bucket[5m])) by (le, route))",
+          "legendFormat": "p99 {{route}}"
+        }
+      ]
+    },
+    {
+      "id": 5,
       "type": "timeseries",
       "title": "HTTP Requests Rate by Status Class (409 vs 4xx vs 5xx)",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
       "targets": [
         {
           "expr": "sum(rate(farmbasics_http_requests_total[5m])) by (status_class, route)",

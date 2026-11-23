@@ -884,15 +884,15 @@ body{
 </blockquote>
 <h3 id="task-101--wp-a0-dashboards-critical-invariant-canaries-alertmanager-routing-off-the-vm-slo-tracking">Task 10.1 — WP-A0: Dashboards; CRITICAL invariant canaries; Alertmanager routing off the VM; SLO tracking</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S10.1.M1</strong> (≈8 min) — Grafana operational dashboards + SLO tracking panels [Doc 08 §5.1, §8]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S10.1.M2</strong> (≈8 min) — Wire CRITICAL invariant-violation canaries (unbalanced journal entry, partition missing, reconciliation drift) [Doc 08 §5.1]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S10.1.M3</strong> (≈6 min) — Verify Alertmanager routes outbound alerts through external off-VM channels [<code>01A</code> §8.2; Doc 08 §8]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S10.1.M1</strong> (≈8 min) — Grafana operational dashboards + SLO tracking panels [Doc 08 §5.1, §8]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S10.1.M2</strong> (≈8 min) — Wire CRITICAL invariant-violation canaries (unbalanced journal entry, partition missing, reconciliation drift) [Doc 08 §5.1]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S10.1.M3</strong> (≈6 min) — Verify Alertmanager routes outbound alerts through external off-VM channels [<code>01A</code> §8.2; Doc 08 §8]</label></li>
 </ul>
 <h3 id="task-102--wp-a1-k6-baseline-load-test-sastdast-pass-dependency-and-secret-scan-clean">Task 10.2 — WP-A1: k6 baseline load test; SAST/DAST pass; dependency and secret scan clean</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S10.2.M1</strong> (≈8 min) — k6 baseline load test + rerun concurrency race suites at full iteration counts [Doc 12 §4.1]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S10.2.M2</strong> (≈8 min) — SAST/DAST security pass + authorization review [Doc 04 §14]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S10.2.M3</strong> (≈6 min) — Dependency audit (14-day cooldown rule) and secret/redaction scan clean [Doc 04 §14; <code>01A</code> §7.1]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S10.2.M1</strong> (≈8 min) — k6 baseline load test + rerun concurrency race suites at full iteration counts [Doc 12 §4.1]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S10.2.M2</strong> (≈8 min) — SAST/DAST security pass + authorization review [Doc 04 §14]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S10.2.M3</strong> (≈6 min) — Dependency audit (14-day cooldown rule) and secret/redaction scan clean [Doc 04 §14; <code>01A</code> §7.1]</label></li>
 </ul>
 <h3 id="task-103--wp-a2-full-dr-rehearsal--restore-from-wal-g-to-a-fresh-vm-redeploy-repoint-timed-against-4-hour-rto">Task 10.3 — WP-A2: Full DR rehearsal — restore from <code>wal-g</code> to a fresh VM, redeploy, repoint, timed against 4-hour RTO</h3>
 <ul class="task-list">
@@ -901,8 +901,8 @@ body{
 </ul>
 <h3 id="task-104--wp-a3-accessibility-audit-and-icon-comprehension-prep">Task 10.4 — WP-A3: Accessibility audit and icon-comprehension prep</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S10.4.M1</strong> (≈8 min) — WCAG AA / DS2 contrast (13.1:1 outdoor tokens) and touch-target (48dp/56dp) audit [Doc 14 §3; <code>Farm-Basics-Design-System-2.md</code> §19]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S10.4.M2</strong> (≈8 min) — Low-literacy icon-comprehension test protocol and non-reader test pack preparation [Doc 14 §4]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S10.4.M1</strong> (≈8 min) — WCAG AA / DS2 contrast (13.1:1 outdoor tokens) and touch-target (48dp/56dp) audit [Doc 14 §3; <code>Farm-Basics-Design-System-2.md</code> §19]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S10.4.M2</strong> (≈8 min) — Low-literacy icon-comprehension test protocol and non-reader test pack preparation [Doc 14 §4]</label></li>
 </ul>
 <hr />
 <h2 id="sprint-11--pilot-instrumentation-release--pilot-collateral-m2">Sprint 11 — Pilot instrumentation, release &amp; pilot collateral (M2)</h2>
@@ -911,22 +911,22 @@ body{
 </blockquote>
 <h3 id="task-111--wp-b0-pilot-telemetry-boundary-success-rate-sustained-logging-sync-failures">Task 11.1 — WP-B0: Pilot telemetry (boundary success rate, sustained logging, sync failures)</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S11.1.M1</strong> (≈8 min) — Telemetry hooks for boundary walk first-attempt success rate, sustained task logging, and offline sync failure rates [Doc 13 §6–7]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S11.1.M2</strong> (≈6 min) — Pilot cohort observation dashboard wired without exposing raw farmer PII [Doc 13 §6]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S11.1.M1</strong> (≈8 min) — Telemetry hooks for boundary walk first-attempt success rate, sustained task logging, and offline sync failure rates [Doc 13 §6–7]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S11.1.M2</strong> (≈6 min) — Pilot cohort observation dashboard wired without exposing raw farmer PII [Doc 13 §6]</label></li>
 </ul>
 <h3 id="task-112--wp-b1-pilot-language-localization-codemagic-internal-track-testflight-staged-rollout-certificate-pinning-rotation-checklist">Task 11.2 — WP-B1: Pilot-language localization; Codemagic internal track, TestFlight, staged rollout; certificate-pinning rotation checklist</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S11.2.M1</strong> (≈8 min) — Pilot-language localization bundle wired via <code>flutter_localizations</code> + native-speaker verification [<code>01A</code> §2.1; Doc 16 §16]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S11.2.M2</strong> (≈8 min) — Codemagic internal track, TestFlight, and staged-rollout release pipeline verified [<code>01A</code> §7.2; Doc 07 §8.2]</label></li>
-<li><label><input type="checkbox" class="fb-check" /><strong>S11.2.M3</strong> (≈6 min) — TLS certificate-pinning rotation checklist verified in release runbook [<code>01A</code> §2.1]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S11.2.M1</strong> (≈8 min) — Pilot-language localization bundle wired via <code>flutter_localizations</code> + native-speaker verification [<code>01A</code> §2.1; Doc 16 §16]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S11.2.M2</strong> (≈8 min) — Codemagic internal track, TestFlight, and staged-rollout release pipeline verified [<code>01A</code> §7.2; Doc 07 §8.2]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S11.2.M3</strong> (≈6 min) — TLS certificate-pinning rotation checklist verified in release runbook [<code>01A</code> §2.1]</label></li>
 </ul>
 <h3 id="task-113--wp-b2-break-glass-credential-provisioned-and-drilled">Task 11.3 — WP-B2: Break-glass credential provisioned and drilled</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S11.3.M1</strong> (≈8 min) — Provision sealed offline Type-1 break-glass credential (<code>04A</code> §6) and execute end-to-end Keycloak-down recovery drill with retroactive <code>BreakGlassAction</code> audit logging [<code>01A</code> §3.3; <code>04A</code> §6]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S11.3.M1</strong> (≈8 min) — Provision sealed offline Type-1 break-glass credential (<code>04A</code> §6) and execute end-to-end Keycloak-down recovery drill with retroactive <code>BreakGlassAction</code> audit logging [<code>01A</code> §3.3; <code>04A</code> §6]</label></li>
 </ul>
 <h3 id="task-114--wp-b3-runbook-and-support-script-verification">Task 11.4 — WP-B3: Runbook and support-script verification</h3>
 <ul class="task-list">
-<li><label><input type="checkbox" class="fb-check" /><strong>S11.4.M1</strong> (≈8 min) — Verify Documents 09, 15, and 16 procedures and support scripts against actual shipped Phase 1 behavior [Doc 09; Doc 15; Doc 16]</label></li>
+<li><label><input type="checkbox" class="fb-check" checked /><strong>S11.4.M1</strong> (≈8 min) — Verify Documents 09, 15, and 16 procedures and support scripts against actual shipped Phase 1 behavior [Doc 09; Doc 15; Doc 16]</label></li>
 </ul>
 <h3 id="task-115--wp-d09-doc13a-qa-pilot-baseline-and-remediation-protocolmd--pilot-agronomic-baseline-instrument--participant-remediation-reserve-protocol">Task 11.5 — WP-D09: <code>Doc/13A-QA-Pilot-Baseline-and-Remediation-Protocol.md</code> — Pilot Agronomic Baseline Instrument &amp; Participant Remediation Reserve Protocol</h3>
 <blockquote>

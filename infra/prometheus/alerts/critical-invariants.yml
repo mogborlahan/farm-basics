@@ -1,0 +1,77 @@
+groups:
+  - name: farmbasics-critical-invariants
+    rules:
+      - alert: CriticalUnbalancedJournalEntry
+        expr: farmbasics_invariant_unbalanced_journal_entries > 0
+        for: 0m
+        labels:
+          severity: critical
+          code: ALT-13-01
+          owner: backend-oncall
+        annotations:
+          summary: "CRITICAL: Unbalanced ledger journal entry detected (ALT-13-01)"
+          description: "Zero unbalanced journal entries are structurally permitted (BR-C-08). Immediate P1 investigation required."
+
+      - alert: CriticalLedgerReconciliationDrift
+        expr: farmbasics_invariant_reconciliation_open_alerts > 0 or increase(farmbasics_ledger_reconciliation_drift_total[15m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+          code: ALT-13-02
+          owner: backend-oncall
+        annotations:
+          summary: "CRITICAL: AccountBalance reconciliation drift detected (ALT-13-02)"
+          description: "Cached AccountBalance diverged from immutable journal_entry_line sums. Alert-only mode active; investigate root cause."
+
+      - alert: CriticalMissingMonthlyPartition
+        expr: farmbasics_invariant_missing_monthly_partitions > 0
+        for: 0m
+        labels:
+          severity: critical
+          owner: backend-oncall
+        annotations:
+          summary: "CRITICAL: Audit or ledger monthly partition missing"
+          description: "Current or next UTC monthly partition missing on audit.audit_log_entry or accounts.journal_entry."
+
+      - alert: CriticalMasterDataSelfApproval
+        expr: farmbasics_invariant_self_approved_master_data > 0
+        for: 0m
+        labels:
+          severity: critical
+          code: ALT-AD06
+          owner: backend-oncall
+        annotations:
+          summary: "CRITICAL: Master data self-approval detected (ALT-AD06)"
+          description: "A MasterDataChangeRequest row has reviewed_by_admin_id == proposed_by_admin_id."
+
+  - name: farmbasics-slo-and-ops
+    rules:
+      - alert: HighInvariantCanaryJobDown
+        expr: farmbasics_invariant_canary_last_run_success == 0
+        for: 10m
+        labels:
+          severity: high
+          owner: backend-oncall
+        annotations:
+          summary: "HIGH: Invariant canary sweep failing"
+          description: "InvariantCanaryBackgroundService failed to complete for 10+ minutes (Doc 08-ENG §10)."
+
+      - alert: SloApiAvailabilityBurnRate
+        expr: (sum(rate(farmbasics_http_requests_total{status_class="5xx"}[5m])) / clamp_min(sum(rate(farmbasics_http_requests_total[5m])), 0.001)) > 0.005
+        for: 5m
+        labels:
+          severity: high
+          owner: backend-oncall
+        annotations:
+          summary: "HIGH: API 5xx error rate breaching 99.5% availability SLO"
+          description: "5xx error ratio exceeded 0.5% over 5 minutes (Doc 08-ENG §9)."
+
+      - alert: SloApiLatencyP99Breach
+        expr: histogram_quantile(0.99, sum(rate(farmbasics_http_request_duration_seconds_bucket[5m])) by (le)) > 2
+        for: 5m
+        labels:
+          severity: medium
+          owner: backend-oncall
+        annotations:
+          summary: "MEDIUM: API p99 latency exceeded 2.0s SLO target"
+          description: "Platform API p99 response duration exceeded 2.0 seconds (BRD NFR-PERF-04 / Doc 08-ENG §9)."

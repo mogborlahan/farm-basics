@@ -11,6 +11,7 @@ using FarmBasics.Api.Geography;
 using FarmBasics.Api.Identity;
 using FarmBasics.Api.Integrations;
 using FarmBasics.Api.MasterData;
+using FarmBasics.Api.Observability;
 using FarmBasics.Api.Persistence;
 using FarmBasics.Api.Platform;
 using FarmBasics.Api.ProductionUnits;
@@ -42,6 +43,7 @@ builder.Services.AddSingleton(sp => new DatabaseConnectionSource(sp.GetRequiredS
 builder.Services.AddSingleton<SchemaMigrationRunner>();
 builder.Services.AddHostedService<DatabaseBootstrapAndPartitionService>();
 builder.Services.AddHostedService<OutboxLedgerBackgroundService>();
+builder.Services.AddHostedService<InvariantCanaryBackgroundService>();
 
 builder.Services.AddOpenTelemetry()
     .WithTracing(tracing => tracing
@@ -246,6 +248,9 @@ app.MapFieldOpsEndpoints();
 app.MapAnalyticsEndpoints();
 app.MapSupportEndpoints();
 app.MapPhoneChangeEndpoints();
+app.MapObservabilityEndpoints();
+app.MapPilotTelemetryEndpoints();
+app.MapBreakGlassEndpoints();
 app.MapSyncSpikeEndpoints();
 app.MapMetrics("/metrics");
 

@@ -5,6 +5,7 @@ using FarmBasics.Api.Persistence;
 using FarmBasics.Api.Platform;
 using FarmBasics.BuildingBlocks.Api;
 using FarmBasics.BuildingBlocks.Auth;
+using FarmBasics.BuildingBlocks.Observability;
 using Npgsql;
 
 namespace FarmBasics.Api.Sync;
@@ -121,6 +122,7 @@ internal static class SyncSpikeEndpoint
                 if (tsObj is null)
                 {
                     await tx.RollbackAsync(cancellationToken);
+                    PlatformMetrics.PilotSyncOutcomesTotal.WithLabels("conflict").Inc();
                     return Results.Json(
                         new ApiErrorResponse(
                             new ApiErrorDetail("CLIENT_GUID_ALREADY_SYNCED", "This offline entity GUID was already synced under a different Idempotency-Key."),
@@ -150,6 +152,7 @@ internal static class SyncSpikeEndpoint
                 cancellationToken);
 
             await tx.CommitAsync(cancellationToken);
+            PlatformMetrics.PilotSyncOutcomesTotal.WithLabels("succeeded").Inc();
             return Results.Text(serializedBody, "application/json", Encoding.UTF8, StatusCodes.Status201Created);
         }
 
@@ -163,13 +166,20 @@ internal static class SyncSpikeEndpoint
             fingerprint,
             cancellationToken);
 
-        return lookup.Outcome switch
+        if (lookup.Outcome == IdempotencyLookupOutcome.FingerprintMismatch)
         {
-            IdempotencyLookupOutcome.FingerprintMismatch => IdempotencyStore.KeyReusedResult(httpContext),
-            IdempotencyLookupOutcome.Completed when lookup.StatusCode.HasValue && lookup.ResponseBody is not null
-                => Results.Text(lookup.ResponseBody, "application/json", Encoding.UTF8, lookup.StatusCode.Value),
-            _ => IdempotencyStore.InFlightTimeoutResult(httpContext)
-        };
+            PlatformMetrics.PilotSyncOutcomesTotal.WithLabels("conflict").Inc();
+            return IdempotencyStore.KeyReusedResult(httpContext);
+        }
+
+        if (lookup.Outcome == IdempotencyLookupOutcome.Completed && lookup.StatusCode.HasValue && lookup.ResponseBody is not null)
+        {
+            PlatformMetrics.PilotSyncOutcomesTotal.WithLabels("succeeded").Inc();
+            return Results.Text(lookup.ResponseBody, "application/json", Encoding.UTF8, lookup.StatusCode.Value);
+        }
+
+        PlatformMetrics.PilotSyncOutcomesTotal.WithLabels("failed").Inc();
+        return IdempotencyStore.InFlightTimeoutResult(httpContext);
     }
 
     private static string ComputeFingerprint(SyncSpikeRequest request)
