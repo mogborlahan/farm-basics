@@ -2,6 +2,7 @@ using System.Text.Json;
 using FarmBasics.Api.Agents;
 using FarmBasics.Api.Audit;
 using FarmBasics.Api.Persistence;
+using FarmBasics.Api.Platform;
 using FarmBasics.Api.Registration;
 using FarmBasics.BuildingBlocks.Api;
 using FarmBasics.BuildingBlocks.Auth;
@@ -195,7 +196,47 @@ internal static class FobEndpoints
             }
         }
 
-        string? resultingStatus;
+        Guid targetFarmerId = Guid.Empty;
+        bool fobExists = false;
+        await using (NpgsqlCommand lockCmd = conn.CreateCommand())
+        {
+            lockCmd.Transaction = tx;
+            lockCmd.CommandText = """
+                SELECT farmer_identity_id
+                FROM identity.fob_credential
+                WHERE id = @fobId
+                FOR UPDATE;
+                """;
+            lockCmd.Parameters.AddWithValue("fobId", fobId);
+
+            if (await lockCmd.ExecuteScalarAsync(cancellationToken) is Guid foundFarmerId)
+            {
+                fobExists = true;
+                targetFarmerId = foundFarmerId;
+            }
+        }
+
+        if (!fobExists)
+        {
+            await tx.RollbackAsync(cancellationToken);
+            return SelfServiceRegistrationEndpoints.ErrorResult(httpContext, StatusCodes.Status404NotFound, "RESOURCE_NOT_FOUND", "Fob credential was not found.");
+        }
+
+        if (isAdminRevoker)
+        {
+            AdminPermissionScope scope = await AdminScopeResolver.ResolveScopesAsync(conn, tx, callerId, "fob", "revoke", cancellationToken);
+            if (!await AdminScopeResolver.IsIdentityInScopeAsync(conn, tx, scope, targetFarmerId, cancellationToken))
+            {
+                await tx.RollbackAsync(cancellationToken);
+                return SelfServiceRegistrationEndpoints.ErrorResult(
+                    httpContext,
+                    StatusCodes.Status403Forbidden,
+                    "SCOPE_VIOLATION",
+                    "Administrator cannot revoke a fob outside their assigned scope (Rule 8).");
+            }
+        }
+
+        string? resultingStatus = null;
         Guid? farmerIdentityId = null;
         await using (NpgsqlCommand revokeCmd = conn.CreateCommand())
         {
@@ -210,14 +251,17 @@ internal static class FobEndpoints
             revokeCmd.Parameters.AddWithValue("fobId", fobId);
 
             await using NpgsqlDataReader reader = await revokeCmd.ExecuteReaderAsync(cancellationToken);
-            if (!await reader.ReadAsync(cancellationToken))
+            if (await reader.ReadAsync(cancellationToken))
             {
-                await tx.RollbackAsync(cancellationToken);
-                return SelfServiceRegistrationEndpoints.ErrorResult(httpContext, StatusCodes.Status404NotFound, "RESOURCE_NOT_FOUND", "Fob credential was not found.");
+                resultingStatus = reader.GetString(0);
+                farmerIdentityId = reader.GetGuid(1);
             }
+        }
 
-            resultingStatus = reader.GetString(0);
-            farmerIdentityId = reader.GetGuid(1);
+        if (resultingStatus is null || !farmerIdentityId.HasValue)
+        {
+            await tx.RollbackAsync(cancellationToken);
+            return SelfServiceRegistrationEndpoints.ErrorResult(httpContext, StatusCodes.Status404NotFound, "RESOURCE_NOT_FOUND", "Fob credential was not found.");
         }
 
         string? rawCaseRef = httpContext.Request.Headers[Support.SupportEndpoints.SupportCaseRefHeaderName].FirstOrDefault();

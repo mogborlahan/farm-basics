@@ -108,6 +108,17 @@ internal static class SupportEndpoints
             return SelfServiceRegistrationEndpoints.ErrorResult(httpContext, StatusCodes.Status404NotFound, "RESOURCE_NOT_FOUND", "Target identity was not found.");
         }
 
+        AdminPermissionScope scope = await AdminScopeResolver.ResolveScopesAsync(conn, tx, callerId, "support", "read", cancellationToken);
+        if (!await AdminScopeResolver.IsIdentityInScopeAsync(conn, tx, scope, identityId, cancellationToken))
+        {
+            await tx.RollbackAsync(cancellationToken);
+            return SelfServiceRegistrationEndpoints.ErrorResult(
+                httpContext,
+                StatusCodes.Status403Forbidden,
+                "SCOPE_VIOLATION",
+                "Support agent cannot access an identity outside their assigned scope (Rule 8).");
+        }
+
         object? latestReview = null;
         await using (NpgsqlCommand revCmd = conn.CreateCommand())
         {
@@ -322,6 +333,17 @@ internal static class SupportEndpoints
         {
             await tx.RollbackAsync(cancellationToken);
             return SelfServiceRegistrationEndpoints.ErrorResult(httpContext, StatusCodes.Status404NotFound, "RESOURCE_NOT_FOUND", "Fob credential was not found.");
+        }
+
+        AdminPermissionScope scope = await AdminScopeResolver.ResolveScopesAsync(conn, tx, callerId, "support", "escalate_fob", cancellationToken);
+        if (!await AdminScopeResolver.IsIdentityInScopeAsync(conn, tx, scope, farmerIdentityId, cancellationToken))
+        {
+            await tx.RollbackAsync(cancellationToken);
+            return SelfServiceRegistrationEndpoints.ErrorResult(
+                httpContext,
+                StatusCodes.Status403Forbidden,
+                "SCOPE_VIOLATION",
+                "Support agent cannot escalate a fob outside their assigned scope (Rule 8).");
         }
 
         if (!string.Equals(fobStatus, "active", StringComparison.Ordinal))

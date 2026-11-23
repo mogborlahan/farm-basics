@@ -1026,6 +1026,244 @@ public sealed partial class Sprint9HarvestOpsAndSupportIntegrationTests
         }
     }
 
+    [Fact]
+    public async Task Wp93AndWp94ScopeIsolationAndSameAgentHandshakeEnforced()
+    {
+        await using WebApplicationFactory<Program> factory = CreateFactory();
+        using HttpClient client = factory.CreateClient();
+        SandboxSmsGatewayClient smsCapture = factory.Services.GetRequiredService<SandboxSmsGatewayClient>();
+        smsCapture.Clear();
+
+        Guid adminId = Guid.NewGuid();
+        Guid orgAdminId = Guid.NewGuid();
+        Guid agent1Id = Guid.NewGuid();
+        Guid agent2Id = Guid.NewGuid();
+        Guid supportAlphaId = Guid.NewGuid();
+        Guid trustAlphaId = Guid.NewGuid();
+
+        string adminJwt = CreateSignedToken(adminId);
+        string orgAdminJwt = CreateSignedToken(orgAdminId);
+        string agent1Jwt = CreateSignedToken(agent1Id);
+        string agent2Jwt = CreateSignedToken(agent2Id);
+        string supportAlphaJwt = CreateSignedToken(supportAlphaId);
+        string trustAlphaJwt = CreateSignedToken(trustAlphaId);
+
+        await ProvisionViaAuthMeAsync(client, agent2Jwt);
+        await ProvisionViaAuthMeAsync(client, supportAlphaJwt);
+        await ProvisionViaAuthMeAsync(client, trustAlphaJwt);
+
+        (Guid orgId, _, Guid session1Id) = await SetupVerifiedOrgAgentAndSessionAsync(
+            client,
+            adminId,
+            adminJwt,
+            orgAdminJwt,
+            agent1Id,
+            agent1Jwt,
+            deviceSerial: $"TAB-A1-{Guid.NewGuid():N}"[..16],
+            deviceFingerprint: $"FP-A1-{Guid.NewGuid():N}");
+
+        // Onboard second active agent + tablet session in same verified org
+        using (HttpRequestMessage addAg2 = new(HttpMethod.Post, $"/v1/organizations/{orgId}/agents"))
+        {
+            addAg2.Headers.Authorization = new AuthenticationHeaderValue("Bearer", orgAdminJwt);
+            addAg2.Content = JsonContent.Create(new { agentIdentityId = agent2Id });
+            Assert.Equal(HttpStatusCode.Created, (await client.SendAsync(addAg2)).StatusCode);
+        }
+
+        string fp2 = $"FP-A2-{Guid.NewGuid():N}";
+        Guid tablet2Id;
+        using (HttpRequestMessage bindTab2 = new(HttpMethod.Post, "/v1/tablets/bind"))
+        {
+            bindTab2.Headers.Authorization = new AuthenticationHeaderValue("Bearer", orgAdminJwt);
+            bindTab2.Content = JsonContent.Create(new
+            {
+                deviceSerial = $"TAB-A2-{Guid.NewGuid():N}"[..16],
+                deviceFingerprint = fp2,
+                organizationId = orgId,
+                assignedAgentId = agent2Id
+            });
+            HttpResponseMessage resp = await client.SendAsync(bindTab2);
+            Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
+            using JsonDocument d = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+            tablet2Id = d.RootElement.GetProperty("data").GetProperty("tabletId").GetGuid();
+        }
+
+        Guid session2Id;
+        using (HttpRequestMessage startSess2 = new(HttpMethod.Post, "/v1/agents/sessions"))
+        {
+            startSess2.Headers.Authorization = new AuthenticationHeaderValue("Bearer", agent2Jwt);
+            startSess2.Content = JsonContent.Create(new { tabletId = tablet2Id, deviceFingerprint = fp2, lifetimeHours = 72 });
+            HttpResponseMessage resp = await client.SendAsync(startSess2);
+            Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
+            using JsonDocument d = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+            session2Id = d.RootElement.GetProperty("data").GetProperty("sessionId").GetGuid();
+        }
+
+        Guid stateAlphaId = Guid.NewGuid();
+        Guid lgaAlphaId = Guid.NewGuid();
+        Guid stateBetaId = Guid.NewGuid();
+        Guid lgaBetaId = Guid.NewGuid();
+        string suffix = Guid.NewGuid().ToString("N")[..6].ToUpperInvariant();
+
+        await using NpgsqlConnection conn = new(_dbFixture.ConnectionString);
+        await conn.OpenAsync();
+        await using (NpgsqlCommand geoSeed = conn.CreateCommand())
+        {
+            geoSeed.CommandText = """
+                INSERT INTO identity.state (id, name, code) VALUES
+                    (@saId, @saName, @saCode),
+                    (@sbId, @sbName, @sbCode);
+                INSERT INTO identity.lga (id, state_id, name, code) VALUES
+                    (@laId, @saId, @laName, @laCode),
+                    (@lbId, @sbId, @lbName, @lbCode);
+                """;
+            geoSeed.Parameters.AddWithValue("saId", stateAlphaId);
+            geoSeed.Parameters.AddWithValue("saName", $"S9R Alpha {suffix}");
+            geoSeed.Parameters.AddWithValue("saCode", $"R{suffix[..3]}");
+            geoSeed.Parameters.AddWithValue("sbId", stateBetaId);
+            geoSeed.Parameters.AddWithValue("sbName", $"S9R Beta {suffix}");
+            geoSeed.Parameters.AddWithValue("sbCode", $"Q{suffix[..3]}");
+            geoSeed.Parameters.AddWithValue("laId", lgaAlphaId);
+            geoSeed.Parameters.AddWithValue("laName", $"LGA RAlpha {suffix}");
+            geoSeed.Parameters.AddWithValue("laCode", $"RA{suffix[..4]}");
+            geoSeed.Parameters.AddWithValue("lbId", lgaBetaId);
+            geoSeed.Parameters.AddWithValue("lbName", $"LGA RBeta {suffix}");
+            geoSeed.Parameters.AddWithValue("lbCode", $"RB{suffix[..4]}");
+            await geoSeed.ExecuteNonQueryAsync();
+        }
+
+        await GrantRoleAsync(conn, supportAlphaId, "CustomerSupportAgent", "region", stateAlphaId, adminId);
+        await GrantRoleAsync(conn, trustAlphaId, "IdentityTrustAdmin", "region", stateAlphaId, adminId);
+
+        string uniqueTail = RandomNumberGenerator.GetInt32(10000, 99999).ToString(System.Globalization.CultureInfo.InvariantCulture);
+        Guid farmerAlphaId = await RegisterVerifiedFarmerAsync(client, smsCapture, $"770951{uniqueTail}", $"+23480951{uniqueTail}", stateAlphaId, lgaAlphaId);
+        Guid farmerBetaId = await RegisterVerifiedFarmerAsync(client, smsCapture, $"770952{uniqueTail}", $"+23480952{uniqueTail}", stateBetaId, lgaBetaId);
+
+        Guid fobAlphaId;
+        using (HttpRequestMessage issueA = new(HttpMethod.Post, "/v1/fobs/issue"))
+        {
+            issueA.Headers.Authorization = new AuthenticationHeaderValue("Bearer", agent1Jwt);
+            issueA.Content = JsonContent.Create(new { identityId = farmerAlphaId, fobSerial = $"FOB-RA-{Guid.NewGuid():N}"[..20], agentSessionId = session1Id });
+            HttpResponseMessage resp = await client.SendAsync(issueA);
+            Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
+            using JsonDocument d = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+            fobAlphaId = d.RootElement.GetProperty("data").GetProperty("fobId").GetGuid();
+        }
+
+        Guid fobBetaId;
+        using (HttpRequestMessage issueB = new(HttpMethod.Post, "/v1/fobs/issue"))
+        {
+            issueB.Headers.Authorization = new AuthenticationHeaderValue("Bearer", agent1Jwt);
+            issueB.Content = JsonContent.Create(new { identityId = farmerBetaId, fobSerial = $"FOB-RB-{Guid.NewGuid():N}"[..20], agentSessionId = session1Id });
+            HttpResponseMessage resp = await client.SendAsync(issueB);
+            Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
+            using JsonDocument d = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+            fobBetaId = d.RootElement.GetProperty("data").GetProperty("fobId").GetGuid();
+        }
+
+        string caseRef = $"CASE-REG-{uniqueTail}";
+
+        // 1. CustomerSupportAgent (State Alpha): in-scope Alpha allowed (200/202); out-of-scope Beta denied (403 SCOPE_VIOLATION)
+        using (HttpRequestMessage alphaRead = new(HttpMethod.Get, $"/v1/admin/support/identities/{farmerAlphaId}"))
+        {
+            alphaRead.Headers.Authorization = new AuthenticationHeaderValue("Bearer", supportAlphaJwt);
+            alphaRead.Headers.Add("X-Support-Case-Ref", caseRef);
+            Assert.Equal(HttpStatusCode.OK, (await client.SendAsync(alphaRead)).StatusCode);
+        }
+
+        using (HttpRequestMessage betaRead = new(HttpMethod.Get, $"/v1/admin/support/identities/{farmerBetaId}"))
+        {
+            betaRead.Headers.Authorization = new AuthenticationHeaderValue("Bearer", supportAlphaJwt);
+            betaRead.Headers.Add("X-Support-Case-Ref", caseRef);
+            HttpResponseMessage resp = await client.SendAsync(betaRead);
+            Assert.Equal(HttpStatusCode.Forbidden, resp.StatusCode);
+            using JsonDocument d = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+            Assert.Equal("SCOPE_VIOLATION", d.RootElement.GetProperty("error").GetProperty("code").GetString());
+        }
+
+        using (HttpRequestMessage alphaEsc = new(HttpMethod.Post, $"/v1/admin/support/fobs/{fobAlphaId}/revoke-request"))
+        {
+            alphaEsc.Headers.Authorization = new AuthenticationHeaderValue("Bearer", supportAlphaJwt);
+            alphaEsc.Content = JsonContent.Create(new { supportCaseRef = caseRef, reason = "Lost NFC fob reported inside assigned State Alpha region." });
+            Assert.Equal(HttpStatusCode.Accepted, (await client.SendAsync(alphaEsc)).StatusCode);
+        }
+
+        using (HttpRequestMessage betaEsc = new(HttpMethod.Post, $"/v1/admin/support/fobs/{fobBetaId}/revoke-request"))
+        {
+            betaEsc.Headers.Authorization = new AuthenticationHeaderValue("Bearer", supportAlphaJwt);
+            betaEsc.Content = JsonContent.Create(new { supportCaseRef = caseRef, reason = "Attempting cross-region fob escalation outside State Alpha." });
+            HttpResponseMessage resp = await client.SendAsync(betaEsc);
+            Assert.Equal(HttpStatusCode.Forbidden, resp.StatusCode);
+            using JsonDocument d = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+            Assert.Equal("SCOPE_VIOLATION", d.RootElement.GetProperty("error").GetProperty("code").GetString());
+        }
+
+        // 2. IdentityTrustAdmin (State Alpha): out-of-scope Beta report-lost refused (403 SCOPE_VIOLATION); in-scope Alpha succeeds (200 OK)
+        using (HttpRequestMessage trustBetaRevoke = new(HttpMethod.Post, $"/v1/fobs/{fobBetaId}/report-lost"))
+        {
+            trustBetaRevoke.Headers.Authorization = new AuthenticationHeaderValue("Bearer", trustAlphaJwt);
+            trustBetaRevoke.Headers.Add("X-Support-Case-Ref", caseRef);
+            HttpResponseMessage resp = await client.SendAsync(trustBetaRevoke);
+            Assert.Equal(HttpStatusCode.Forbidden, resp.StatusCode);
+            using JsonDocument d = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+            Assert.Equal("SCOPE_VIOLATION", d.RootElement.GetProperty("error").GetProperty("code").GetString());
+        }
+
+        using (HttpRequestMessage trustAlphaRevoke = new(HttpMethod.Post, $"/v1/fobs/{fobAlphaId}/report-lost"))
+        {
+            trustAlphaRevoke.Headers.Authorization = new AuthenticationHeaderValue("Bearer", trustAlphaJwt);
+            trustAlphaRevoke.Headers.Add("X-Support-Case-Ref", caseRef);
+            HttpResponseMessage resp = await client.SendAsync(trustAlphaRevoke);
+            Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
+            using JsonDocument d = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+            Assert.Equal("revoked", d.RootElement.GetProperty("data").GetProperty("status").GetString());
+        }
+
+        // 3. PhoneChangeEndpoints: second agent attempting to confirm agent1's phone-change request receives 403 PERMISSION_DENIED
+        smsCapture.Clear();
+        string recoveredPhoneE164 = $"+23480958{uniqueTail}";
+        string recoveredPhoneLocal = $"080958{uniqueTail}";
+        Guid pcReqId;
+        using (HttpRequestMessage initPc = new(HttpMethod.Post, $"/v1/identities/{farmerAlphaId}/phone-change/initiate"))
+        {
+            initPc.Headers.Authorization = new AuthenticationHeaderValue("Bearer", agent1Jwt);
+            initPc.Headers.Add("X-Agent-Session-Id", session1Id.ToString());
+            initPc.Content = JsonContent.Create(new { newPhone = recoveredPhoneLocal });
+            HttpResponseMessage resp = await client.SendAsync(initPc);
+            Assert.Equal(HttpStatusCode.Created, resp.StatusCode);
+            using JsonDocument d = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+            pcReqId = d.RootElement.GetProperty("data").GetProperty("phoneChangeRequestId").GetGuid();
+        }
+
+        SmsSendRequest? pcSms = smsCapture.SentMessages.LastOrDefault(m => m.ToPhoneE164 == recoveredPhoneE164);
+        Assert.NotNull(pcSms);
+        Match pcMatch = OtpCodeRegex().Match(pcSms.Body);
+        Assert.True(pcMatch.Success);
+        string pcOtp = pcMatch.Groups[1].Value;
+
+        using (HttpRequestMessage otherAgentConfirm = new(HttpMethod.Post, $"/v1/identities/{farmerAlphaId}/phone-change/{pcReqId}/confirm"))
+        {
+            otherAgentConfirm.Headers.Authorization = new AuthenticationHeaderValue("Bearer", agent2Jwt);
+            otherAgentConfirm.Headers.Add("X-Agent-Session-Id", session2Id.ToString());
+            otherAgentConfirm.Content = JsonContent.Create(new { otp = pcOtp });
+            HttpResponseMessage resp = await client.SendAsync(otherAgentConfirm);
+            Assert.Equal(HttpStatusCode.Forbidden, resp.StatusCode);
+            using JsonDocument d = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+            Assert.Equal("PERMISSION_DENIED", d.RootElement.GetProperty("error").GetProperty("code").GetString());
+        }
+
+        using (HttpRequestMessage origAgentConfirm = new(HttpMethod.Post, $"/v1/identities/{farmerAlphaId}/phone-change/{pcReqId}/confirm"))
+        {
+            origAgentConfirm.Headers.Authorization = new AuthenticationHeaderValue("Bearer", agent1Jwt);
+            origAgentConfirm.Headers.Add("X-Agent-Session-Id", session1Id.ToString());
+            origAgentConfirm.Content = JsonContent.Create(new { otp = pcOtp });
+            HttpResponseMessage resp = await client.SendAsync(origAgentConfirm);
+            Assert.Equal(HttpStatusCode.OK, resp.StatusCode);
+            using JsonDocument d = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+            Assert.Equal("completed", d.RootElement.GetProperty("data").GetProperty("status").GetString());
+        }
+    }
+
     public void Dispose()
     {
         _rsa.Dispose();

@@ -72,4 +72,57 @@ internal static class AdminScopeResolver
             RegionIds: regions.ToArray(),
             OrganizationIds: organizations.ToArray());
     }
+
+    public static async Task<bool> IsIdentityInScopeAsync(
+        NpgsqlConnection conn,
+        NpgsqlTransaction? tx,
+        AdminPermissionScope scope,
+        Guid targetIdentityId,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(scope);
+        if (scope.HasGlobal)
+        {
+            return true;
+        }
+
+        bool hasRegions = scope.RegionIds.Count > 0;
+        bool hasOrgs = scope.OrganizationIds.Count > 0;
+        if (!hasRegions && !hasOrgs)
+        {
+            return false;
+        }
+
+        await using NpgsqlCommand cmd = conn.CreateCommand();
+        if (tx is not null)
+        {
+            cmd.Transaction = tx;
+        }
+
+        cmd.CommandText = """
+            SELECT EXISTS (
+                SELECT 1
+                FROM identity.identity i
+                LEFT JOIN identity.lga l ON l.id = i.lga_id
+                WHERE i.id = @targetIdentityId
+                  AND (
+                      (@hasRegions AND (i.state_id = ANY(@regionIds) OR i.lga_id = ANY(@regionIds) OR l.state_id = ANY(@regionIds)))
+                      OR (@hasOrgs AND EXISTS (
+                          SELECT 1
+                          FROM identity.role_profile rp
+                          WHERE rp.identity_id = i.id
+                            AND rp.linked_organization_id = ANY(@orgIds)
+                      ))
+                  )
+            );
+            """;
+        cmd.Parameters.AddWithValue("targetIdentityId", targetIdentityId);
+        cmd.Parameters.AddWithValue("hasRegions", hasRegions);
+        cmd.Parameters.AddWithValue("regionIds", scope.RegionIds.ToArray());
+        cmd.Parameters.AddWithValue("hasOrgs", hasOrgs);
+        cmd.Parameters.AddWithValue("orgIds", scope.OrganizationIds.ToArray());
+
+        object? scalar = await cmd.ExecuteScalarAsync(cancellationToken);
+        return scalar is bool inScope && inScope;
+    }
 }

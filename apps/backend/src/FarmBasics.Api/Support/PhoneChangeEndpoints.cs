@@ -268,13 +268,14 @@ internal static class PhoneChangeEndpoints
         string expectedOtpHash = string.Empty;
         DateTimeOffset expiresAt = default;
         string reqStatus = string.Empty;
+        Guid initiatedByAgentId = Guid.Empty;
         bool reqFound = false;
 
         await using (NpgsqlCommand reqCmd = conn.CreateCommand())
         {
             reqCmd.Transaction = tx;
             reqCmd.CommandText = """
-                SELECT old_phone, new_phone, otp_code_hash, otp_expires_at, status
+                SELECT old_phone, new_phone, otp_code_hash, otp_expires_at, status, initiated_by_agent_id
                 FROM identity.phone_change_request
                 WHERE id = @requestId
                   AND identity_id = @identityId
@@ -292,6 +293,7 @@ internal static class PhoneChangeEndpoints
                 expectedOtpHash = reader.GetString(2);
                 expiresAt = reader.GetFieldValue<DateTimeOffset>(3);
                 reqStatus = reader.GetString(4);
+                initiatedByAgentId = reader.GetGuid(5);
             }
         }
 
@@ -299,6 +301,16 @@ internal static class PhoneChangeEndpoints
         {
             await tx.RollbackAsync(cancellationToken);
             return SelfServiceRegistrationEndpoints.ErrorResult(httpContext, StatusCodes.Status404NotFound, "RESOURCE_NOT_FOUND", "Phone change request was not found.");
+        }
+
+        if (initiatedByAgentId != agentId)
+        {
+            await tx.RollbackAsync(cancellationToken);
+            return SelfServiceRegistrationEndpoints.ErrorResult(
+                httpContext,
+                StatusCodes.Status403Forbidden,
+                "PERMISSION_DENIED",
+                "Phone change confirmation must be completed by the initiating extension agent.");
         }
 
         if (!string.Equals(reqStatus, "pending_otp", StringComparison.Ordinal))
